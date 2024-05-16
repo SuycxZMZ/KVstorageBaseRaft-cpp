@@ -1,0 +1,371 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"childIndexes" : 
+					[
+						1,
+						9
+					],
+					"jsonFile" : "directory-.-Debug-f5ebdc15457944623624.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.22"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						3,
+						7
+					]
+				},
+				{
+					"build" : "src",
+					"childIndexes" : 
+					[
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+						8
+					],
+					"jsonFile" : "directory-src-Debug-b6cf2213fc5053b67c22.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.22"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "src"
+				},
+				{
+					"build" : "src/skipList",
+					"jsonFile" : "directory-src.skipList-Debug-68d4c534d62953f07f0b.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.22"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 0,
+					"source" : "src/skipList"
+				},
+				{
+					"build" : "src/common",
+					"jsonFile" : "directory-src.common-Debug-26ca1aee19599f655637.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.22"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 0,
+					"source" : "src/common"
+				},
+				{
+					"build" : "src/rpc",
+					"jsonFile" : "directory-src.rpc-Debug-7cfaa0b0de104e780152.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.22"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 0,
+					"source" : "src/rpc",
+					"targetIndexes" : 
+					[
+						6
+					]
+				},
+				{
+					"build" : "src/fiber",
+					"jsonFile" : "directory-src.fiber-Debug-3c4b72161ec08078e593.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.22"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 0,
+					"source" : "src/fiber",
+					"targetIndexes" : 
+					[
+						2
+					]
+				},
+				{
+					"build" : "src/raftRpcPro",
+					"jsonFile" : "directory-src.raftRpcPro-Debug-5fc728fe09eb46fce1ee.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.22"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 0,
+					"source" : "src/raftRpcPro"
+				},
+				{
+					"build" : "src/raftCore",
+					"jsonFile" : "directory-src.raftCore-Debug-5927ccbb43211cac09b5.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.22"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 0,
+					"source" : "src/raftCore"
+				},
+				{
+					"build" : "src/raftClerk",
+					"jsonFile" : "directory-src.raftClerk-Debug-b49e9cb2a637d2f05e12.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.22"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 0,
+					"source" : "src/raftClerk"
+				},
+				{
+					"build" : "example",
+					"childIndexes" : 
+					[
+						10,
+						11,
+						14
+					],
+					"jsonFile" : "directory-example-Debug-b6fca4a6d0a37c6ae6b9.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.22"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "example"
+				},
+				{
+					"build" : "example/fiberExample",
+					"jsonFile" : "directory-example.fiberExample-Debug-a6281b17ec2c54aada2a.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.22"
+					},
+					"parentIndex" : 9,
+					"projectIndex" : 0,
+					"source" : "example/fiberExample",
+					"targetIndexes" : 
+					[
+						8,
+						9,
+						10,
+						11
+					]
+				},
+				{
+					"build" : "example/rpcExample",
+					"childIndexes" : 
+					[
+						12,
+						13
+					],
+					"jsonFile" : "directory-example.rpcExample-Debug-cda0eaf41e38705f12c3.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.22"
+					},
+					"parentIndex" : 9,
+					"projectIndex" : 0,
+					"source" : "example/rpcExample"
+				},
+				{
+					"build" : "example/rpcExample/callee",
+					"jsonFile" : "directory-example.rpcExample.callee-Debug-9ba384afd6253f4b7fed.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.22"
+					},
+					"parentIndex" : 11,
+					"projectIndex" : 0,
+					"source" : "example/rpcExample/callee",
+					"targetIndexes" : 
+					[
+						4
+					]
+				},
+				{
+					"build" : "example/rpcExample/caller",
+					"jsonFile" : "directory-example.rpcExample.caller-Debug-5f939013c4d2415baa6f.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.22"
+					},
+					"parentIndex" : 11,
+					"projectIndex" : 0,
+					"source" : "example/rpcExample/caller",
+					"targetIndexes" : 
+					[
+						1
+					]
+				},
+				{
+					"build" : "example/raftCoreExample",
+					"jsonFile" : "directory-example.raftCoreExample-Debug-5759f8595df051970da5.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.22"
+					},
+					"parentIndex" : 9,
+					"projectIndex" : 0,
+					"source" : "example/raftCoreExample",
+					"targetIndexes" : 
+					[
+						0,
+						5
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+						8,
+						9,
+						10,
+						11,
+						12,
+						13,
+						14
+					],
+					"name" : "KVRaftCpp",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+						8,
+						9,
+						10,
+						11
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 14,
+					"id" : "callerMain::@8bc4f59cdd6e66b7d757",
+					"jsonFile" : "target-callerMain-Debug-2e49190d9c518d2af17e.json",
+					"name" : "callerMain",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 13,
+					"id" : "consumer::@d4aa7e61a26be3511dea",
+					"jsonFile" : "target-consumer-Debug-658eb60d000c7afafd92.json",
+					"name" : "consumer",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 5,
+					"id" : "fiber_lib::@d24e72df460051067778",
+					"jsonFile" : "target-fiber_lib-Debug-e790e30a43b2349889d2.json",
+					"name" : "fiber_lib",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "format::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-format-Debug-75a1c9376e0c54cfe656.json",
+					"name" : "format",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 12,
+					"id" : "provider::@4e1cffdfaa8884e613d1",
+					"jsonFile" : "target-provider-Debug-aa906a188b55019c9de6.json",
+					"name" : "provider",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 14,
+					"id" : "raftCoreRun::@8bc4f59cdd6e66b7d757",
+					"jsonFile" : "target-raftCoreRun-Debug-0d29579de865a9cd0785.json",
+					"name" : "raftCoreRun",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 4,
+					"id" : "rpc_lib::@c0b061266edb2b3621b8",
+					"jsonFile" : "target-rpc_lib-Debug-1a2d98bd14fc5b063a80.json",
+					"name" : "rpc_lib",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "skip_list_on_raft::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-skip_list_on_raft-Debug-9d2de48b51b5192132cb.json",
+					"name" : "skip_list_on_raft",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 10,
+					"id" : "test_hook::@064bc21e286d072af657",
+					"jsonFile" : "target-test_hook-Debug-eaa363406a137d269417.json",
+					"name" : "test_hook",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 10,
+					"id" : "test_iomanager::@064bc21e286d072af657",
+					"jsonFile" : "target-test_iomanager-Debug-f057efcaa87f9231851f.json",
+					"name" : "test_iomanager",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 10,
+					"id" : "test_scheduler::@064bc21e286d072af657",
+					"jsonFile" : "target-test_scheduler-Debug-b5ac4814763f699f517a.json",
+					"name" : "test_scheduler",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 10,
+					"id" : "test_server::@064bc21e286d072af657",
+					"jsonFile" : "target-test_server-Debug-eeb58dc3c7ca6b7a630e.json",
+					"name" : "test_server",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/home/suycx/Code/KVstorageBaseRaft-cpp/build",
+		"source" : "/home/suycx/Code/KVstorageBaseRaft-cpp"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 6
+	}
+}

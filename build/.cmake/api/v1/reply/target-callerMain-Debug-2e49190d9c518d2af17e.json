@@ -1,0 +1,282 @@
+{
+	"artifacts" : 
+	[
+		{
+			"path" : "/home/suycx/Code/KVstorageBaseRaft-cpp/bin/callerMain"
+		}
+	],
+	"backtrace" : 1,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_executable",
+			"link_directories",
+			"target_link_libraries",
+			"include_directories"
+		],
+		"files" : 
+		[
+			"example/raftCoreExample/CMakeLists.txt",
+			"CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 10,
+				"parent" : 0
+			},
+			{
+				"file" : 1
+			},
+			{
+				"command" : 1,
+				"file" : 1,
+				"line" : 32,
+				"parent" : 2
+			},
+			{
+				"command" : 2,
+				"file" : 0,
+				"line" : 11,
+				"parent" : 0
+			},
+			{
+				"command" : 2,
+				"file" : 1,
+				"line" : 40,
+				"parent" : 2
+			},
+			{
+				"command" : 3,
+				"file" : 1,
+				"line" : 21,
+				"parent" : 2
+			},
+			{
+				"command" : 3,
+				"file" : 1,
+				"line" : 22,
+				"parent" : 2
+			},
+			{
+				"command" : 3,
+				"file" : 1,
+				"line" : 23,
+				"parent" : 2
+			},
+			{
+				"command" : 3,
+				"file" : 1,
+				"line" : 24,
+				"parent" : 2
+			},
+			{
+				"command" : 3,
+				"file" : 1,
+				"line" : 25,
+				"parent" : 2
+			},
+			{
+				"command" : 3,
+				"file" : 1,
+				"line" : 26,
+				"parent" : 2
+			},
+			{
+				"command" : 3,
+				"file" : 1,
+				"line" : 27,
+				"parent" : 2
+			},
+			{
+				"command" : 3,
+				"file" : 1,
+				"line" : 28,
+				"parent" : 2
+			}
+		]
+	},
+	"compileGroups" : 
+	[
+		{
+			"compileCommandFragments" : 
+			[
+				{
+					"fragment" : "-g -std=gnu++20"
+				}
+			],
+			"includes" : 
+			[
+				{
+					"backtrace" : 6,
+					"path" : "/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include"
+				},
+				{
+					"backtrace" : 7,
+					"path" : "/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include"
+				},
+				{
+					"backtrace" : 8,
+					"path" : "/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include"
+				},
+				{
+					"backtrace" : 9,
+					"path" : "/home/suycx/Code/KVstorageBaseRaft-cpp/example"
+				},
+				{
+					"backtrace" : 10,
+					"path" : "/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include"
+				},
+				{
+					"backtrace" : 11,
+					"path" : "/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include"
+				},
+				{
+					"backtrace" : 12,
+					"path" : "/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include"
+				},
+				{
+					"backtrace" : 13,
+					"path" : "/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include"
+				}
+			],
+			"language" : "CXX",
+			"languageStandard" : 
+			{
+				"backtraces" : 
+				[
+					1
+				],
+				"standard" : "20"
+			},
+			"sourceIndexes" : 
+			[
+				0,
+				1,
+				2,
+				3
+			]
+		}
+	],
+	"dependencies" : 
+	[
+		{
+			"backtrace" : 4,
+			"id" : "skip_list_on_raft::@6890427a1f51a3e7e1df"
+		}
+	],
+	"id" : "callerMain::@8bc4f59cdd6e66b7d757",
+	"link" : 
+	{
+		"commandFragments" : 
+		[
+			{
+				"fragment" : "-g",
+				"role" : "flags"
+			},
+			{
+				"fragment" : "",
+				"role" : "flags"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "-L/home/suycx/Code/KVstorageBaseRaft-cpp/lib",
+				"role" : "libraryPath"
+			},
+			{
+				"fragment" : "-Wl,-rpath,/home/suycx/Code/KVstorageBaseRaft-cpp/lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 4,
+				"fragment" : "/home/suycx/Code/KVstorageBaseRaft-cpp/lib/libskip_list_on_raft.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 4,
+				"fragment" : "-lprotobuf",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 4,
+				"fragment" : "-lboost_serialization",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 5,
+				"fragment" : "-lmuduo_net",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 5,
+				"fragment" : "-lmuduo_base",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 5,
+				"fragment" : "-lpthread",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 5,
+				"fragment" : "-ldl",
+				"role" : "libraries"
+			}
+		],
+		"language" : "CXX"
+	},
+	"name" : "callerMain",
+	"nameOnDisk" : "callerMain",
+	"paths" : 
+	{
+		"build" : "example/raftCoreExample",
+		"source" : "example/raftCoreExample"
+	},
+	"sourceGroups" : 
+	[
+		{
+			"name" : "Source Files",
+			"sourceIndexes" : 
+			[
+				0,
+				1,
+				2,
+				3
+			]
+		}
+	],
+	"sources" : 
+	[
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "src/raftClerk/clerk.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "src/raftClerk/raftServerRpcUtil.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "example/raftCoreExample/caller.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "src/common/util.cpp",
+			"sourceGroupIndex" : 0
+		}
+	],
+	"type" : "EXECUTABLE"
+}

@@ -1,0 +1,1 @@
+/usr/bin/c++ -g CMakeFiles/test_hook.dir/test_hook.cpp.o -o /home/suycx/Code/KVstorageBaseRaft-cpp/bin/test_hook   -L/home/suycx/Code/KVstorageBaseRaft-cpp/lib  -Wl,-rpath,/home/suycx/Code/KVstorageBaseRaft-cpp/lib /home/suycx/Code/KVstorageBaseRaft-cpp/lib/libfiber_lib.a -lpthread -ldl -ldl 
