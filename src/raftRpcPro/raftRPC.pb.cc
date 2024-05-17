@@ -2,6 +2,7 @@
 // source: raftRPC.proto
 
 #include "raftRPC.pb.h"
+
 #include <algorithm>
 
 #include <google/protobuf/io/coded_stream.h>

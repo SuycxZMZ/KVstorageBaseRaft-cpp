@@ -680,6 +680,30 @@ src/rpc/mprpccontroller.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/skip_list_on_raft.dir/build.make CMakeFiles/skip_list_on_raft.dir/src/rpc/mprpccontroller.cpp.s
 .PHONY : src/rpc/mprpccontroller.cpp.s
 
+src/rpc/rpcheader.pb.o: src/rpc/rpcheader.pb.cc.o
+.PHONY : src/rpc/rpcheader.pb.o
+
+# target to build an object file
+src/rpc/rpcheader.pb.cc.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/skip_list_on_raft.dir/build.make CMakeFiles/skip_list_on_raft.dir/src/rpc/rpcheader.pb.cc.o
+.PHONY : src/rpc/rpcheader.pb.cc.o
+
+src/rpc/rpcheader.pb.i: src/rpc/rpcheader.pb.cc.i
+.PHONY : src/rpc/rpcheader.pb.i
+
+# target to preprocess a source file
+src/rpc/rpcheader.pb.cc.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/skip_list_on_raft.dir/build.make CMakeFiles/skip_list_on_raft.dir/src/rpc/rpcheader.pb.cc.i
+.PHONY : src/rpc/rpcheader.pb.cc.i
+
+src/rpc/rpcheader.pb.s: src/rpc/rpcheader.pb.cc.s
+.PHONY : src/rpc/rpcheader.pb.s
+
+# target to generate assembly for a file
+src/rpc/rpcheader.pb.cc.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/skip_list_on_raft.dir/build.make CMakeFiles/skip_list_on_raft.dir/src/rpc/rpcheader.pb.cc.s
+.PHONY : src/rpc/rpcheader.pb.cc.s
+
 src/rpc/rpcheader.pb.o: src/rpc/rpcheader.pb.cpp.o
 .PHONY : src/rpc/rpcheader.pb.o
 
@@ -799,6 +823,9 @@ help:
 	@echo "... src/rpc/mprpccontroller.o"
 	@echo "... src/rpc/mprpccontroller.i"
 	@echo "... src/rpc/mprpccontroller.s"
+	@echo "... src/rpc/rpcheader.pb.o"
+	@echo "... src/rpc/rpcheader.pb.i"
+	@echo "... src/rpc/rpcheader.pb.s"
 	@echo "... src/rpc/rpcheader.pb.o"
 	@echo "... src/rpc/rpcheader.pb.i"
 	@echo "... src/rpc/rpcheader.pb.s"

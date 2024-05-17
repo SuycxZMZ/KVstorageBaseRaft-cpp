@@ -384,5 +384,5 @@ src_raftCore:INTERNAL=/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/Persis
 //Description of the variable
 src_raftRpcPro:INTERNAL=/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/kvServerRPC.pb.cc;/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/raftRPC.pb.cc
 //Description of the variable
-src_rpc:INTERNAL=/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/mprpcchannel.cpp;/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/mprpcconfig.cpp;/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/mprpccontroller.cpp;/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/rpcheader.pb.cpp;/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/rpcprovider.cpp
+src_rpc:INTERNAL=/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/mprpcchannel.cpp;/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/mprpcconfig.cpp;/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/mprpccontroller.cpp;/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/rpcheader.pb.cc;/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/rpcheader.pb.cpp;/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/rpcprovider.cpp
 

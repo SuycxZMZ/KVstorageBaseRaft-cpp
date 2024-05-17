@@ -332,12 +332,12 @@ src/skipList/clean:
 CMakeFiles/skip_list_on_raft.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/skip_list_on_raft.dir/build.make CMakeFiles/skip_list_on_raft.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/skip_list_on_raft.dir/build.make CMakeFiles/skip_list_on_raft.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles --progress-num=30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49 "Built target skip_list_on_raft"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles --progress-num=31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51 "Built target skip_list_on_raft"
 .PHONY : CMakeFiles/skip_list_on_raft.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/skip_list_on_raft.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles 20
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles 21
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/skip_list_on_raft.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles 0
 .PHONY : CMakeFiles/skip_list_on_raft.dir/rule
@@ -384,12 +384,12 @@ CMakeFiles/format.dir/clean:
 src/rpc/CMakeFiles/rpc_lib.dir/all:
 	$(MAKE) $(MAKESILENT) -f src/rpc/CMakeFiles/rpc_lib.dir/build.make src/rpc/CMakeFiles/rpc_lib.dir/depend
 	$(MAKE) $(MAKESILENT) -f src/rpc/CMakeFiles/rpc_lib.dir/build.make src/rpc/CMakeFiles/rpc_lib.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles --progress-num=23,24,25,26,27,28,29 "Built target rpc_lib"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles --progress-num=23,24,25,26,27,28,29,30 "Built target rpc_lib"
 .PHONY : src/rpc/CMakeFiles/rpc_lib.dir/all
 
 # Build rule for subdir invocation for target.
 src/rpc/CMakeFiles/rpc_lib.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles 7
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles 8
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/rpc/CMakeFiles/rpc_lib.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles 0
 .PHONY : src/rpc/CMakeFiles/rpc_lib.dir/rule
@@ -436,7 +436,7 @@ src/fiber/CMakeFiles/fiber_lib.dir/clean:
 example/fiberExample/CMakeFiles/test_server.dir/all: src/fiber/CMakeFiles/fiber_lib.dir/all
 	$(MAKE) $(MAKESILENT) -f example/fiberExample/CMakeFiles/test_server.dir/build.make example/fiberExample/CMakeFiles/test_server.dir/depend
 	$(MAKE) $(MAKESILENT) -f example/fiberExample/CMakeFiles/test_server.dir/build.make example/fiberExample/CMakeFiles/test_server.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles --progress-num=56,57 "Built target test_server"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles --progress-num=58,59 "Built target test_server"
 .PHONY : example/fiberExample/CMakeFiles/test_server.dir/all
 
 # Build rule for subdir invocation for target.
@@ -462,7 +462,7 @@ example/fiberExample/CMakeFiles/test_server.dir/clean:
 example/fiberExample/CMakeFiles/test_scheduler.dir/all: src/fiber/CMakeFiles/fiber_lib.dir/all
 	$(MAKE) $(MAKESILENT) -f example/fiberExample/CMakeFiles/test_scheduler.dir/build.make example/fiberExample/CMakeFiles/test_scheduler.dir/depend
 	$(MAKE) $(MAKESILENT) -f example/fiberExample/CMakeFiles/test_scheduler.dir/build.make example/fiberExample/CMakeFiles/test_scheduler.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles --progress-num=54,55 "Built target test_scheduler"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles --progress-num=56,57 "Built target test_scheduler"
 .PHONY : example/fiberExample/CMakeFiles/test_scheduler.dir/all
 
 # Build rule for subdir invocation for target.
@@ -488,7 +488,7 @@ example/fiberExample/CMakeFiles/test_scheduler.dir/clean:
 example/fiberExample/CMakeFiles/test_iomanager.dir/all: src/fiber/CMakeFiles/fiber_lib.dir/all
 	$(MAKE) $(MAKESILENT) -f example/fiberExample/CMakeFiles/test_iomanager.dir/build.make example/fiberExample/CMakeFiles/test_iomanager.dir/depend
 	$(MAKE) $(MAKESILENT) -f example/fiberExample/CMakeFiles/test_iomanager.dir/build.make example/fiberExample/CMakeFiles/test_iomanager.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles --progress-num=52,53 "Built target test_iomanager"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles --progress-num=54,55 "Built target test_iomanager"
 .PHONY : example/fiberExample/CMakeFiles/test_iomanager.dir/all
 
 # Build rule for subdir invocation for target.
@@ -514,7 +514,7 @@ example/fiberExample/CMakeFiles/test_iomanager.dir/clean:
 example/fiberExample/CMakeFiles/test_hook.dir/all: src/fiber/CMakeFiles/fiber_lib.dir/all
 	$(MAKE) $(MAKESILENT) -f example/fiberExample/CMakeFiles/test_hook.dir/build.make example/fiberExample/CMakeFiles/test_hook.dir/depend
 	$(MAKE) $(MAKESILENT) -f example/fiberExample/CMakeFiles/test_hook.dir/build.make example/fiberExample/CMakeFiles/test_hook.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles --progress-num=50,51 "Built target test_hook"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles --progress-num=52,53 "Built target test_hook"
 .PHONY : example/fiberExample/CMakeFiles/test_hook.dir/all
 
 # Build rule for subdir invocation for target.
@@ -545,7 +545,7 @@ example/rpcExample/callee/CMakeFiles/provider.dir/all: src/rpc/CMakeFiles/rpc_li
 
 # Build rule for subdir invocation for target.
 example/rpcExample/callee/CMakeFiles/provider.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles 10
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles 11
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 example/rpcExample/callee/CMakeFiles/provider.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles 0
 .PHONY : example/rpcExample/callee/CMakeFiles/provider.dir/rule
@@ -571,7 +571,7 @@ example/rpcExample/caller/CMakeFiles/consumer.dir/all: src/rpc/CMakeFiles/rpc_li
 
 # Build rule for subdir invocation for target.
 example/rpcExample/caller/CMakeFiles/consumer.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles 10
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles 11
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 example/rpcExample/caller/CMakeFiles/consumer.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles 0
 .PHONY : example/rpcExample/caller/CMakeFiles/consumer.dir/rule
@@ -598,7 +598,7 @@ example/raftCoreExample/CMakeFiles/raftCoreRun.dir/all: src/rpc/CMakeFiles/rpc_l
 
 # Build rule for subdir invocation for target.
 example/raftCoreExample/CMakeFiles/raftCoreRun.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles 29
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles 31
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 example/raftCoreExample/CMakeFiles/raftCoreRun.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles 0
 .PHONY : example/raftCoreExample/CMakeFiles/raftCoreRun.dir/rule
@@ -624,7 +624,7 @@ example/raftCoreExample/CMakeFiles/callerMain.dir/all: CMakeFiles/skip_list_on_r
 
 # Build rule for subdir invocation for target.
 example/raftCoreExample/CMakeFiles/callerMain.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles 25
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles 26
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 example/raftCoreExample/CMakeFiles/callerMain.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles 0
 .PHONY : example/raftCoreExample/CMakeFiles/callerMain.dir/rule

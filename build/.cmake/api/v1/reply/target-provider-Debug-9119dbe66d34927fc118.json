@@ -2,7 +2,7 @@
 	"artifacts" : 
 	[
 		{
-			"path" : "/home/suycx/Code/KVstorageBaseRaft-cpp/bin/callerMain"
+			"path" : "/home/suycx/Code/KVstorageBaseRaft-cpp/bin/provider"
 		}
 	],
 	"backtrace" : 1,
@@ -17,8 +17,9 @@
 		],
 		"files" : 
 		[
-			"example/raftCoreExample/CMakeLists.txt",
-			"CMakeLists.txt"
+			"example/rpcExample/callee/CMakeLists.txt",
+			"CMakeLists.txt",
+			"src/rpc/CMakeLists.txt"
 		],
 		"nodes" : 
 		[
@@ -28,7 +29,7 @@
 			{
 				"command" : 0,
 				"file" : 0,
-				"line" : 10,
+				"line" : 5,
 				"parent" : 0
 			},
 			{
@@ -37,19 +38,40 @@
 			{
 				"command" : 1,
 				"file" : 1,
-				"line" : 32,
+				"line" : 29,
 				"parent" : 2
 			},
 			{
 				"command" : 2,
 				"file" : 0,
-				"line" : 11,
+				"line" : 6,
 				"parent" : 0
 			},
 			{
+				"file" : 2
+			},
+			{
 				"command" : 2,
+				"file" : 2,
+				"line" : 9,
+				"parent" : 5
+			},
+			{
+				"command" : 3,
 				"file" : 1,
-				"line" : 40,
+				"line" : 18,
+				"parent" : 2
+			},
+			{
+				"command" : 3,
+				"file" : 1,
+				"line" : 19,
+				"parent" : 2
+			},
+			{
+				"command" : 3,
+				"file" : 1,
+				"line" : 20,
 				"parent" : 2
 			},
 			{
@@ -81,24 +103,6 @@
 				"file" : 1,
 				"line" : 25,
 				"parent" : 2
-			},
-			{
-				"command" : 3,
-				"file" : 1,
-				"line" : 26,
-				"parent" : 2
-			},
-			{
-				"command" : 3,
-				"file" : 1,
-				"line" : 27,
-				"parent" : 2
-			},
-			{
-				"command" : 3,
-				"file" : 1,
-				"line" : 28,
-				"parent" : 2
 			}
 		]
 	},
@@ -114,35 +118,35 @@
 			"includes" : 
 			[
 				{
-					"backtrace" : 6,
+					"backtrace" : 7,
 					"path" : "/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include"
 				},
 				{
-					"backtrace" : 7,
+					"backtrace" : 8,
 					"path" : "/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include"
 				},
 				{
-					"backtrace" : 8,
+					"backtrace" : 9,
 					"path" : "/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include"
 				},
 				{
-					"backtrace" : 9,
+					"backtrace" : 10,
 					"path" : "/home/suycx/Code/KVstorageBaseRaft-cpp/example"
 				},
 				{
-					"backtrace" : 10,
+					"backtrace" : 11,
 					"path" : "/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include"
 				},
 				{
-					"backtrace" : 11,
+					"backtrace" : 12,
 					"path" : "/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include"
 				},
 				{
-					"backtrace" : 12,
+					"backtrace" : 13,
 					"path" : "/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include"
 				},
 				{
-					"backtrace" : 13,
+					"backtrace" : 14,
 					"path" : "/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include"
 				}
 			],
@@ -158,9 +162,7 @@
 			"sourceIndexes" : 
 			[
 				0,
-				1,
-				2,
-				3
+				1
 			]
 		}
 	],
@@ -168,10 +170,10 @@
 	[
 		{
 			"backtrace" : 4,
-			"id" : "skip_list_on_raft::@6890427a1f51a3e7e1df"
+			"id" : "rpc_lib::@c0b061266edb2b3621b8"
 		}
 	],
-	"id" : "callerMain::@8bc4f59cdd6e66b7d757",
+	"id" : "provider::@4e1cffdfaa8884e613d1",
 	"link" : 
 	{
 		"commandFragments" : 
@@ -195,7 +197,7 @@
 			},
 			{
 				"backtrace" : 4,
-				"fragment" : "/home/suycx/Code/KVstorageBaseRaft-cpp/lib/libskip_list_on_raft.a",
+				"fragment" : "/home/suycx/Code/KVstorageBaseRaft-cpp/lib/librpc_lib.a",
 				"role" : "libraries"
 			},
 			{
@@ -205,38 +207,33 @@
 			},
 			{
 				"backtrace" : 4,
-				"fragment" : "-lboost_serialization",
-				"role" : "libraries"
-			},
-			{
-				"backtrace" : 5,
 				"fragment" : "-lmuduo_net",
 				"role" : "libraries"
 			},
 			{
-				"backtrace" : 5,
+				"backtrace" : 4,
 				"fragment" : "-lmuduo_base",
 				"role" : "libraries"
 			},
 			{
-				"backtrace" : 5,
+				"backtrace" : 4,
 				"fragment" : "-lpthread",
 				"role" : "libraries"
 			},
 			{
-				"backtrace" : 5,
-				"fragment" : "-ldl",
+				"backtrace" : 6,
+				"fragment" : "-lboost_serialization",
 				"role" : "libraries"
 			}
 		],
 		"language" : "CXX"
 	},
-	"name" : "callerMain",
-	"nameOnDisk" : "callerMain",
+	"name" : "provider",
+	"nameOnDisk" : "provider",
 	"paths" : 
 	{
-		"build" : "example/raftCoreExample",
-		"source" : "example/raftCoreExample"
+		"build" : "example/rpcExample/callee",
+		"source" : "example/rpcExample/callee"
 	},
 	"sourceGroups" : 
 	[
@@ -245,9 +242,7 @@
 			"sourceIndexes" : 
 			[
 				0,
-				1,
-				2,
-				3
+				1
 			]
 		}
 	],
@@ -256,25 +251,13 @@
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "src/raftClerk/clerk.cpp",
+			"path" : "example/rpcExample/callee/friendService.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "src/raftClerk/raftServerRpcUtil.cpp",
-			"sourceGroupIndex" : 0
-		},
-		{
-			"backtrace" : 1,
-			"compileGroupIndex" : 0,
-			"path" : "example/raftCoreExample/caller.cpp",
-			"sourceGroupIndex" : 0
-		},
-		{
-			"backtrace" : 1,
-			"compileGroupIndex" : 0,
-			"path" : "src/common/util.cpp",
+			"path" : "example/rpcExample/friend.pb.cc",
 			"sourceGroupIndex" : 0
 		}
 	],

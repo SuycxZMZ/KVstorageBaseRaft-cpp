@@ -111,10 +111,24 @@ src/rpc/CMakeFiles/rpc_lib.dir/mprpccontroller.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/rpc_lib.dir/mprpccontroller.cpp.s"
 	cd /home/suycx/Code/KVstorageBaseRaft-cpp/build/src/rpc && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/mprpccontroller.cpp -o CMakeFiles/rpc_lib.dir/mprpccontroller.cpp.s
 
+src/rpc/CMakeFiles/rpc_lib.dir/rpcheader.pb.cc.o: src/rpc/CMakeFiles/rpc_lib.dir/flags.make
+src/rpc/CMakeFiles/rpc_lib.dir/rpcheader.pb.cc.o: /home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/rpcheader.pb.cc
+src/rpc/CMakeFiles/rpc_lib.dir/rpcheader.pb.cc.o: src/rpc/CMakeFiles/rpc_lib.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object src/rpc/CMakeFiles/rpc_lib.dir/rpcheader.pb.cc.o"
+	cd /home/suycx/Code/KVstorageBaseRaft-cpp/build/src/rpc && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/rpc/CMakeFiles/rpc_lib.dir/rpcheader.pb.cc.o -MF CMakeFiles/rpc_lib.dir/rpcheader.pb.cc.o.d -o CMakeFiles/rpc_lib.dir/rpcheader.pb.cc.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/rpcheader.pb.cc
+
+src/rpc/CMakeFiles/rpc_lib.dir/rpcheader.pb.cc.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/rpc_lib.dir/rpcheader.pb.cc.i"
+	cd /home/suycx/Code/KVstorageBaseRaft-cpp/build/src/rpc && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/rpcheader.pb.cc > CMakeFiles/rpc_lib.dir/rpcheader.pb.cc.i
+
+src/rpc/CMakeFiles/rpc_lib.dir/rpcheader.pb.cc.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/rpc_lib.dir/rpcheader.pb.cc.s"
+	cd /home/suycx/Code/KVstorageBaseRaft-cpp/build/src/rpc && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/rpcheader.pb.cc -o CMakeFiles/rpc_lib.dir/rpcheader.pb.cc.s
+
 src/rpc/CMakeFiles/rpc_lib.dir/rpcheader.pb.cpp.o: src/rpc/CMakeFiles/rpc_lib.dir/flags.make
 src/rpc/CMakeFiles/rpc_lib.dir/rpcheader.pb.cpp.o: /home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/rpcheader.pb.cpp
 src/rpc/CMakeFiles/rpc_lib.dir/rpcheader.pb.cpp.o: src/rpc/CMakeFiles/rpc_lib.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object src/rpc/CMakeFiles/rpc_lib.dir/rpcheader.pb.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object src/rpc/CMakeFiles/rpc_lib.dir/rpcheader.pb.cpp.o"
 	cd /home/suycx/Code/KVstorageBaseRaft-cpp/build/src/rpc && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/rpc/CMakeFiles/rpc_lib.dir/rpcheader.pb.cpp.o -MF CMakeFiles/rpc_lib.dir/rpcheader.pb.cpp.o.d -o CMakeFiles/rpc_lib.dir/rpcheader.pb.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/rpcheader.pb.cpp
 
 src/rpc/CMakeFiles/rpc_lib.dir/rpcheader.pb.cpp.i: cmake_force
@@ -128,7 +142,7 @@ src/rpc/CMakeFiles/rpc_lib.dir/rpcheader.pb.cpp.s: cmake_force
 src/rpc/CMakeFiles/rpc_lib.dir/rpcprovider.cpp.o: src/rpc/CMakeFiles/rpc_lib.dir/flags.make
 src/rpc/CMakeFiles/rpc_lib.dir/rpcprovider.cpp.o: /home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/rpcprovider.cpp
 src/rpc/CMakeFiles/rpc_lib.dir/rpcprovider.cpp.o: src/rpc/CMakeFiles/rpc_lib.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object src/rpc/CMakeFiles/rpc_lib.dir/rpcprovider.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object src/rpc/CMakeFiles/rpc_lib.dir/rpcprovider.cpp.o"
 	cd /home/suycx/Code/KVstorageBaseRaft-cpp/build/src/rpc && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/rpc/CMakeFiles/rpc_lib.dir/rpcprovider.cpp.o -MF CMakeFiles/rpc_lib.dir/rpcprovider.cpp.o.d -o CMakeFiles/rpc_lib.dir/rpcprovider.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/rpcprovider.cpp
 
 src/rpc/CMakeFiles/rpc_lib.dir/rpcprovider.cpp.i: cmake_force
@@ -142,7 +156,7 @@ src/rpc/CMakeFiles/rpc_lib.dir/rpcprovider.cpp.s: cmake_force
 src/rpc/CMakeFiles/rpc_lib.dir/__/common/util.cpp.o: src/rpc/CMakeFiles/rpc_lib.dir/flags.make
 src/rpc/CMakeFiles/rpc_lib.dir/__/common/util.cpp.o: /home/suycx/Code/KVstorageBaseRaft-cpp/src/common/util.cpp
 src/rpc/CMakeFiles/rpc_lib.dir/__/common/util.cpp.o: src/rpc/CMakeFiles/rpc_lib.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object src/rpc/CMakeFiles/rpc_lib.dir/__/common/util.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object src/rpc/CMakeFiles/rpc_lib.dir/__/common/util.cpp.o"
 	cd /home/suycx/Code/KVstorageBaseRaft-cpp/build/src/rpc && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/rpc/CMakeFiles/rpc_lib.dir/__/common/util.cpp.o -MF CMakeFiles/rpc_lib.dir/__/common/util.cpp.o.d -o CMakeFiles/rpc_lib.dir/__/common/util.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/common/util.cpp
 
 src/rpc/CMakeFiles/rpc_lib.dir/__/common/util.cpp.i: cmake_force
@@ -158,6 +172,7 @@ rpc_lib_OBJECTS = \
 "CMakeFiles/rpc_lib.dir/mprpcchannel.cpp.o" \
 "CMakeFiles/rpc_lib.dir/mprpcconfig.cpp.o" \
 "CMakeFiles/rpc_lib.dir/mprpccontroller.cpp.o" \
+"CMakeFiles/rpc_lib.dir/rpcheader.pb.cc.o" \
 "CMakeFiles/rpc_lib.dir/rpcheader.pb.cpp.o" \
 "CMakeFiles/rpc_lib.dir/rpcprovider.cpp.o" \
 "CMakeFiles/rpc_lib.dir/__/common/util.cpp.o"
@@ -168,12 +183,13 @@ rpc_lib_EXTERNAL_OBJECTS =
 /home/suycx/Code/KVstorageBaseRaft-cpp/lib/librpc_lib.a: src/rpc/CMakeFiles/rpc_lib.dir/mprpcchannel.cpp.o
 /home/suycx/Code/KVstorageBaseRaft-cpp/lib/librpc_lib.a: src/rpc/CMakeFiles/rpc_lib.dir/mprpcconfig.cpp.o
 /home/suycx/Code/KVstorageBaseRaft-cpp/lib/librpc_lib.a: src/rpc/CMakeFiles/rpc_lib.dir/mprpccontroller.cpp.o
+/home/suycx/Code/KVstorageBaseRaft-cpp/lib/librpc_lib.a: src/rpc/CMakeFiles/rpc_lib.dir/rpcheader.pb.cc.o
 /home/suycx/Code/KVstorageBaseRaft-cpp/lib/librpc_lib.a: src/rpc/CMakeFiles/rpc_lib.dir/rpcheader.pb.cpp.o
 /home/suycx/Code/KVstorageBaseRaft-cpp/lib/librpc_lib.a: src/rpc/CMakeFiles/rpc_lib.dir/rpcprovider.cpp.o
 /home/suycx/Code/KVstorageBaseRaft-cpp/lib/librpc_lib.a: src/rpc/CMakeFiles/rpc_lib.dir/__/common/util.cpp.o
 /home/suycx/Code/KVstorageBaseRaft-cpp/lib/librpc_lib.a: src/rpc/CMakeFiles/rpc_lib.dir/build.make
 /home/suycx/Code/KVstorageBaseRaft-cpp/lib/librpc_lib.a: src/rpc/CMakeFiles/rpc_lib.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Linking CXX static library /home/suycx/Code/KVstorageBaseRaft-cpp/lib/librpc_lib.a"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Linking CXX static library /home/suycx/Code/KVstorageBaseRaft-cpp/lib/librpc_lib.a"
 	cd /home/suycx/Code/KVstorageBaseRaft-cpp/build/src/rpc && $(CMAKE_COMMAND) -P CMakeFiles/rpc_lib.dir/cmake_clean_target.cmake
 	cd /home/suycx/Code/KVstorageBaseRaft-cpp/build/src/rpc && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/rpc_lib.dir/link.txt --verbose=$(VERBOSE)
 

@@ -2,11 +2,6 @@
 cmake_minimum_required(VERSION 3.22)
 project(KVRaftCpp)
 
-
-
-
-
-
 set(CMAKE_CXX_STANDARD 20)
 # 生成debug版本，可以进行gdb调试
 set(CMAKE_BUILD_TYPE "Debug")
@@ -18,6 +13,8 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
 # 设置项目编译头文件搜索路径 -I
 # 目前可能存在路径污染的问题，需要进一步解决
+# include_directories(/usr/include/google/protobuf)
+
 include_directories(${PROJECT_SOURCE_DIR}/src/common/include)
 include_directories(${PROJECT_SOURCE_DIR}/src/fiber/include)
 include_directories(${PROJECT_SOURCE_DIR}/src/rpc/include)

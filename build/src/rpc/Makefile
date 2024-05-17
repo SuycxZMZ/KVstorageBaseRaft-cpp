@@ -226,6 +226,30 @@ mprpccontroller.cpp.s:
 	cd /home/suycx/Code/KVstorageBaseRaft-cpp/build && $(MAKE) $(MAKESILENT) -f src/rpc/CMakeFiles/rpc_lib.dir/build.make src/rpc/CMakeFiles/rpc_lib.dir/mprpccontroller.cpp.s
 .PHONY : mprpccontroller.cpp.s
 
+rpcheader.pb.o: rpcheader.pb.cc.o
+.PHONY : rpcheader.pb.o
+
+# target to build an object file
+rpcheader.pb.cc.o:
+	cd /home/suycx/Code/KVstorageBaseRaft-cpp/build && $(MAKE) $(MAKESILENT) -f src/rpc/CMakeFiles/rpc_lib.dir/build.make src/rpc/CMakeFiles/rpc_lib.dir/rpcheader.pb.cc.o
+.PHONY : rpcheader.pb.cc.o
+
+rpcheader.pb.i: rpcheader.pb.cc.i
+.PHONY : rpcheader.pb.i
+
+# target to preprocess a source file
+rpcheader.pb.cc.i:
+	cd /home/suycx/Code/KVstorageBaseRaft-cpp/build && $(MAKE) $(MAKESILENT) -f src/rpc/CMakeFiles/rpc_lib.dir/build.make src/rpc/CMakeFiles/rpc_lib.dir/rpcheader.pb.cc.i
+.PHONY : rpcheader.pb.cc.i
+
+rpcheader.pb.s: rpcheader.pb.cc.s
+.PHONY : rpcheader.pb.s
+
+# target to generate assembly for a file
+rpcheader.pb.cc.s:
+	cd /home/suycx/Code/KVstorageBaseRaft-cpp/build && $(MAKE) $(MAKESILENT) -f src/rpc/CMakeFiles/rpc_lib.dir/build.make src/rpc/CMakeFiles/rpc_lib.dir/rpcheader.pb.cc.s
+.PHONY : rpcheader.pb.cc.s
+
 rpcheader.pb.o: rpcheader.pb.cpp.o
 .PHONY : rpcheader.pb.o
 
@@ -295,6 +319,9 @@ help:
 	@echo "... mprpccontroller.o"
 	@echo "... mprpccontroller.i"
 	@echo "... mprpccontroller.s"
+	@echo "... rpcheader.pb.o"
+	@echo "... rpcheader.pb.i"
+	@echo "... rpcheader.pb.s"
 	@echo "... rpcheader.pb.o"
 	@echo "... rpcheader.pb.i"
 	@echo "... rpcheader.pb.s"

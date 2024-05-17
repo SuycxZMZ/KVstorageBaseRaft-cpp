@@ -35,6 +35,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/skip_list_on_raft.dir/src/rpc/mprpcconfig.cpp.o.d"
   "CMakeFiles/skip_list_on_raft.dir/src/rpc/mprpccontroller.cpp.o"
   "CMakeFiles/skip_list_on_raft.dir/src/rpc/mprpccontroller.cpp.o.d"
+  "CMakeFiles/skip_list_on_raft.dir/src/rpc/rpcheader.pb.cc.o"
+  "CMakeFiles/skip_list_on_raft.dir/src/rpc/rpcheader.pb.cc.o.d"
   "CMakeFiles/skip_list_on_raft.dir/src/rpc/rpcheader.pb.cpp.o"
   "CMakeFiles/skip_list_on_raft.dir/src/rpc/rpcheader.pb.cpp.o.d"
   "CMakeFiles/skip_list_on_raft.dir/src/rpc/rpcprovider.cpp.o"

@@ -111,10 +111,24 @@ CMakeFiles/skip_list_on_raft.dir/src/rpc/mprpccontroller.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/skip_list_on_raft.dir/src/rpc/mprpccontroller.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/mprpccontroller.cpp -o CMakeFiles/skip_list_on_raft.dir/src/rpc/mprpccontroller.cpp.s
 
+CMakeFiles/skip_list_on_raft.dir/src/rpc/rpcheader.pb.cc.o: CMakeFiles/skip_list_on_raft.dir/flags.make
+CMakeFiles/skip_list_on_raft.dir/src/rpc/rpcheader.pb.cc.o: /home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/rpcheader.pb.cc
+CMakeFiles/skip_list_on_raft.dir/src/rpc/rpcheader.pb.cc.o: CMakeFiles/skip_list_on_raft.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/skip_list_on_raft.dir/src/rpc/rpcheader.pb.cc.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/skip_list_on_raft.dir/src/rpc/rpcheader.pb.cc.o -MF CMakeFiles/skip_list_on_raft.dir/src/rpc/rpcheader.pb.cc.o.d -o CMakeFiles/skip_list_on_raft.dir/src/rpc/rpcheader.pb.cc.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/rpcheader.pb.cc
+
+CMakeFiles/skip_list_on_raft.dir/src/rpc/rpcheader.pb.cc.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/skip_list_on_raft.dir/src/rpc/rpcheader.pb.cc.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/rpcheader.pb.cc > CMakeFiles/skip_list_on_raft.dir/src/rpc/rpcheader.pb.cc.i
+
+CMakeFiles/skip_list_on_raft.dir/src/rpc/rpcheader.pb.cc.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/skip_list_on_raft.dir/src/rpc/rpcheader.pb.cc.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/rpcheader.pb.cc -o CMakeFiles/skip_list_on_raft.dir/src/rpc/rpcheader.pb.cc.s
+
 CMakeFiles/skip_list_on_raft.dir/src/rpc/rpcheader.pb.cpp.o: CMakeFiles/skip_list_on_raft.dir/flags.make
 CMakeFiles/skip_list_on_raft.dir/src/rpc/rpcheader.pb.cpp.o: /home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/rpcheader.pb.cpp
 CMakeFiles/skip_list_on_raft.dir/src/rpc/rpcheader.pb.cpp.o: CMakeFiles/skip_list_on_raft.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/skip_list_on_raft.dir/src/rpc/rpcheader.pb.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/skip_list_on_raft.dir/src/rpc/rpcheader.pb.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/skip_list_on_raft.dir/src/rpc/rpcheader.pb.cpp.o -MF CMakeFiles/skip_list_on_raft.dir/src/rpc/rpcheader.pb.cpp.o.d -o CMakeFiles/skip_list_on_raft.dir/src/rpc/rpcheader.pb.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/rpcheader.pb.cpp
 
 CMakeFiles/skip_list_on_raft.dir/src/rpc/rpcheader.pb.cpp.i: cmake_force
@@ -128,7 +142,7 @@ CMakeFiles/skip_list_on_raft.dir/src/rpc/rpcheader.pb.cpp.s: cmake_force
 CMakeFiles/skip_list_on_raft.dir/src/rpc/rpcprovider.cpp.o: CMakeFiles/skip_list_on_raft.dir/flags.make
 CMakeFiles/skip_list_on_raft.dir/src/rpc/rpcprovider.cpp.o: /home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/rpcprovider.cpp
 CMakeFiles/skip_list_on_raft.dir/src/rpc/rpcprovider.cpp.o: CMakeFiles/skip_list_on_raft.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/skip_list_on_raft.dir/src/rpc/rpcprovider.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/skip_list_on_raft.dir/src/rpc/rpcprovider.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/skip_list_on_raft.dir/src/rpc/rpcprovider.cpp.o -MF CMakeFiles/skip_list_on_raft.dir/src/rpc/rpcprovider.cpp.o.d -o CMakeFiles/skip_list_on_raft.dir/src/rpc/rpcprovider.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/rpcprovider.cpp
 
 CMakeFiles/skip_list_on_raft.dir/src/rpc/rpcprovider.cpp.i: cmake_force
@@ -142,7 +156,7 @@ CMakeFiles/skip_list_on_raft.dir/src/rpc/rpcprovider.cpp.s: cmake_force
 CMakeFiles/skip_list_on_raft.dir/src/fiber/fd_manager.cpp.o: CMakeFiles/skip_list_on_raft.dir/flags.make
 CMakeFiles/skip_list_on_raft.dir/src/fiber/fd_manager.cpp.o: /home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/fd_manager.cpp
 CMakeFiles/skip_list_on_raft.dir/src/fiber/fd_manager.cpp.o: CMakeFiles/skip_list_on_raft.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/skip_list_on_raft.dir/src/fiber/fd_manager.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/skip_list_on_raft.dir/src/fiber/fd_manager.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/skip_list_on_raft.dir/src/fiber/fd_manager.cpp.o -MF CMakeFiles/skip_list_on_raft.dir/src/fiber/fd_manager.cpp.o.d -o CMakeFiles/skip_list_on_raft.dir/src/fiber/fd_manager.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/fd_manager.cpp
 
 CMakeFiles/skip_list_on_raft.dir/src/fiber/fd_manager.cpp.i: cmake_force
@@ -156,7 +170,7 @@ CMakeFiles/skip_list_on_raft.dir/src/fiber/fd_manager.cpp.s: cmake_force
 CMakeFiles/skip_list_on_raft.dir/src/fiber/fiber.cpp.o: CMakeFiles/skip_list_on_raft.dir/flags.make
 CMakeFiles/skip_list_on_raft.dir/src/fiber/fiber.cpp.o: /home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/fiber.cpp
 CMakeFiles/skip_list_on_raft.dir/src/fiber/fiber.cpp.o: CMakeFiles/skip_list_on_raft.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/skip_list_on_raft.dir/src/fiber/fiber.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/skip_list_on_raft.dir/src/fiber/fiber.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/skip_list_on_raft.dir/src/fiber/fiber.cpp.o -MF CMakeFiles/skip_list_on_raft.dir/src/fiber/fiber.cpp.o.d -o CMakeFiles/skip_list_on_raft.dir/src/fiber/fiber.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/fiber.cpp
 
 CMakeFiles/skip_list_on_raft.dir/src/fiber/fiber.cpp.i: cmake_force
@@ -170,7 +184,7 @@ CMakeFiles/skip_list_on_raft.dir/src/fiber/fiber.cpp.s: cmake_force
 CMakeFiles/skip_list_on_raft.dir/src/fiber/hook.cpp.o: CMakeFiles/skip_list_on_raft.dir/flags.make
 CMakeFiles/skip_list_on_raft.dir/src/fiber/hook.cpp.o: /home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/hook.cpp
 CMakeFiles/skip_list_on_raft.dir/src/fiber/hook.cpp.o: CMakeFiles/skip_list_on_raft.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/skip_list_on_raft.dir/src/fiber/hook.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/skip_list_on_raft.dir/src/fiber/hook.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/skip_list_on_raft.dir/src/fiber/hook.cpp.o -MF CMakeFiles/skip_list_on_raft.dir/src/fiber/hook.cpp.o.d -o CMakeFiles/skip_list_on_raft.dir/src/fiber/hook.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/hook.cpp
 
 CMakeFiles/skip_list_on_raft.dir/src/fiber/hook.cpp.i: cmake_force
@@ -184,7 +198,7 @@ CMakeFiles/skip_list_on_raft.dir/src/fiber/hook.cpp.s: cmake_force
 CMakeFiles/skip_list_on_raft.dir/src/fiber/iomanager.cpp.o: CMakeFiles/skip_list_on_raft.dir/flags.make
 CMakeFiles/skip_list_on_raft.dir/src/fiber/iomanager.cpp.o: /home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/iomanager.cpp
 CMakeFiles/skip_list_on_raft.dir/src/fiber/iomanager.cpp.o: CMakeFiles/skip_list_on_raft.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/skip_list_on_raft.dir/src/fiber/iomanager.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/skip_list_on_raft.dir/src/fiber/iomanager.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/skip_list_on_raft.dir/src/fiber/iomanager.cpp.o -MF CMakeFiles/skip_list_on_raft.dir/src/fiber/iomanager.cpp.o.d -o CMakeFiles/skip_list_on_raft.dir/src/fiber/iomanager.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/iomanager.cpp
 
 CMakeFiles/skip_list_on_raft.dir/src/fiber/iomanager.cpp.i: cmake_force
@@ -198,7 +212,7 @@ CMakeFiles/skip_list_on_raft.dir/src/fiber/iomanager.cpp.s: cmake_force
 CMakeFiles/skip_list_on_raft.dir/src/fiber/scheduler.cpp.o: CMakeFiles/skip_list_on_raft.dir/flags.make
 CMakeFiles/skip_list_on_raft.dir/src/fiber/scheduler.cpp.o: /home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/scheduler.cpp
 CMakeFiles/skip_list_on_raft.dir/src/fiber/scheduler.cpp.o: CMakeFiles/skip_list_on_raft.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/skip_list_on_raft.dir/src/fiber/scheduler.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object CMakeFiles/skip_list_on_raft.dir/src/fiber/scheduler.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/skip_list_on_raft.dir/src/fiber/scheduler.cpp.o -MF CMakeFiles/skip_list_on_raft.dir/src/fiber/scheduler.cpp.o.d -o CMakeFiles/skip_list_on_raft.dir/src/fiber/scheduler.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/scheduler.cpp
 
 CMakeFiles/skip_list_on_raft.dir/src/fiber/scheduler.cpp.i: cmake_force
@@ -212,7 +226,7 @@ CMakeFiles/skip_list_on_raft.dir/src/fiber/scheduler.cpp.s: cmake_force
 CMakeFiles/skip_list_on_raft.dir/src/fiber/thread.cpp.o: CMakeFiles/skip_list_on_raft.dir/flags.make
 CMakeFiles/skip_list_on_raft.dir/src/fiber/thread.cpp.o: /home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/thread.cpp
 CMakeFiles/skip_list_on_raft.dir/src/fiber/thread.cpp.o: CMakeFiles/skip_list_on_raft.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object CMakeFiles/skip_list_on_raft.dir/src/fiber/thread.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object CMakeFiles/skip_list_on_raft.dir/src/fiber/thread.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/skip_list_on_raft.dir/src/fiber/thread.cpp.o -MF CMakeFiles/skip_list_on_raft.dir/src/fiber/thread.cpp.o.d -o CMakeFiles/skip_list_on_raft.dir/src/fiber/thread.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/thread.cpp
 
 CMakeFiles/skip_list_on_raft.dir/src/fiber/thread.cpp.i: cmake_force
@@ -226,7 +240,7 @@ CMakeFiles/skip_list_on_raft.dir/src/fiber/thread.cpp.s: cmake_force
 CMakeFiles/skip_list_on_raft.dir/src/fiber/timer.cpp.o: CMakeFiles/skip_list_on_raft.dir/flags.make
 CMakeFiles/skip_list_on_raft.dir/src/fiber/timer.cpp.o: /home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/timer.cpp
 CMakeFiles/skip_list_on_raft.dir/src/fiber/timer.cpp.o: CMakeFiles/skip_list_on_raft.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object CMakeFiles/skip_list_on_raft.dir/src/fiber/timer.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building CXX object CMakeFiles/skip_list_on_raft.dir/src/fiber/timer.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/skip_list_on_raft.dir/src/fiber/timer.cpp.o -MF CMakeFiles/skip_list_on_raft.dir/src/fiber/timer.cpp.o.d -o CMakeFiles/skip_list_on_raft.dir/src/fiber/timer.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/timer.cpp
 
 CMakeFiles/skip_list_on_raft.dir/src/fiber/timer.cpp.i: cmake_force
@@ -240,7 +254,7 @@ CMakeFiles/skip_list_on_raft.dir/src/fiber/timer.cpp.s: cmake_force
 CMakeFiles/skip_list_on_raft.dir/src/fiber/utils.cpp.o: CMakeFiles/skip_list_on_raft.dir/flags.make
 CMakeFiles/skip_list_on_raft.dir/src/fiber/utils.cpp.o: /home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/utils.cpp
 CMakeFiles/skip_list_on_raft.dir/src/fiber/utils.cpp.o: CMakeFiles/skip_list_on_raft.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building CXX object CMakeFiles/skip_list_on_raft.dir/src/fiber/utils.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Building CXX object CMakeFiles/skip_list_on_raft.dir/src/fiber/utils.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/skip_list_on_raft.dir/src/fiber/utils.cpp.o -MF CMakeFiles/skip_list_on_raft.dir/src/fiber/utils.cpp.o.d -o CMakeFiles/skip_list_on_raft.dir/src/fiber/utils.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/utils.cpp
 
 CMakeFiles/skip_list_on_raft.dir/src/fiber/utils.cpp.i: cmake_force
@@ -254,7 +268,7 @@ CMakeFiles/skip_list_on_raft.dir/src/fiber/utils.cpp.s: cmake_force
 CMakeFiles/skip_list_on_raft.dir/src/raftCore/Persister.cpp.o: CMakeFiles/skip_list_on_raft.dir/flags.make
 CMakeFiles/skip_list_on_raft.dir/src/raftCore/Persister.cpp.o: /home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/Persister.cpp
 CMakeFiles/skip_list_on_raft.dir/src/raftCore/Persister.cpp.o: CMakeFiles/skip_list_on_raft.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Building CXX object CMakeFiles/skip_list_on_raft.dir/src/raftCore/Persister.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Building CXX object CMakeFiles/skip_list_on_raft.dir/src/raftCore/Persister.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/skip_list_on_raft.dir/src/raftCore/Persister.cpp.o -MF CMakeFiles/skip_list_on_raft.dir/src/raftCore/Persister.cpp.o.d -o CMakeFiles/skip_list_on_raft.dir/src/raftCore/Persister.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/Persister.cpp
 
 CMakeFiles/skip_list_on_raft.dir/src/raftCore/Persister.cpp.i: cmake_force
@@ -268,7 +282,7 @@ CMakeFiles/skip_list_on_raft.dir/src/raftCore/Persister.cpp.s: cmake_force
 CMakeFiles/skip_list_on_raft.dir/src/raftCore/kvServer.cpp.o: CMakeFiles/skip_list_on_raft.dir/flags.make
 CMakeFiles/skip_list_on_raft.dir/src/raftCore/kvServer.cpp.o: /home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/kvServer.cpp
 CMakeFiles/skip_list_on_raft.dir/src/raftCore/kvServer.cpp.o: CMakeFiles/skip_list_on_raft.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Building CXX object CMakeFiles/skip_list_on_raft.dir/src/raftCore/kvServer.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_16) "Building CXX object CMakeFiles/skip_list_on_raft.dir/src/raftCore/kvServer.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/skip_list_on_raft.dir/src/raftCore/kvServer.cpp.o -MF CMakeFiles/skip_list_on_raft.dir/src/raftCore/kvServer.cpp.o.d -o CMakeFiles/skip_list_on_raft.dir/src/raftCore/kvServer.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/kvServer.cpp
 
 CMakeFiles/skip_list_on_raft.dir/src/raftCore/kvServer.cpp.i: cmake_force
@@ -282,7 +296,7 @@ CMakeFiles/skip_list_on_raft.dir/src/raftCore/kvServer.cpp.s: cmake_force
 CMakeFiles/skip_list_on_raft.dir/src/raftCore/raft.cpp.o: CMakeFiles/skip_list_on_raft.dir/flags.make
 CMakeFiles/skip_list_on_raft.dir/src/raftCore/raft.cpp.o: /home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/raft.cpp
 CMakeFiles/skip_list_on_raft.dir/src/raftCore/raft.cpp.o: CMakeFiles/skip_list_on_raft.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_16) "Building CXX object CMakeFiles/skip_list_on_raft.dir/src/raftCore/raft.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_17) "Building CXX object CMakeFiles/skip_list_on_raft.dir/src/raftCore/raft.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/skip_list_on_raft.dir/src/raftCore/raft.cpp.o -MF CMakeFiles/skip_list_on_raft.dir/src/raftCore/raft.cpp.o.d -o CMakeFiles/skip_list_on_raft.dir/src/raftCore/raft.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/raft.cpp
 
 CMakeFiles/skip_list_on_raft.dir/src/raftCore/raft.cpp.i: cmake_force
@@ -296,7 +310,7 @@ CMakeFiles/skip_list_on_raft.dir/src/raftCore/raft.cpp.s: cmake_force
 CMakeFiles/skip_list_on_raft.dir/src/raftCore/raftRpcUtil.cpp.o: CMakeFiles/skip_list_on_raft.dir/flags.make
 CMakeFiles/skip_list_on_raft.dir/src/raftCore/raftRpcUtil.cpp.o: /home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/raftRpcUtil.cpp
 CMakeFiles/skip_list_on_raft.dir/src/raftCore/raftRpcUtil.cpp.o: CMakeFiles/skip_list_on_raft.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_17) "Building CXX object CMakeFiles/skip_list_on_raft.dir/src/raftCore/raftRpcUtil.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_18) "Building CXX object CMakeFiles/skip_list_on_raft.dir/src/raftCore/raftRpcUtil.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/skip_list_on_raft.dir/src/raftCore/raftRpcUtil.cpp.o -MF CMakeFiles/skip_list_on_raft.dir/src/raftCore/raftRpcUtil.cpp.o.d -o CMakeFiles/skip_list_on_raft.dir/src/raftCore/raftRpcUtil.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/raftRpcUtil.cpp
 
 CMakeFiles/skip_list_on_raft.dir/src/raftCore/raftRpcUtil.cpp.i: cmake_force
@@ -310,7 +324,7 @@ CMakeFiles/skip_list_on_raft.dir/src/raftCore/raftRpcUtil.cpp.s: cmake_force
 CMakeFiles/skip_list_on_raft.dir/src/raftRpcPro/kvServerRPC.pb.cc.o: CMakeFiles/skip_list_on_raft.dir/flags.make
 CMakeFiles/skip_list_on_raft.dir/src/raftRpcPro/kvServerRPC.pb.cc.o: /home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/kvServerRPC.pb.cc
 CMakeFiles/skip_list_on_raft.dir/src/raftRpcPro/kvServerRPC.pb.cc.o: CMakeFiles/skip_list_on_raft.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_18) "Building CXX object CMakeFiles/skip_list_on_raft.dir/src/raftRpcPro/kvServerRPC.pb.cc.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_19) "Building CXX object CMakeFiles/skip_list_on_raft.dir/src/raftRpcPro/kvServerRPC.pb.cc.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/skip_list_on_raft.dir/src/raftRpcPro/kvServerRPC.pb.cc.o -MF CMakeFiles/skip_list_on_raft.dir/src/raftRpcPro/kvServerRPC.pb.cc.o.d -o CMakeFiles/skip_list_on_raft.dir/src/raftRpcPro/kvServerRPC.pb.cc.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/kvServerRPC.pb.cc
 
 CMakeFiles/skip_list_on_raft.dir/src/raftRpcPro/kvServerRPC.pb.cc.i: cmake_force
@@ -324,7 +338,7 @@ CMakeFiles/skip_list_on_raft.dir/src/raftRpcPro/kvServerRPC.pb.cc.s: cmake_force
 CMakeFiles/skip_list_on_raft.dir/src/raftRpcPro/raftRPC.pb.cc.o: CMakeFiles/skip_list_on_raft.dir/flags.make
 CMakeFiles/skip_list_on_raft.dir/src/raftRpcPro/raftRPC.pb.cc.o: /home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/raftRPC.pb.cc
 CMakeFiles/skip_list_on_raft.dir/src/raftRpcPro/raftRPC.pb.cc.o: CMakeFiles/skip_list_on_raft.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_19) "Building CXX object CMakeFiles/skip_list_on_raft.dir/src/raftRpcPro/raftRPC.pb.cc.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_20) "Building CXX object CMakeFiles/skip_list_on_raft.dir/src/raftRpcPro/raftRPC.pb.cc.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/skip_list_on_raft.dir/src/raftRpcPro/raftRPC.pb.cc.o -MF CMakeFiles/skip_list_on_raft.dir/src/raftRpcPro/raftRPC.pb.cc.o.d -o CMakeFiles/skip_list_on_raft.dir/src/raftRpcPro/raftRPC.pb.cc.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/raftRPC.pb.cc
 
 CMakeFiles/skip_list_on_raft.dir/src/raftRpcPro/raftRPC.pb.cc.i: cmake_force
@@ -340,6 +354,7 @@ skip_list_on_raft_OBJECTS = \
 "CMakeFiles/skip_list_on_raft.dir/src/rpc/mprpcchannel.cpp.o" \
 "CMakeFiles/skip_list_on_raft.dir/src/rpc/mprpcconfig.cpp.o" \
 "CMakeFiles/skip_list_on_raft.dir/src/rpc/mprpccontroller.cpp.o" \
+"CMakeFiles/skip_list_on_raft.dir/src/rpc/rpcheader.pb.cc.o" \
 "CMakeFiles/skip_list_on_raft.dir/src/rpc/rpcheader.pb.cpp.o" \
 "CMakeFiles/skip_list_on_raft.dir/src/rpc/rpcprovider.cpp.o" \
 "CMakeFiles/skip_list_on_raft.dir/src/fiber/fd_manager.cpp.o" \
@@ -363,6 +378,7 @@ skip_list_on_raft_EXTERNAL_OBJECTS =
 /home/suycx/Code/KVstorageBaseRaft-cpp/lib/libskip_list_on_raft.a: CMakeFiles/skip_list_on_raft.dir/src/rpc/mprpcchannel.cpp.o
 /home/suycx/Code/KVstorageBaseRaft-cpp/lib/libskip_list_on_raft.a: CMakeFiles/skip_list_on_raft.dir/src/rpc/mprpcconfig.cpp.o
 /home/suycx/Code/KVstorageBaseRaft-cpp/lib/libskip_list_on_raft.a: CMakeFiles/skip_list_on_raft.dir/src/rpc/mprpccontroller.cpp.o
+/home/suycx/Code/KVstorageBaseRaft-cpp/lib/libskip_list_on_raft.a: CMakeFiles/skip_list_on_raft.dir/src/rpc/rpcheader.pb.cc.o
 /home/suycx/Code/KVstorageBaseRaft-cpp/lib/libskip_list_on_raft.a: CMakeFiles/skip_list_on_raft.dir/src/rpc/rpcheader.pb.cpp.o
 /home/suycx/Code/KVstorageBaseRaft-cpp/lib/libskip_list_on_raft.a: CMakeFiles/skip_list_on_raft.dir/src/rpc/rpcprovider.cpp.o
 /home/suycx/Code/KVstorageBaseRaft-cpp/lib/libskip_list_on_raft.a: CMakeFiles/skip_list_on_raft.dir/src/fiber/fd_manager.cpp.o
@@ -381,7 +397,7 @@ skip_list_on_raft_EXTERNAL_OBJECTS =
 /home/suycx/Code/KVstorageBaseRaft-cpp/lib/libskip_list_on_raft.a: CMakeFiles/skip_list_on_raft.dir/src/raftRpcPro/raftRPC.pb.cc.o
 /home/suycx/Code/KVstorageBaseRaft-cpp/lib/libskip_list_on_raft.a: CMakeFiles/skip_list_on_raft.dir/build.make
 /home/suycx/Code/KVstorageBaseRaft-cpp/lib/libskip_list_on_raft.a: CMakeFiles/skip_list_on_raft.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_20) "Linking CXX static library /home/suycx/Code/KVstorageBaseRaft-cpp/lib/libskip_list_on_raft.a"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_21) "Linking CXX static library /home/suycx/Code/KVstorageBaseRaft-cpp/lib/libskip_list_on_raft.a"
 	$(CMAKE_COMMAND) -P CMakeFiles/skip_list_on_raft.dir/cmake_clean_target.cmake
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/skip_list_on_raft.dir/link.txt --verbose=$(VERBOSE)
 
