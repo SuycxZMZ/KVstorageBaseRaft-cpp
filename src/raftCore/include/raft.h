@@ -32,7 +32,7 @@ constexpr int Expire = 2;  // 投票（消息、竞选者）过期
 constexpr int Normal = 3;
 
 class Raft : public raftRpcProctoc::raftRpc {
-   private:
+private:
     std::mutex m_mtx;
 
     // 需要与其他raft节点通信，这里保存与其他结点通信的rpc入口
@@ -52,11 +52,12 @@ class Raft : public raftRpcProctoc::raftRpc {
     std::vector<raftRpcProctoc::LogEntry> m_logs;  //// 日志条目数组，包含了状态机要执行的指令集，以及收到领导时的任期号
                                                    // 这两个状态所有结点都在维护，易失
     int m_commitIndex;
-    int m_lastApplied;  // 已经汇报给状态机（上层应用）的log 的index
+
+    // 已经汇报给状态机（上层应用）的log 的index
+    int m_lastApplied;  
 
     // 这两个状态是由服务器来维护，易失
-    std::vector<int>
-        m_nextIndex;  // 这两个状态的下标1开始，因为通常commitIndex和lastApplied从0开始，应该是一个无效的index，因此下标从1开始
+    std::vector<int> m_nextIndex;  // 这两个状态的下标1开始，因为通常commitIndex和lastApplied从0开始，应该是一个无效的index，因此下标从1开始
     std::vector<int> m_matchIndex;
     enum Status { Follower, Candidate, Leader };
     // 身份
@@ -66,7 +67,6 @@ class Raft : public raftRpcProctoc::raftRpc {
     // ApplyMsgQueue chan ApplyMsg // raft内部使用的chan，applyChan是用于和服务层交互，最后好像没用上
 
     // 选举超时
-
     std::chrono::_V2::system_clock::time_point m_lastResetElectionTime;
     // 心跳超时，用于leader
     std::chrono::_V2::system_clock::time_point m_lastResetHearBeatTime;
@@ -79,49 +79,118 @@ class Raft : public raftRpcProctoc::raftRpc {
     // 协程
     std::unique_ptr<monsoon::IOManager> m_ioManager = nullptr;
 
-   public:
+public:
+
+    /**
+     * @brief 日志同步 + 心跳 rpc ，重点关注
+    */
     void AppendEntries1(const raftRpcProctoc::AppendEntriesArgs *args, raftRpcProctoc::AppendEntriesReply *reply);
+
+    /**
+     * @brief 定期向状态机写入日志，非重点函数
+    */
     void applierTicker();
+
+    /**
+     * @brief 快照相关，非重点
+    */
     bool CondInstallSnapshot(int lastIncludedTerm, int lastIncludedIndex, std::string snapshot);
+
+    /**
+     * @brief 发起选举
+    */
     void doElection();
+
     /**
      * @brief 发起心跳，只有leader才需要发起心跳
+     *        每隔一段时间检查睡眠时间内有没有重置定时器，没有则说明超时了
+     *        如果有则设置合适睡眠时间：睡眠到重置时间+超时时间
      */
     void doHeartBeat();
-    // 每隔一段时间检查睡眠时间内有没有重置定时器，没有则说明超时了
-    // 如果有则设置合适睡眠时间：睡眠到重置时间+超时时间
+
+    /**
+     * @brief 监控是否该发起选举了
+    */
     void electionTimeOutTicker();
+
+
     std::vector<ApplyMsg> getApplyLogs();
     int getNewCommandIndex();
     void getPrevLogInfo(int server, int *preIndex, int *preTerm);
+
+    /**
+     * @brief 看当前节点是否是leader
+    */
     void GetState(int *term, bool *isLeader);
     void InstallSnapshot(const raftRpcProctoc::InstallSnapshotRequest *args,
                          raftRpcProctoc::InstallSnapshotResponse *reply);
+
+    /**
+     * @brief 检查是否需要发起心跳（leader）
+    */
     void leaderHearBeatTicker();
     void leaderSendSnapShot(int server);
+
+    /**
+     * @brief leader更新commitIndex
+    */
     void leaderUpdateCommitIndex();
+
+    /**
+     * @brief 对应Index的日志是否匹配，只需要Index和Term就可以知道是否匹配
+    */
     bool matchLog(int logIndex, int logTerm);
+
+    /**
+     * @brief 持久化
+    */
     void persist();
+
+    /**
+     * @brief 变成candidate之后需要让其他结点给自己投票
+    */
     void RequestVote(const raftRpcProctoc::RequestVoteArgs *args, raftRpcProctoc::RequestVoteReply *reply);
+
+    /**
+     * @brief 判断当前节点是否含有最新的日志
+    */
     bool UpToDate(int index, int term);
     int getLastLogIndex();
     int getLastLogTerm();
     void getLastLogIndexAndTerm(int *lastLogIndex, int *lastLogTerm);
     int getLogTermFromLogIndex(int logIndex);
     int GetRaftStateSize();
+
+    /**
+     * @brief 设计快照之后logIndex不能与再日志中的数组下标相等了，根据logIndex找到其在日志数组中的位置
+    */
     int getSlicesIndexFromLogIndex(int logIndex);
 
+    /**
+     * @brief 请求其他结点的投票
+    */
     bool sendRequestVote(int server, std::shared_ptr<raftRpcProctoc::RequestVoteArgs> args,
                          std::shared_ptr<raftRpcProctoc::RequestVoteReply> reply, std::shared_ptr<int> votedNum);
+    
+    /**
+     * @brief Leader发送心跳后，对心跳的回复进行对应的处理
+    */
     bool sendAppendEntries(int server, std::shared_ptr<raftRpcProctoc::AppendEntriesArgs> args,
                            std::shared_ptr<raftRpcProctoc::AppendEntriesReply> reply, std::shared_ptr<int> appendNums);
 
-    // rf.applyChan <- msg //不拿锁执行  可以单独创建一个线程执行，但是为了同意使用std:thread
+    // rf.applyChan <- msg //不拿锁执行  可以单独创建一个线程执行，但是为了统一使用std:thread
     // ，避免使用pthread_create，因此专门写一个函数来执行
+
+    /**
+     * @brief 给上层的kvserver层发送消息
+    */
     void pushMsgToKvServer(ApplyMsg msg);
     void readPersist(std::string data);
     std::string persistData();
 
+    /**
+     * @brief 发布发来一个新日志
+    */
     void Start(Op command, int *newLogIndex, int *newLogTerm, bool *isLeader);
 
     // Snapshot the service says it has created a snapshot that has
@@ -133,31 +202,53 @@ class Raft : public raftRpcProctoc::raftRpc {
     // 即服务层主动发起请求raft保存snapshot里面的数据，index是用来表示snapshot快照执行到了哪条命令
     void Snapshot(int index, std::string snapshot);
 
-   public:
-    // 重写基类方法,因为rpc远程调用真正调用的是这个方法
-    // 序列化，反序列化等操作rpc框架都已经做完了，因此这里只需要获取值然后真正调用本地方法即可。
+public:
+    /**
+     * @brief 重写基类方法,因为rpc远程调用真正调用的是这个方法
+     *        序列化，反序列化等操作rpc框架都已经做完了，因此这里只需要获取值然后真正调用本地方法即可。
+    */
     void AppendEntries(google::protobuf::RpcController *controller, const ::raftRpcProctoc::AppendEntriesArgs *request,
                        ::raftRpcProctoc::AppendEntriesReply *response, ::google::protobuf::Closure *done) override;
+    
+    /**
+     * @brief 重写基类方法,因为rpc远程调用真正调用的是这个方法
+     *        序列化，反序列化等操作rpc框架都已经做完了，因此这里只需要获取值然后真正调用本地方法即可。
+    */
     void InstallSnapshot(google::protobuf::RpcController *controller,
                          const ::raftRpcProctoc::InstallSnapshotRequest *request,
                          ::raftRpcProctoc::InstallSnapshotResponse *response,
                          ::google::protobuf::Closure *done) override;
+
+    /**
+     * @brief 重写基类方法,因为rpc远程调用真正调用的是这个方法
+     *        序列化，反序列化等操作rpc框架都已经做完了，因此这里只需要获取值然后真正调用本地方法即可。
+    */
     void RequestVote(google::protobuf::RpcController *controller, const ::raftRpcProctoc::RequestVoteArgs *request,
                      ::raftRpcProctoc::RequestVoteReply *response, ::google::protobuf::Closure *done) override;
 
-   public:
+public:
+
+    /**
+     * @brief 初始化
+    */
     void init(std::vector<std::shared_ptr<RaftRpcUtil>> peers, int me, std::shared_ptr<Persister> persister,
               std::shared_ptr<LockQueue<ApplyMsg>> applyCh);
 
-   private:
-    // for persist
+private:
+    // 
 
+    /**
+     * @brief for persist
+    */
     class BoostPersistRaftNode {
-       public:
+    public:
         friend class boost::serialization::access;
-        // When the class Archive corresponds to an output archive, the
-        // & operator is defined similar to <<.  Likewise, when the class Archive
-        // is a type of input archive the & operator is defined similar to >>.
+
+        /**
+         * @brief When the class Archive corresponds to an output archive, the
+         *        & operator is defined similar to <<.  Likewise, when the class Archive
+         *        is a type of input archive the & operator is defined similar to >>.
+        */
         template <class Archive>
         void serialize(Archive &ar, const unsigned int version) {
             ar & m_currentTerm;
@@ -173,7 +264,7 @@ class Raft : public raftRpcProctoc::raftRpc {
         std::vector<std::string> m_logs;
         std::unordered_map<std::string, int> umap;
 
-       public:
+    public:
     };
 };
 
