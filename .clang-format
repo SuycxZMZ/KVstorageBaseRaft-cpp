@@ -1,3 +1,4 @@
+# find . -iname '*.h' -o -iname '*.cpp' -o -iname '*.hpp' -o -iname '*.cc' | xargs clang-format -i
 Language:        Cpp
 # BasedOnStyle:  Google
 AccessModifierOffset: -1

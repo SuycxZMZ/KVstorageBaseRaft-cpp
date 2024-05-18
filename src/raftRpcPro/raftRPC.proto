@@ -31,10 +31,10 @@ message AppendEntriesReply {
 }
 
 message RequestVoteArgs  {
-	int32 Term         =1;
-	int32 CandidateId  =2;
-	int32 LastLogIndex =3;
-	int32 LastLogTerm  =4;
+	int32 Term         =1; // candidate的term
+	int32 CandidateId  =2; // candidate的id
+	int32 LastLogIndex =3; // candidate的最后一个log的index
+	int32 LastLogTerm  =4; // candidate的最后一个log的term
 }
 
 // RequestVoteReply
@@ -42,9 +42,9 @@ message RequestVoteArgs  {
 // field names must start with capital letters!
 message RequestVoteReply  {
 	// Your data here (2A).
-	int32 Term        =1;
-	bool VoteGranted  =2;
-	int32 VoteState   =3;
+	int32 Term        =1; // follower的term
+	bool VoteGranted  =2; // 是否投票
+	int32 VoteState   =3; // 用来标识节点（网络）状态
 }
 
 
