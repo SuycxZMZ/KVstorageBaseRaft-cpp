@@ -208,27 +208,39 @@ bool Raft::CondInstallSnapshot(int lastIncludedTerm, int lastIncludedIndex, std:
     // return true
 }
 
+/**
+ * @brief 实际发起选举，构造需要发送的rpc，并多线程调用sendRequestVote处理rpc及其相应。
+*/
 void Raft::doElection() {
+
+    // 下面的操作都在锁内完成
     std::lock_guard<std::mutex> g(m_mtx);
 
     if (m_status == Leader) {
-        // fmt.Printf("[       ticker-func-rf(%v)              ] is a Leader,wait the  lock\n", rf.me)
     }
-    // fmt.Printf("[       ticker-func-rf(%v)              ] get the  lock\n", rf.me)
 
     if (m_status != Leader) {
         DPrintf("[       ticker-func-rf(%d)              ]  选举定时器到期且不是leader，开始选举 \n", m_me);
-        // 当选举的时候定时器超时就必须重新选举，不然没有选票就会一直卡主
+        // 当选举的时候定时器超时就必须重新选举，不然没有选票就会一直卡住
         // 重竞选超时，term也会增加的
         m_status = Candidate;
+
         /// 开始新一轮的选举
         m_currentTerm += 1;
-        m_votedFor = m_me;  // 即是自己给自己投，也避免candidate给同辈的candidate投
+
+        // 即是自己给自己投，也避免candidate给同辈的candidate投
+        m_votedFor = m_me;  
+
+        // 持久化一下
         persist();
-        std::shared_ptr<int> votedNum = std::make_shared<int>(1);  // 使用 make_shared 函数初始化 !! 亮点
-        //	重新设置定时器
+
+        // 使用 make_shared 函数初始化
+        std::shared_ptr<int> votedNum = std::make_shared<int>(1); 
+
+        //重新设置定时器
         m_lastResetElectionTime = now();
-        //	发布RequestVote RPC
+
+        //发布RequestVote RPC
         for (int i = 0; i < m_peers.size(); i++) {
             if (i == m_me) {
                 continue;
@@ -246,8 +258,8 @@ void Raft::doElection() {
 
             // 使用匿名函数执行避免其拿到锁
 
-            std::thread t(&Raft::sendRequestVote, this, i, requestVoteArgs, requestVoteReply,
-                          votedNum);  // 创建新线程并执行b函数，并传递参数
+            std::thread t(&Raft::sendRequestVote, this, 
+                          i, requestVoteArgs, requestVoteReply, votedNum);
             t.detach();
         }
     }
@@ -320,16 +332,29 @@ void Raft::doHeartBeat() {
     }
 }
 
+/**
+ * @brief 1.负责查看是否该发起选举，条件就是当前节点是否超时，如果该发起选举就执行doElection发起选举。
+ *        2.doElection：实际发起选举，构造需要发送的rpc，并多线程调用sendRequestVote处理rpc及其相应。
+ *        3.sendRequestVote：负责发送选举中的RPC，在发送完rpc后还需要负责接收并处理对端发送回来的响应。
+ *        4.RequestVote：接收别人发来的选举请求，主要检验是否要给对方投票。
+*/
 void Raft::electionTimeOutTicker() {
     // Check if a Leader election should be started.
     while (true) {
         /**
-         * 如果不睡眠，那么对于leader，这个函数会一直空转，浪费cpu。且加入协程之后，空转会导致其他协程无法运行，对于时间敏感的AE，会导致心跳无法正常发送导致异常
-         */
+         * 如果不睡眠，那么对于leader，这个函数会一直空转，浪费cpu。
+         * 且加入协程之后，空转会导致其他协程无法运行，对于时间敏感的AE，会导致心跳无法正常发送导致异常
+        */
         while (m_status == Leader) {
-            usleep(
-                HeartBeatTimeout);  // 定时时间没有严谨设置，因为HeartBeatTimeout比选举超时一般小一个数量级，因此就设置为HeartBeatTimeout了
+            // 定时时间没有严谨设置，因为HeartBeatTimeout比选举超时一般小一个数量级，因此就设置为HeartBeatTimeout了
+            usleep(HeartBeatTimeout); 
         }
+
+        /**
+         * 计算距离上次重置选举计时器的时间加上随机化的选举超时时间，然后根据这个时间决定是否睡眠
+         * 若超时时间未到，进入睡眠状态，若在此期间选举计时器被重置，则继续循环。
+         * 若超时时间已到，调用doElection() 函数启动领导者选举过程。
+        */
         std::chrono::duration<signed long int, std::ratio<1, 1000000000>> suitableSleepTime{};
         std::chrono::system_clock::time_point wakeTime{};
         {
@@ -339,12 +364,12 @@ void Raft::electionTimeOutTicker() {
             m_mtx.unlock();
         }
 
+        // 如果需要睡眠，那么就睡眠 .count()返回毫秒数
         if (std::chrono::duration<double, std::milli>(suitableSleepTime).count() > 1) {
             // 获取当前时间点
             auto start = std::chrono::steady_clock::now();
 
             usleep(std::chrono::duration_cast<std::chrono::microseconds>(suitableSleepTime).count());
-            // std::this_thread::sleep_for(suitableSleepTime);
 
             // 获取函数运行结束后的时间点
             auto end = std::chrono::steady_clock::now();
@@ -360,8 +385,9 @@ void Raft::electionTimeOutTicker() {
                       << std::endl;
         }
 
+        // 说明睡眠的这段时间有重置定时器，那么就没有超时，再次睡眠
+        // 选举定时器的触发条件：收到leader发来的appendEntryRPC 、给其他的节点选举投票
         if (std::chrono::duration<double, std::milli>(m_lastResetElectionTime - wakeTime).count() > 0) {
-            // 说明睡眠的这段时间有重置定时器，那么就没有超时，再次睡眠
             continue;
         }
         doElection();
@@ -772,13 +798,19 @@ int Raft::getSlicesIndexFromLogIndex(int logIndex) {
     return SliceIndex;
 }
 
+/**
+ * @brief 请求其他结点的投票
+ * @param server 请求投票的结点
+ * @param args 请求投票的参数
+ * @param reply 请求投票的响应
+ * @param votedNum 记录投票的结点数量
+*/
 bool Raft::sendRequestVote(int server, std::shared_ptr<raftRpcProctoc::RequestVoteArgs> args,
                            std::shared_ptr<raftRpcProctoc::RequestVoteReply> reply, std::shared_ptr<int> votedNum) {
-    // 这个ok是网络是否正常通信的ok，而不是requestVote rpc是否投票的rpc
-    //  ok := rf.peers[server].Call("Raft.RequestVote", args, reply)
-    //  todo
+
     auto start = now();
     DPrintf("[func-sendRequestVote rf{%d}] 向server{%d} 發送 RequestVote 開始", m_me, m_currentTerm, getLastLogIndex());
+    // 发送请求投票
     bool ok = m_peers[server]->RequestVote(args.get(), reply.get());
     DPrintf("[func-sendRequestVote rf{%d}] 向server{%d} 發送 RequestVote 完畢，耗時:{%d} ms", m_me, m_currentTerm,
             getLastLogIndex(), now() - start);
@@ -786,19 +818,15 @@ bool Raft::sendRequestVote(int server, std::shared_ptr<raftRpcProctoc::RequestVo
     if (!ok) {
         return ok;  // 不知道为什么不加这个的话如果服务器宕机会出现问题的，通不过2B  todo
     }
-    // for !ok {
-    //
-    //	//ok := rf.peers[server].Call("Raft.RequestVote", args, reply)
-    //	//if ok {
-    //	//	break
-    //	//}
-    // } //这里是发送出去了，但是不能保证他一定到达
+
     // 对回应进行处理，要记得无论什么时候收到回复就要检查term
     std::lock_guard<std::mutex> lg(m_mtx);
     if (reply->term() > m_currentTerm) {
-        m_status = Follower;  // 三变：身份，term，和投票
+        // 三变：身份，term，和投票
+        m_status = Follower;  
         m_currentTerm = reply->term();
         m_votedFor = -1;
+        
         persist();
         return true;
     } else if (reply->term() < m_currentTerm) {
@@ -990,36 +1018,60 @@ void Raft::Start(Op command, int* newLogIndex, int* newLogTerm, bool* isLeader) 
     *isLeader = true;
 }
 
-// Make
-// the service or tester wants to create a Raft server. the ports
-// of all the Raft servers (including this one) are in peers[]. this
-// server's port is peers[me]. all the servers' peers[] arrays
-// have the same order. persister is a place for this server to
-// save its persistent state, and also initially holds the most
-// recent saved state, if any. applyCh is a channel on which the
-// tester or service expects Raft to send ApplyMsg messages.
-// Make() must return quickly, so it should start goroutines
-// for any long-running work.
+/**
+ * @brief 初始化
+ *        Make
+ *        the service or tester wants to create a Raft server. the ports
+ *        of all the Raft servers (including this one) are in peers[]. this
+ *        server's port is peers[me]. all the servers' peers[] arrays
+ *        have the same order. persister is a place for this server to
+ *        save its persistent state, and also initially holds the most
+ *        recent saved state, if any. applyCh is a channel on which the
+ *        tester or service expects Raft to send ApplyMsg messages.
+ *        Make() must return quickly, so it should start goroutines
+ *        for any long-running work.
+ * @param [in] peers 与其他raft节点通信的channel
+ * @param [in] me 自身raft节点在peers中的索引
+ * @param [in] persister 持久化类
+ * @param [in] applyCh 与kv-server沟通的channel
+*/
 void Raft::init(std::vector<std::shared_ptr<RaftRpcUtil>> peers, int me, std::shared_ptr<Persister> persister,
                 std::shared_ptr<LockQueue<ApplyMsg>> applyCh) {
+    
+    // 需要与其他raft节点通信类
     m_peers = peers;
+
+    // 持久化类
     m_persister = persister;
+
+    // 标记自己，不能给自己发送rpc
     m_me = me;
-    // Your initialization code here (2A, 2B, 2C).
+
     m_mtx.lock();
 
     // applier
+    // 与kv-server沟通
     this->applyChan = applyCh;
     //    rf.ApplyMsgQueue = make(chan ApplyMsg)
+
+    // 初始化当前任期为0
     m_currentTerm = 0;
+
+    // 初始化状态为follower
     m_status = Follower;
+
+    // 初始化commitIndex为0
     m_commitIndex = 0;
+
+    // 初始化lastApplied为0
     m_lastApplied = 0;
+
     m_logs.clear();
     for (int i = 0; i < m_peers.size(); i++) {
         m_matchIndex.push_back(0);
         m_nextIndex.push_back(0);
     }
+    // 当前term没有给其他人投过票就用-1表示
     m_votedFor = -1;
 
     m_lastSnapshotIncludeIndex = 0;
@@ -1039,26 +1091,23 @@ void Raft::init(std::vector<std::shared_ptr<RaftRpcUtil>> peers, int me, std::sh
 
     m_mtx.unlock();
 
+    // start ticker  开始三个定时器 分别维护：选举、日志同步和心跳、raft节点与kv-server的联系
     m_ioManager = std::make_unique<monsoon::IOManager>(FIBER_THREAD_NUM, FIBER_USE_CALLER_THREAD);
-
-    // start ticker fiber to start elections
-    // 启动三个循环定时器
-    // todo:原来是启动了三个线程，现在是直接使用了协程，三个函数中leaderHearBeatTicker
-    // 、electionTimeOutTicker执行时间是恒定的，applierTicker时间受到数据库响应延迟和两次apply之间请求数量的影响，这个随着数据量增多可能不太合理，最好其还是启用一个线程。
+    /**
+     * start ticker fiber to start elections
+     * 启动三个循环定时器
+     * todo:原来是启动了三个线程，现在是直接使用了协程，
+     * 三个函数中leaderHearBeatTicker、electionTimeOutTicker执行时间是恒定的，
+     * 
+     * [?]
+     * applierTicker时间受到数据库响应延迟和两次apply之间请求数量的影响，
+     * 这个随着数据量增多可能不太合理，最好其还是启用一个线程。
+    */
     m_ioManager->scheduler([this]() -> void { this->leaderHearBeatTicker(); });
     m_ioManager->scheduler([this]() -> void { this->electionTimeOutTicker(); });
 
     std::thread t3(&Raft::applierTicker, this);
     t3.detach();
-
-    // std::thread t(&Raft::leaderHearBeatTicker, this);
-    // t.detach();
-    //
-    // std::thread t2(&Raft::electionTimeOutTicker, this);
-    // t2.detach();
-    //
-    // std::thread t3(&Raft::applierTicker, this);
-    // t3.detach();
 }
 
 std::string Raft::persistData() {

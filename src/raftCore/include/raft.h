@@ -49,8 +49,11 @@ private:
 
     // 记录当前term给谁投票过
     int m_votedFor;
-    std::vector<raftRpcProctoc::LogEntry> m_logs;  //// 日志条目数组，包含了状态机要执行的指令集，以及收到领导时的任期号
-                                                   // 这两个状态所有结点都在维护，易失
+
+    // 日志条目数组，包含了状态机要执行的指令集，以及收到领导时的任期号
+    // 这两个状态所有结点都在维护，易失
+    std::vector<raftRpcProctoc::LogEntry> m_logs;  //
+                                                   
     int m_commitIndex;
 
     // 已经汇报给状态机（上层应用）的log 的index
@@ -66,7 +69,7 @@ private:
     std::shared_ptr<LockQueue<ApplyMsg>> applyChan;  // client从这里取日志（2B），client与raft通信的接口
     // ApplyMsgQueue chan ApplyMsg // raft内部使用的chan，applyChan是用于和服务层交互，最后好像没用上
 
-    // 选举超时
+    // 选举超时时间
     std::chrono::_V2::system_clock::time_point m_lastResetElectionTime;
     // 心跳超时，用于leader
     std::chrono::_V2::system_clock::time_point m_lastResetHearBeatTime;
@@ -97,7 +100,7 @@ public:
     bool CondInstallSnapshot(int lastIncludedTerm, int lastIncludedIndex, std::string snapshot);
 
     /**
-     * @brief 发起选举
+     * @brief 实际发起选举，构造需要发送的rpc，并多线程调用sendRequestVote处理rpc及其相应。
     */
     void doElection();
 
@@ -109,7 +112,10 @@ public:
     void doHeartBeat();
 
     /**
-     * @brief 监控是否该发起选举了
+     * @brief 1.负责查看是否该发起选举，如果该发起选举就执行doElection发起选举。
+     *        2.doElection：实际发起选举，构造需要发送的rpc，并多线程调用sendRequestVote处理rpc及其相应。
+     *        3.sendRequestVote：负责发送选举中的RPC，在发送完rpc后还需要负责接收并处理对端发送回来的响应。
+     *        4.RequestVote：接收别人发来的选举请求，主要检验是否要给对方投票。
     */
     void electionTimeOutTicker();
 
@@ -168,6 +174,10 @@ public:
 
     /**
      * @brief 请求其他结点的投票
+     * @param server 请求投票的结点
+     * @param args 请求投票的参数
+     * @param reply 请求投票的响应
+     * @param votedNum 记录投票的结点数量
     */
     bool sendRequestVote(int server, std::shared_ptr<raftRpcProctoc::RequestVoteArgs> args,
                          std::shared_ptr<raftRpcProctoc::RequestVoteReply> reply, std::shared_ptr<int> votedNum);
@@ -230,6 +240,20 @@ public:
 
     /**
      * @brief 初始化
+     *        Make
+     *        the service or tester wants to create a Raft server. the ports
+     *        of all the Raft servers (including this one) are in peers[]. this
+     *        server's port is peers[me]. all the servers' peers[] arrays
+     *        have the same order. persister is a place for this server to
+     *        save its persistent state, and also initially holds the most
+     *        recent saved state, if any. applyCh is a channel on which the
+     *        tester or service expects Raft to send ApplyMsg messages.
+     *        Make() must return quickly, so it should start goroutines
+     *        for any long-running work.
+     * @param [in] peers 与其他raft节点通信的channel
+     * @param [in] me 自身raft节点在peers中的索引
+     * @param [in] persister 持久化类
+     * @param [in] applyCh 与kv-server沟通的channel
     */
     void init(std::vector<std::shared_ptr<RaftRpcUtil>> peers, int me, std::shared_ptr<Persister> persister,
               std::shared_ptr<LockQueue<ApplyMsg>> applyCh);
