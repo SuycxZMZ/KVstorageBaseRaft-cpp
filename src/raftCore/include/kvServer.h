@@ -22,6 +22,13 @@
 #include "raft.h"
 #include "skipList.h"
 
+/**
+ * @brief kvServer负责与外部clerk通信
+ *        一个外部请求的处理可以简单的看成两步：
+ *        1.接收外部请求。
+ *        2.本机内部与raft和kvDB协商如何处理该请求。
+ *        3.返回外部响应。
+*/
 class KvServer : raftKVRpcProctoc::kvServerRpc {
    private:
     std::mutex m_mtx;
@@ -33,7 +40,7 @@ class KvServer : raftKVRpcProctoc::kvServerRpc {
     // Your definitions here.
     std::string m_serializedKVData;  // todo ： 序列化后的kv数据，理论上可以不用，但是目前没有找到特别好的替代方法
     SkipList<std::string, std::string> m_skipList;
-    std::unordered_map<std::string, std::string> m_kvDB;
+    std::unordered_map<std::string, std::string> m_kvDB; //kvDB，用unordered_map来替代
 
     std::unordered_map<int, LockQueue<Op> *> waitApplyCh;
     // index(raft) -> chan  //？？？字段含义   waitApplyCh是一个map，键是int，值是Op类型的管道

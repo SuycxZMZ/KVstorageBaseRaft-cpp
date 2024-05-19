@@ -30,8 +30,6 @@ void Raft::AppendEntries1(const raftRpcProctoc::AppendEntriesArgs* args, raftRpc
     DEFER { persist(); };  // 由于这个局部变量创建在锁之后，因此执行persist的时候应该也是拿到锁的.
     if (args->term() > m_currentTerm) {
         // 三变 ,防止遗漏，无论什么时候都是三变
-        // DPrintf("[func-AppendEntries-rf{%v} ] 变成follower且更新term 因为Leader{%v}的term{%v}> rf{%v}.term{%v}\n",
-        // rf.me, args.LeaderId, args.Term, rf.me, rf.currentTerm)
         m_status = Follower;
         m_currentTerm = args->term();
         m_votedFor = -1;  // 这里设置成-1有意义，如果突然宕机然后上线理论上是可以投票的
@@ -53,8 +51,6 @@ void Raft::AppendEntries1(const raftRpcProctoc::AppendEntriesArgs* args, raftRpc
         reply->set_success(false);
         reply->set_term(m_currentTerm);
         reply->set_updatenextindex(getLastLogIndex() + 1);
-        //  DPrintf("[func-AppendEntries-rf{%v}] 拒绝了节点{%v}，因为日志太新,args.PrevLogIndex{%v} >
-        //  lastLogIndex{%v}，返回值：{%v}\n", rf.me, args.LeaderId, args.PrevLogIndex, rf.getLastLogIndex(), reply)
         return;
     } else if (args->prevlogindex() < m_lastSnapshotIncludeIndex) {
         // 如果prevlogIndex还没有更上快照
@@ -63,17 +59,12 @@ void Raft::AppendEntries1(const raftRpcProctoc::AppendEntriesArgs* args, raftRpc
         reply->set_updatenextindex(
             m_lastSnapshotIncludeIndex +
             1);  // todo 如果想直接弄到最新好像不对，因为是从后慢慢往前匹配的，这里不匹配说明后面的都不匹配
-        //  DPrintf("[func-AppendEntries-rf{%v}] 拒绝了节点{%v}，因为log太老，返回值：{%v}\n", rf.me, args.LeaderId,
-        //  reply) return
     }
-    //	本机日志有那么长，冲突(same index,different term),截断日志
+    // 本机日志有那么长，冲突(same index,different term),截断日志
     // 注意：这里目前当args.PrevLogIndex == rf.lastSnapshotIncludeIndex与不等的时候要分开考虑，可以看看能不能优化这块
     if (matchLog(args->prevlogindex(), args->prevlogterm())) {
-        //	todo：	整理logs
-        // ，不能直接截断，必须一个一个检查，因为发送来的log可能是之前的，直接截断可能导致“取回”已经在follower日志中的条目
-        // 那意思是不是可能会有一段发来的AE中的logs中前半是匹配的，后半是不匹配的，这种应该：1.follower如何处理？ 2.如何给leader回复
-        // 3. leader如何处理
 
+        // 日志匹配，复制
         for (int i = 0; i < args->entries_size(); i++) {
             auto log = args->entries(i);
             if (log.logindex() > getLastLogIndex()) {
@@ -81,10 +72,6 @@ void Raft::AppendEntries1(const raftRpcProctoc::AppendEntriesArgs* args, raftRpc
                 m_logs.push_back(log);
             } else {
                 // 没超过就比较是否匹配，不匹配再更新，而不是直接截断
-                //  todo ： 这里可以改进为比较对应logIndex位置的term是否相等，term相等就代表匹配
-                //   todo：这个地方放出来会出问题,按理说index相同，term相同，log也应该相同才对
-                //  rf.logs[entry.Index-firstIndex].Term ?= entry.Term
-
                 if (m_logs[getSlicesIndexFromLogIndex(log.logindex())].logterm() == log.logterm() &&
                     m_logs[getSlicesIndexFromLogIndex(log.logindex())].command() != log.command()) {
                     // 相同位置的log ，其logTerm相等，但是命令却不相同，不符合raft的前向匹配，异常了！
@@ -111,11 +98,6 @@ void Raft::AppendEntries1(const raftRpcProctoc::AppendEntriesArgs* args, raftRpc
             format(
                 "[func-AppendEntries1-rf{%d}]rf.getLastLogIndex(){%d} != args.PrevLogIndex{%d}+len(args.Entries){%d}",
                 m_me, getLastLogIndex(), args->prevlogindex(), args->entries_size()));
-        // if len(args.Entries) > 0 {
-        //	fmt.Printf("[func-AppendEntries  rf:{%v}] ] : args.term:%v, rf.term:%v  ,rf.logs的长度：%v\n", rf.me,
-        //args.Term,
-        // rf.currentTerm, len(rf.logs))
-        // }
         if (args->leadercommit() > m_commitIndex) {
             m_commitIndex = std::min(args->leadercommit(), getLastLogIndex());
             // 这个地方不能无脑跟上getLastLogIndex()，因为可能存在args->leadercommit()落后于 getLastLogIndex()的情况
@@ -127,13 +109,8 @@ void Raft::AppendEntries1(const raftRpcProctoc::AppendEntriesArgs* args, raftRpc
                         getLastLogIndex(), m_commitIndex));
         reply->set_success(true);
         reply->set_term(m_currentTerm);
-
-        //        DPrintf("[func-AppendEntries-rf{%v}] 接收了来自节点{%v}的log，当前lastLogIndex{%v}，返回值：{%v}\n",
-        //        rf.me,
-        //                args.LeaderId, rf.getLastLogIndex(), reply)
-
         return;
-    } else {
+    } else { // 不匹配
         // 优化
         // PrevLogIndex 长度合适，但是不匹配，因此往前寻找 矛盾的term的第一个元素
         // 为什么该term的日志都是矛盾的呢？也不一定都是矛盾的，只是这么优化减少rpc而已
@@ -148,20 +125,8 @@ void Raft::AppendEntries1(const raftRpcProctoc::AppendEntriesArgs* args, raftRpc
         }
         reply->set_success(false);
         reply->set_term(m_currentTerm);
-        // 对UpdateNextIndex待优化  todo  找到符合的term的最后一个
-        //        DPrintf("[func-AppendEntries-rf{%v}]
-        //        拒绝了节点{%v}，因为prevLodIndex{%v}的args.term{%v}不匹配当前节点的logterm{%v}，返回值：{%v}\n",
-        //                rf.me, args.LeaderId, args.PrevLogIndex, args.PrevLogTerm,
-        //                rf.logs[rf.getSlicesIndexFromLogIndex(args.PrevLogIndex)].LogTerm, reply)
-        //        DPrintf("[func-AppendEntries-rf{%v}] 返回值: reply.UpdateNextIndex从{%v}优化到{%v}，优化了{%v}\n",
-        //        rf.me,
-        //                args.PrevLogIndex, reply.UpdateNextIndex, args.PrevLogIndex - reply.UpdateNextIndex) //
-        //                很多都是优化了0
         return;
     }
-
-    // fmt.Printf("[func-AppendEntries,rf{%v}]:len(rf.logs):%v, rf.commitIndex:%v\n", rf.me, len(rf.logs),
-    // rf.commitIndex)
 }
 
 
@@ -668,8 +633,6 @@ void Raft::persist() {
     // Your code here (2C).
     auto data = persistData();
     m_persister->SaveRaftState(data);
-    // fmt.Printf("RaftNode[%d] persist starts, currentTerm[%d] voteFor[%d] log[%v]\n", rf.me, rf.currentTerm,
-    // rf.votedFor, rf.logs) fmt.Printf("%v\n", string(data))
 }
 
 

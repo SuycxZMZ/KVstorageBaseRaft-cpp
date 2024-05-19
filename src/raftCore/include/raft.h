@@ -32,7 +32,7 @@ constexpr int Expire = 2;  // 投票（消息、竞选者）过期
 constexpr int Normal = 3;
 
 class Raft : public raftRpcProctoc::raftRpc {
-   private:
+private:
     std::mutex m_mtx;
 
     // 需要与其他raft节点通信，这里保存与其他结点通信的rpc入口
@@ -51,8 +51,8 @@ class Raft : public raftRpcProctoc::raftRpc {
     int m_votedFor;
 
     // 日志条目数组，包含了状态机要执行的指令集，以及收到领导时的任期号
-    // 这两个状态所有结点都在维护，易失
-    std::vector<raftRpcProctoc::LogEntry> m_logs;
+    // 这两个状态所有结点都在维护，易失 
+    std::vector<raftRpcProctoc::LogEntry> m_logs;   //raft节点保存的全部的日志信息。
     int m_commitIndex;
     // 已经汇报给状态机（上层应用）的log 的index
     int m_lastApplied;
@@ -60,10 +60,10 @@ class Raft : public raftRpcProctoc::raftRpc {
     // 这两个状态的下标1开始，因为通常commitIndex和lastApplied从0开始，应该是一个无效的index，因此下标从1开始
 
     // 只有leader才需要维护m_nextIndex和m_matchIndex
-    // 下一次要发送的日志号
+    // m_nextIndex 保存leader下一次应该从哪一个日志开始发送给follower
     std::vector<int> m_nextIndex;
 
-    // 记录已经复制给其他节点的日志的index
+    // m_matchIndex表示follower在哪一个日志是已经匹配了的（由于日志安全性，某一个日志匹配，那么这个日志及其之前的日志都是匹配的）
     std::vector<int> m_matchIndex;
 
     // raft节点身份枚举
@@ -72,13 +72,17 @@ class Raft : public raftRpcProctoc::raftRpc {
     Status m_status;
 
     // client从这里取日志（2B），client与raft通信的接口
-    std::shared_ptr<LockQueue<ApplyMsg>> applyChan;
+    std::shared_ptr<LockQueue<ApplyMsg>> applyChan; 
     // ApplyMsgQueue chan ApplyMsg // raft内部使用的chan，applyChan是用于和服务层交互，最后好像没用上
 
     // 选举超时时间
     std::chrono::_V2::system_clock::time_point m_lastResetElectionTime;
     // 心跳超时，用于leader
     std::chrono::_V2::system_clock::time_point m_lastResetHearBeatTime;
+
+    // Snapshot是kvDb的快照，也可以看成是日志，因此:全部的日志 = m_logs + snapshot
+    // 因为Snapshot是kvDB生成的，kvDB肯定不知道raft的存在，而什么term、什么日志Index都是raft才有的概念，因此snapshot中肯定没有term和index信息。
+    // 所以需要raft自己来保存这些信息。故，快照与m_logs联合起来理解即可。
 
     // 2D中用于传入快照点
     // 储存了快照中的最后一个日志的Index和Term
@@ -274,7 +278,7 @@ public:
     void init(std::vector<std::shared_ptr<RaftRpcUtil>> peers, int me, std::shared_ptr<Persister> persister,
               std::shared_ptr<LockQueue<ApplyMsg>> applyCh);
 
-   private:
+private:
     //
 
     /**
