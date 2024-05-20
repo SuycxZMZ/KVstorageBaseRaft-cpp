@@ -110,9 +110,6 @@ void KvServer::Get(const raftKVRpcProctoc::GetArgs *args, raftKVRpcProctoc::GetR
     Op raftCommitOp;
 
     if (!chForRaftIndex->timeOutPop(CONSENSUS_TIMEOUT, &raftCommitOp)) {
-        //        DPrintf("[GET TIMEOUT!!!]From Client %d (Request %d) To Server %d, key %v, raftIndex %d",
-        //        args.ClientId, args.RequestId, kv.me, op.Key, raftIndex)
-        // todo 2023年06月01日
         int _ = -1;
         bool isLeader = false;
         m_raftNode->GetState(&_, &isLeader);
@@ -135,9 +132,6 @@ void KvServer::Get(const raftKVRpcProctoc::GetArgs *args, raftKVRpcProctoc::GetR
         }
     } else {
         // raft已经提交了该command（op），可以正式开始执行了
-        //         DPrintf("[WaitChanGetRaftApplyMessage<--]Server %d , get Command <-- Index:%d , ClientId %d,
-        //         RequestId %d, Opreation %v, Key :%v, Value :%v", kv.me, raftIndex, op.ClientId, op.RequestId,
-        //         op.Operation, op.Key, op.Value)
         // todo 这里还要再次检验的原因：感觉不用检验，因为leader只要正确的提交了，那么这些肯定是符合的
         if (raftCommitOp.ClientId == op.ClientId && raftCommitOp.RequestId == op.RequestId) {
             std::string value;
@@ -152,10 +146,6 @@ void KvServer::Get(const raftKVRpcProctoc::GetArgs *args, raftKVRpcProctoc::GetR
             }
         } else {
             reply->set_err(ErrWrongLeader);
-            //            DPrintf("[GET ] 不满足：raftCommitOp.ClientId{%v} == op.ClientId{%v} &&
-            //            raftCommitOp.RequestId{%v}
-            //            == op.RequestId{%v}", raftCommitOp.ClientId, op.ClientId, raftCommitOp.RequestId,
-            //            op.RequestId)
         }
     }
     m_mtx.lock();  // todo 這個可以先弄一個defer，因爲刪除優先級並不高，先把rpc發回去更加重要

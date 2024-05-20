@@ -30,17 +30,17 @@
  *        3.返回外部响应。
 */
 class KvServer : raftKVRpcProctoc::kvServerRpc {
-   private:
+private:
     std::mutex m_mtx;
     int m_me;
-    std::shared_ptr<Raft> m_raftNode;
+    std::shared_ptr<Raft> m_raftNode;                 // raft节点
     std::shared_ptr<LockQueue<ApplyMsg> > applyChan;  // kvServer和raft节点的通信管道
     int m_maxRaftState;                               // snapshot if log grows this big
 
     // Your definitions here.
-    std::string m_serializedKVData;  // todo ： 序列化后的kv数据，理论上可以不用，但是目前没有找到特别好的替代方法
-    SkipList<std::string, std::string> m_skipList;
-    std::unordered_map<std::string, std::string> m_kvDB; //kvDB，用unordered_map来替代
+    std::string m_serializedKVData;                      // todo ： 序列化后的kv数据，理论上可以不用，但是目前没有找到特别好的替代方法
+    SkipList<std::string, std::string> m_skipList;       // skipList，用于存储kv数据
+    std::unordered_map<std::string, std::string> m_kvDB; // kvDB，用unordered_map来替代
 
     std::unordered_map<int, LockQueue<Op> *> waitApplyCh;
     // index(raft) -> chan  //？？？字段含义   waitApplyCh是一个map，键是int，值是Op类型的管道
@@ -50,7 +50,7 @@ class KvServer : raftKVRpcProctoc::kvServerRpc {
     // last SnapShot point , raftIndex
     int m_lastSnapShotRaftLogIndex;
 
-   public:
+public:
     KvServer() = delete;
 
     KvServer(int me, int maxraftstate, std::string nodeInforFileName, short port);
@@ -65,18 +65,22 @@ class KvServer : raftKVRpcProctoc::kvServerRpc {
 
     void ExecutePutOpOnKVDB(Op op);
 
-    void Get(const raftKVRpcProctoc::GetArgs *args,
-             raftKVRpcProctoc::GetReply
-                 *reply);  // 将 GetArgs 改为rpc调用的，因为是远程客户端，即服务器宕机对客户端来说是无感的
     /**
-     * 從raft節點中獲取消息  （不要誤以爲是執行【GET】命令）
+     * @brief rpc 实际调用内部实现
+    */
+    void Get(const raftKVRpcProctoc::GetArgs *args,
+             raftKVRpcProctoc::GetReply *reply);  // 将 GetArgs 改为rpc调用的，因为是远程客户端，即服务器宕机对客户端来说是无感的
+    /**
+     * @brief 从raft节点获取命令
      * @param message
      */
     void GetCommandFromRaft(ApplyMsg message);
 
     bool ifRequestDuplicate(std::string ClientId, int RequestId);
 
-    // clerk 使用RPC远程调用
+    /**
+     * @brief rpc 实际调用内部实现
+    */
     void PutAppend(const raftKVRpcProctoc::PutAppendArgs *args, raftKVRpcProctoc::PutAppendReply *reply);
 
     ////一直等待raft传来的applyCh
@@ -94,16 +98,21 @@ class KvServer : raftKVRpcProctoc::kvServerRpc {
 
     std::string MakeSnapShot();
 
-   public:  // for rpc
+public:  // for rpc
+    /**
+     * @brief 与客户打交道，Rpc框架调用
+    */
     void PutAppend(google::protobuf::RpcController *controller, const ::raftKVRpcProctoc::PutAppendArgs *request,
                    ::raftKVRpcProctoc::PutAppendReply *response, ::google::protobuf::Closure *done) override;
-
+    /**
+     * @brief 与客户打交道，Rpc框架调用
+    */
     void Get(google::protobuf::RpcController *controller, const ::raftKVRpcProctoc::GetArgs *request,
              ::raftKVRpcProctoc::GetReply *response, ::google::protobuf::Closure *done) override;
 
-    /////////////////serialiazation start ///////////////////////////////
-    // notice ： func serialize
-   private:
+/////////////////serialiazation start ///////////////////////////////
+// notice ： func serialize
+private:
     friend class boost::serialization::access;
 
     // When the class Archive corresponds to an output archive, the
