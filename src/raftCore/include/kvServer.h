@@ -42,10 +42,10 @@ private:
     SkipList<std::string, std::string> m_skipList;       // skipList，用于存储kv数据
     std::unordered_map<std::string, std::string> m_kvDB; // kvDB，用unordered_map来替代
 
-    std::unordered_map<int, LockQueue<Op> *> waitApplyCh;
+    std::unordered_map<int, LockQueue<Op> *> waitApplyCh;//？？？字段含义   waitApplyCh是一个map，键是int，值是Op类型的管道
     // index(raft) -> chan  //？？？字段含义   waitApplyCh是一个map，键是int，值是Op类型的管道
 
-    std::unordered_map<std::string, int> m_lastRequestId;  // clientid -> requestID  //一个kV服务器可能连接多个client
+    std::unordered_map<std::string, int> m_lastRequestId;  // clientid -> requestID 一个kV服务器可能连接多个client
 
     // last SnapShot point , raftIndex
     int m_lastSnapShotRaftLogIndex;

@@ -120,7 +120,7 @@ class LockQueue {
 
 // 这个Op是kv传递给raft的command
 class Op {
-   public:
+public:
     // Your definitions here.
     // Field names must start with capital letters,
     // otherwise RPC will break.
@@ -131,7 +131,7 @@ class Op {
     int RequestId;         // 客户端号码请求的Request的序列号，为了保证线性一致性
                     //  IfDuplicate bool // Duplicate command can't be applied twice , but only for PUT and APPEND
 
-   public:
+public:
     // todo
     // 为了协调raftRPC中的command只设置成了string,这个的限制就是正常字符中不能包含|
     // 当然后期可以换成更高级的序列化方法，比如protobuf
@@ -154,14 +154,14 @@ class Op {
         return true;  // todo : 解析失敗如何處理，要看一下boost庫了
     }
 
-   public:
+public:
     friend std::ostream& operator<<(std::ostream& os, const Op& obj) {
         os << "[MyClass:Operation{" + obj.Operation + "},Key{" + obj.Key + "},Value{" + obj.Value + "},ClientId{" +
                   obj.ClientId + "},RequestId{" + std::to_string(obj.RequestId) + "}";  // 在这里实现自定义的输出格式
         return os;
     }
 
-   private:
+private:
     friend class boost::serialization::access;
     template <class Archive>
     void serialize(Archive& ar, const unsigned int version) {

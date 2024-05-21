@@ -77,6 +77,7 @@ void KvServer::ExecutePutOpOnKVDB(Op op) {
 
 // 处理来自clerk的Get RPC
 void KvServer::Get(const raftKVRpcProctoc::GetArgs *args, raftKVRpcProctoc::GetReply *reply) {
+    // 根据请求参数生成Op，生成Op是因为raft和raftServer沟通用的是类似于go中的channel的机制
     Op op;
     op.Operation = "Get";
     op.Key = args->key();
@@ -109,6 +110,7 @@ void KvServer::Get(const raftKVRpcProctoc::GetArgs *args, raftKVRpcProctoc::GetR
     // timeout
     Op raftCommitOp;
 
+    //通过超时pop来限定命令执行时间，如果超过时间还没拿到消息说明命令执行超时了。
     if (!chForRaftIndex->timeOutPop(CONSENSUS_TIMEOUT, &raftCommitOp)) {
         int _ = -1;
         bool isLeader = false;
@@ -116,17 +118,17 @@ void KvServer::Get(const raftKVRpcProctoc::GetArgs *args, raftKVRpcProctoc::GetR
 
         if (ifRequestDuplicate(op.ClientId, op.RequestId) && isLeader) {
             // 如果超时，代表raft集群不保证已经commitIndex该日志，但是如果是已经提交过的get请求，是可以再执行的。
-            //  不会违反线性一致性
+            // 不会违反线性一致性
             std::string value;
             bool exist = false;
-            ExecuteGetOpOnKVDB(op, &value, &exist);
+            ExecuteGetOpOnKVDB(op, &value, &exist); 
             if (exist) {
                 reply->set_err(OK);
                 reply->set_value(value);
             } else {
                 reply->set_err(ErrNoKey);
                 reply->set_value("");
-            }
+            } 
         } else {
             reply->set_err(ErrWrongLeader);  // 返回这个，其实就是让clerk换一个节点重试
         }
@@ -246,8 +248,7 @@ void KvServer::PutAppend(const raftKVRpcProctoc::PutAppendArgs *args, raftKVRpcP
             m_me, m_me, raftIndex, &op.ClientId, op.RequestId, &op.Operation, &op.Key, &op.Value);
 
         if (ifRequestDuplicate(op.ClientId, op.RequestId)) {
-            reply->set_err(
-                OK);  // 超时了,但因为是重复的请求，返回ok，实际上就算没有超时，在真正执行的时候也要判断是否重复
+            reply->set_err(OK);  // 超时了,但因为是重复的请求，返回ok，实际上就算没有超时，在真正执行的时候也要判断是否重复
         } else {
             reply->set_err(ErrWrongLeader);  /// 这里返回这个的目的让clerk重新尝试
         }
