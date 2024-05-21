@@ -1014,10 +1014,10 @@ void Raft::Start(Op command, int* newLogIndex, int* newLogTerm, bool* isLeader) 
  *        tester or service expects Raft to send ApplyMsg messages.
  *        Make() must return quickly, so it should start goroutines
  *        for any long-running work.
- * @param [in] peers 与其他raft节点通信的channel
- * @param [in] me 自身raft节点在peers中的索引
- * @param [in] persister 持久化类
- * @param [in] applyCh 与kv-server沟通的channel
+ * @param peers 与其他raft节点通信的channel
+ * @param me 自身raft节点在peers中的索引
+ * @param persister 持久化类
+ * @param applyCh 与kv-server沟通的channel
 */
 void Raft::init(std::vector<std::shared_ptr<RaftRpcUtil>> peers, int me, std::shared_ptr<Persister> persister,
                 std::shared_ptr<LockQueue<ApplyMsg>> applyCh) {

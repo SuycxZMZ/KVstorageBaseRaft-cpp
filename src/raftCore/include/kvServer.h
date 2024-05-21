@@ -34,7 +34,7 @@ private:
     std::mutex m_mtx;
     int m_me;
     std::shared_ptr<Raft> m_raftNode;                 // raft节点
-    std::shared_ptr<LockQueue<ApplyMsg> > applyChan;  // kvServer和raft节点的通信管道
+    std::shared_ptr<LockQueue<ApplyMsg> > applyChan;  // kvServer中拿到的消息，server用这些消息与raft打交道，由Raft::applierTicker线程填充
     int m_maxRaftState;                               // snapshot if log grows this big
 
     // Your definitions here.
