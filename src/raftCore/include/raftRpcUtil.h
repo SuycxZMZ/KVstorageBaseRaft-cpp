@@ -21,7 +21,6 @@ public:
     bool RequestVote(raftRpcProctoc::RequestVoteArgs *args, raftRpcProctoc::RequestVoteReply *response);
     // 响应其他节点的方法
     /**
-     *
      * @param ip  远端ip
      * @param port  远端端口
      */
