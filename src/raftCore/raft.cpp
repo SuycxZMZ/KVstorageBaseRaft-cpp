@@ -217,7 +217,7 @@ void Raft::doElection() {
             auto requestVoteReply = std::make_shared<raftRpcProctoc::RequestVoteReply>();
 
             // 发送，使用匿名函数执行避免其拿到锁
-            std::thread t(&Raft::sendRequestVote, this, 
+            std::thread t(&Raft::sendRequestVote, this,
                           i, requestVoteArgs, requestVoteReply, votedNum);
             t.detach();
         }
@@ -231,12 +231,10 @@ void Raft::doElection() {
  */
 void Raft::doHeartBeat() {
     std::lock_guard<std::mutex> g(m_mtx);
-
     if (m_status == Leader) {
         DPrintf("[func-Raft::doHeartBeat()-Leader: {%d}] Leader的心跳定时器触发了且拿到mutex，开始发送AE\n", m_me);
         auto appendNums = std::make_shared<int>(1);  // 正确返回的节点的数量
-
-        // 对Follower（除了自己外的所有节点发送AE）
+        // 对Follower发送心跳
         // todo 这里肯定是要修改的，最好使用一个单独的goruntime来负责管理发送log，因为后面的log发送涉及优化之类的
         // 最少要单独写一个函数来管理，而不是在这一坨
         for (int i = 0; i < m_peers.size(); i++) {
@@ -245,7 +243,7 @@ void Raft::doHeartBeat() {
             }
             DPrintf("[func-Raft::doHeartBeat()-Leader: {%d}] Leader的心跳定时器触发了 index:{%d}\n", m_me, i);
             myAssert(m_nextIndex[i] >= 1, format("rf.nextIndex[%d] = {%d}", i, m_nextIndex[i]));
-            // 日志压缩加入后要判断是发送快照还是发送AE
+            // 日志压缩加入后要判断是发送快照还是发送心跳
             if (m_nextIndex[i] <= m_lastSnapshotIncludeIndex) {
                 std::thread t(&Raft::leaderSendSnapShot, this, i);  // 创建新线程并执行b函数，并传递参数
                 t.detach();
@@ -609,16 +607,13 @@ void Raft::persist() {
 
 
 /**
- * @brief 变成candidate之后需要让其他结点给自己投票，这里，该函数在候选者的sendRequestVote中调用
- *        候选者远程调用其他结点，请求投票
+ * @brief 变成 candidate 之后需要让其他结点给自己投票，candidate通过该函数远程调用远端节点的投票函数
  * @param args 请求投票的参数
  * @param reply 请求投票的响应
  */
 void Raft::RequestVote(const raftRpcProctoc::RequestVoteArgs* args, raftRpcProctoc::RequestVoteReply* reply) {
     std::lock_guard<std::mutex> lg(m_mtx);
-
-    DEFER {
-        // 应该先持久化，再撤销lock
+    DEFER { // 应该先持久化，再撤销lock
         persist();
     };
     // 对args的term的三种情况分别进行处理，大于小于等于自己的term都是不同的处理
@@ -765,59 +760,49 @@ bool Raft::sendRequestVote(int server, std::shared_ptr<raftRpcProctoc::RequestVo
 
     auto start = now();
     DPrintf("[func-sendRequestVote rf{%d}] 向server{%d} 發送 RequestVote 開始", m_me, m_currentTerm, getLastLogIndex());
-    // 发送请求投票，远程调用raft节点的投票
-    bool ok = m_peers[server]->RequestVote(args.get(), reply.get());
+    bool ok = m_peers[server]->RequestVote(args.get(), reply.get()); // 发送请求投票，远程调用raft节点的投票
     DPrintf("[func-sendRequestVote rf{%d}] 向server{%d} 發送 RequestVote 完畢，耗時:{%d} ms", m_me, m_currentTerm,
             getLastLogIndex(), now() - start);
 
     if (!ok) {
-        return ok;  // 不知道为什么不加这个的话如果服务器宕机会出现问题的，通不过2B  todo
+        return ok;  // 不知道为什么不加这个的话如果服务器宕机会出现问题的
     }
 
     // 对回应进行处理，要记得无论什么时候收到回复就要检查term
     std::lock_guard<std::mutex> lg(m_mtx);
-    if (reply->term() > m_currentTerm) {
-        // 三变：身份，term，和投票
+    if (reply->term() > m_currentTerm) { // 三变：身份，term，和投票
         m_status = Follower;  
         m_currentTerm = reply->term();
         m_votedFor = -1;
-
         persist();
         return true;
     } else if (reply->term() < m_currentTerm) {
         return true;
     }
-    myAssert(reply->term() == m_currentTerm, format("assert {reply.Term==rf.currentTerm} fail"));
 
-    // 如果投票不成功，直接返回
-    if (!reply->votegranted()) {
+    myAssert(reply->term() == m_currentTerm, format("assert {reply.Term==rf.currentTerm} fail"));
+    if (!reply->votegranted()) { // 如果投票不成功，直接返回
         return true;
     }
-
-    // 如果投票成功，记录投票的结点数量
-    *votedNum = *votedNum + 1;
-
-    // 如果投票成功，并且投票数量大于等于一半，那么就变成leader
-    if (*votedNum >= m_peers.size() / 2 + 1) { 
+    // ---------------- term 相等且投票成功的逻辑 ---------------- //
+    *votedNum = *votedNum + 1; // 如果投票成功，记录投票的结点数量，这里在lg锁的保护范围内，操作*votedNum是线程安全的
+    if (*votedNum >= m_peers.size() / 2 + 1) {  // 如果投票成功，并且投票数量大于等于一半，那么就变成leader
         *votedNum = 0;
-        if (m_status == Leader) {
-            // 如果已经是leader了，那么是就是了，不会进行下一步处理了k
+        if (m_status == Leader) { // 如果已经是leader了，那么是就是了，不会进行下一步处理了
             myAssert(false, format("[func-sendRequestVote-rf{%d}]  term:{%d} 同一个term当两次领导，error", m_me,
                                    m_currentTerm));
         }
-        // 第一次变成leader，初始化状态和 nextIndex、matchIndex
-        m_status = Leader;
+        m_status = Leader; // 第一次变成leader，初始化状态和 nextIndex、matchIndex
         DPrintf("[func-sendRequestVote rf{%d}] elect success  ,current term:{%d} ,lastLogIndex:{%d}\n", m_me,
                 m_currentTerm, getLastLogIndex());
 
         int lastLogIndex = getLastLogIndex();
-        for (int i = 0; i < m_nextIndex.size(); i++) { // 只有leader才需要维护m_nextIndex和m_matchIndex
-            m_nextIndex[i] = lastLogIndex + 1;  // 有效下标从1开始，因此要+1
-            m_matchIndex[i] = 0;                // 每换一个领导都是从0开始，见fig2
+        for (int i = 0; i < m_nextIndex.size(); i++) { // 只有leader才需要维护 m_nextIndex 和 m_matchIndex
+            m_nextIndex[i] = lastLogIndex + 1;  
+            m_matchIndex[i] = 0;                // 每换一个领导都是从0开始 ？
         }
         std::thread t(&Raft::doHeartBeat, this);  // 马上向其他节点宣告自己就是leader
         t.detach();
-
         persist();
     }
     return true;

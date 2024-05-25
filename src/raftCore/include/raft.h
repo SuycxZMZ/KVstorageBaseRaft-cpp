@@ -142,8 +142,7 @@ public:
     void persist();
 
     /**
-     * @brief 变成candidate之后需要让其他结点给自己投票，这里，该函数在候选者的sendRequestVote中调用
-     *        通过与其他节点的channel进行rpc请求
+     * @brief 变成 candidate 之后需要让其他结点给自己投票，candidate通过该函数远程调用远端节点的投票函数
      * @param args 请求投票的参数
      * @param reply 请求投票的响应
      */
