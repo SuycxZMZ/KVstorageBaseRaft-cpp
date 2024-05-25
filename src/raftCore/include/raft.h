@@ -25,69 +25,43 @@ constexpr int Disconnected = 0;
 constexpr int AppNormal = 1;
 
 ///////////////投票状态
-
 constexpr int Killed = 0;
 constexpr int Voted = 1;   // 本轮已经投过票了
 constexpr int Expire = 2;  // 投票（消息、竞选者）过期
 constexpr int Normal = 3;
 
+/**
+ * @brief Raft 核心类
+*/
 class Raft : public raftRpcProctoc::raftRpc {
 private:
-    std::mutex m_mtx;
+    std::mutex m_mtx; // 互斥锁，用于保护raft状态的修改
+    std::vector<std::shared_ptr<RaftRpcUtil>> m_peers; // 保存与其他raft结点通信的rpc入口
+    std::shared_ptr<Persister> m_persister; // 持久化层，负责raft数据的持久化
 
-    // 需要与其他raft节点通信，这里保存与其他结点通信的rpc入口
-    std::vector<std::shared_ptr<RaftRpcUtil>> m_peers;
-
-    // 持久化层，负责raft数据的持久化
-    std::shared_ptr<Persister> m_persister;
-
-    // raft是以集群启动，这个用来标识自己的的编号
-    int m_me;
-
-    // 记录当前的term
-    int m_currentTerm;
-
-    // 记录当前term给谁投票过
-    int m_votedFor;
-
-    // 日志条目数组，包含了状态机要执行的指令集，以及收到领导时的任期号
-    // 这两个状态所有结点都在维护，易失 
+    int m_me; // raft是以集群启动，这个用来标识自己的的编号
+    int m_currentTerm; // 记录任期
+    int m_votedFor; // 记录当前term给谁投票过
+ 
     std::vector<raftRpcProctoc::LogEntry> m_logs;   //raft节点保存的全部的日志信息。
-    int m_commitIndex;
-    // 已经汇报给状态机（上层应用）的log 的index
-    int m_lastApplied;
-    // 这两个状态是由服务器来维护，易失
+    int m_commitIndex;  // 已提交到状态机的日志的index
+    int m_lastApplied;  // 已经汇报给状态机（上层应用）的log 的index
     // 这两个状态的下标1开始，因为通常commitIndex和lastApplied从0开始，应该是一个无效的index，因此下标从1开始
+    
+    std::vector<int> m_nextIndex; // m_nextIndex 保存leader下一次应该从哪一个日志开始发送给follower
+    std::vector<int> m_matchIndex; // m_matchIndex表示follower在哪一个日志是已经匹配了的
 
-    // 只有leader才需要维护m_nextIndex和m_matchIndex
-    // m_nextIndex 保存leader下一次应该从哪一个日志开始发送给follower
-    std::vector<int> m_nextIndex;
+    enum Status { Follower, Candidate, Leader }; // raft节点身份枚举
+    Status m_status; // 节点身份
 
-    // m_matchIndex表示follower在哪一个日志是已经匹配了的（由于日志安全性，某一个日志匹配，那么这个日志及其之前的日志都是匹配的）
-    std::vector<int> m_matchIndex;
+    std::shared_ptr<LockQueue<ApplyMsg>> applyChan;  // client从这里取日志，client与raft通信的接口
 
-    // raft节点身份枚举
-    enum Status { Follower, Candidate, Leader };
-    // 节点身份
-    Status m_status;
-
-    // client从这里取日志（2B），client与raft通信的接口
-    std::shared_ptr<LockQueue<ApplyMsg>> applyChan; 
-    // ApplyMsgQueue chan ApplyMsg // raft内部使用的chan，applyChan是用于和服务层交互，最后好像没用上
-
-    // 选举超时时间
-    std::chrono::_V2::system_clock::time_point m_lastResetElectionTime;
-    // 心跳超时，用于leader
-    std::chrono::_V2::system_clock::time_point m_lastResetHearBeatTime;
+    std::chrono::_V2::system_clock::time_point m_lastResetElectionTime; // 选举超时时间
+    std::chrono::_V2::system_clock::time_point m_lastResetHearBeatTime; // 心跳超时，用于leader
 
     // Snapshot是kvDb的快照，也可以看成是日志，因此:全部的日志 = m_logs + snapshot
-    // 因为Snapshot是kvDB生成的，kvDB肯定不知道raft的存在，而什么term、什么日志Index都是raft才有的概念，因此snapshot中肯定没有term和index信息。
-    // 所以需要raft自己来保存这些信息。故，快照与m_logs联合起来理解即可。
-
-    // 2D中用于传入快照点
-    // 储存了快照中的最后一个日志的Index和Term
-    int m_lastSnapshotIncludeIndex;
-    int m_lastSnapshotIncludeTerm;
+    int m_lastSnapshotIncludeIndex; // 最后一个日志的Index
+    int m_lastSnapshotIncludeTerm; // 最后一个日志的Term
 
     // 协程
     std::unique_ptr<monsoon::IOManager> m_ioManager = nullptr;
@@ -126,7 +100,7 @@ public:
      * @brief 1.负责查看是否该发起选举，如果该发起选举就执行doElection发起选举。
      *        2.doElection：实际发起选举，构造需要发送的rpc，并多线程调用sendRequestVote处理rpc及其相应。
      *        3.sendRequestVote：负责发送选举中的RPC，在发送完rpc后还需要负责接收并处理对端发送回来的响应。
-     *        4.RequestVote：接收别人发来的选举请求，主要检验是否要给对方投票。
+     *        4.RequestVote：远端执行，接收别人发来的选举请求，主要检验是否要给对方投票。
      */
     void electionTimeOutTicker();
 
@@ -192,7 +166,7 @@ public:
 
     /**
      * @brief 请求其他结点的投票
-     * @param server 请求投票的结点
+     * @param server 请求投票的结点索引
      * @param args 请求投票的参数
      * @param reply 请求投票的响应
      * @param votedNum 记录投票的结点数量
@@ -224,13 +198,6 @@ public:
      */
     void Start(Op command, int *newLogIndex, int *newLogTerm, bool *isLeader);
 
-    // Snapshot the service says it has created a snapshot that has
-    // all info up to and including index. this means the
-    // service no longer needs the log through (and including)
-    // that index. Raft should now trim its log as much as possible.
-    // index代表是快照apply应用的index,而snapshot代表的是上层service传来的快照字节流，包括了Index之前的数据
-    // 这个函数的目的是把安装到快照里的日志抛弃，并安装快照数据，同时更新快照下标，属于peers自身主动更新，与leader发送快照不冲突
-    // 即服务层主动发起请求raft保存snapshot里面的数据，index是用来表示snapshot快照执行到了哪条命令
     void Snapshot(int index, std::string snapshot);
 
 public:
@@ -257,35 +224,24 @@ public:
     void RequestVote(google::protobuf::RpcController *controller, const ::raftRpcProctoc::RequestVoteArgs *request,
                      ::raftRpcProctoc::RequestVoteReply *response, ::google::protobuf::Closure *done) override;
 
-   public:
+public:
     /**
      * @brief 初始化
-     *        Make
-     *        the service or tester wants to create a Raft server. the ports
-     *        of all the Raft servers (including this one) are in peers[]. this
-     *        server's port is peers[me]. all the servers' peers[] arrays
-     *        have the same order. persister is a place for this server to
-     *        save its persistent state, and also initially holds the most
-     *        recent saved state, if any. applyCh is a channel on which the
-     *        tester or service expects Raft to send ApplyMsg messages.
-     *        Make() must return quickly, so it should start goroutines
-     *        for any long-running work.
      * @param peers 与其他raft节点通信的channel
      * @param me 自身raft节点在peers中的索引
-     * @param persister 持久化类
+     * @param persister 持久化类的 shared_ptr
      * @param applyCh 与kv-server沟通的channel
      */
     void init(std::vector<std::shared_ptr<RaftRpcUtil>> peers, int me, std::shared_ptr<Persister> persister,
               std::shared_ptr<LockQueue<ApplyMsg>> applyCh);
 
 private:
-    //
 
     /**
      * @brief for persist
      */
     class BoostPersistRaftNode {
-       public:
+    public:
         friend class boost::serialization::access;
 
         /**
@@ -307,8 +263,6 @@ private:
         int m_lastSnapshotIncludeTerm;
         std::vector<std::string> m_logs;
         std::unordered_map<std::string, int> umap;
-
-       public:
     };
 };
 
