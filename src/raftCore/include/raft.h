@@ -175,7 +175,7 @@ public:
                          std::shared_ptr<raftRpcProctoc::RequestVoteReply> reply, std::shared_ptr<int> votedNum);
 
     /**
-     * @brief Leader发送心跳后，对心跳的回复进行对应的处理
+     * @brief Leader真正发送心跳的函数，执行RPC
      * @param server 回复的结点
      * @param args 回复的参数
      * @param reply 回复的响应
@@ -199,7 +199,7 @@ public:
 
     void Snapshot(int index, std::string snapshot);
 
-public:
+public: 
     /**
      * @brief 重写基类方法,因为rpc远程调用真正调用的是这个方法
      *        序列化，反序列化等操作rpc框架都已经做完了，因此这里只需要获取值然后真正调用本地方法即可。

@@ -810,9 +810,9 @@ bool Raft::sendRequestVote(int server, std::shared_ptr<raftRpcProctoc::RequestVo
 
 
 /**
- * @brief Leader发送心跳后，对心跳的回复进行对应的处理
- * @param server 远程节点索引
- * @param args 请求参数
+ * @brief Leader真正发送心跳的函数，执行RPC
+ * @param server 回复的结点
+ * @param args 回复的参数
  * @param reply 回复的响应
  * @param appendNums 记录回复的结点数量
  * @param return 返回是否成功
@@ -820,13 +820,10 @@ bool Raft::sendRequestVote(int server, std::shared_ptr<raftRpcProctoc::RequestVo
 bool Raft::sendAppendEntries(int server, std::shared_ptr<raftRpcProctoc::AppendEntriesArgs> args,
                              std::shared_ptr<raftRpcProctoc::AppendEntriesReply> reply,
                              std::shared_ptr<int> appendNums) {
-    // todo： paper中5.3节第一段末尾提到，如果append失败应该不断的retries ,直到这个log成功的被store
+    // 如果append失败应该不断的retries ,直到这个log成功的被store
     DPrintf("[func-Raft::sendAppendEntries-raft{%d}] leader 向节点{%d}发送AE rpc開始 ， args->entries_size():{%d}",
             m_me, server, args->entries_size());
-    
-    // 发送rpc请求
-    bool ok = m_peers[server]->AppendEntries(args.get(), reply.get());
-
+    bool ok = m_peers[server]->AppendEntries(args.get(), reply.get()); // 发送rpc请求
     if (!ok) {
         DPrintf("[func-Raft::sendAppendEntries-raft{%d}] leader 向节点{%d}发送AE rpc失敗", m_me, server);
         return ok;
@@ -835,11 +832,10 @@ bool Raft::sendAppendEntries(int server, std::shared_ptr<raftRpcProctoc::AppendE
     if (reply->appstate() == Disconnected) {
         return ok;
     }
-    std::lock_guard<std::mutex> lg1(m_mtx);
 
+    std::lock_guard<std::mutex> lg1(m_mtx);
     // 对reply进行处理
-    // 对于rpc通信，无论什么时候都要检查term
-    if (reply->term() > m_currentTerm) {
+    if (reply->term() > m_currentTerm) { // 自己已经过时了
         m_status = Follower;
         m_currentTerm = reply->term();
         m_votedFor = -1;
@@ -850,9 +846,8 @@ bool Raft::sendAppendEntries(int server, std::shared_ptr<raftRpcProctoc::AppendE
         return ok;
     }
 
-    if (m_status != Leader) {
-        // 如果不是leader，那么就不要对返回的情况进行处理了
-        return ok;
+    if (m_status != Leader) { // 如果不是leader，那么就不要对返回的情况进行处理了
+        return ok; 
     }
 
     // term相等
@@ -865,27 +860,21 @@ bool Raft::sendAppendEntries(int server, std::shared_ptr<raftRpcProctoc::AppendE
             DPrintf("[func -sendAppendEntries  rf{%d}]  返回的日志term相等，但是不匹配，回缩nextIndex[%d]：{%d}\n",
                     m_me, server, reply->updatenextindex());
             //// 优化日志匹配，让follower决定到底应该下一次从哪一个开始尝试发送
-            m_nextIndex[server] = reply->updatenextindex();  // 失败是不更新mathIndex的
+            m_nextIndex[server] = reply->updatenextindex();  // 失败不更新mathIndex
         }
-        // rf.nextIndex数组是冗余？，看下论文fig2，其实不是冗余的
-    } else {
-        *appendNums = *appendNums + 1; //到这里代表同意接收了本次心跳或者日志
+    } else { //到这里代表同意接收了本次心跳或者日志
+        *appendNums = *appendNums + 1; 
         //同意了日志，就更新对应的 m_matchIndex 和 m_nextIndex
         m_matchIndex[server] = std::max(m_matchIndex[server], args->prevlogindex() + args->entries_size());
         m_nextIndex[server] = m_matchIndex[server] + 1;
         int lastLogIndex = getLastLogIndex();
-
         myAssert(m_nextIndex[server] <= lastLogIndex + 1,
-                 format("error msg:rf.nextIndex[%d] > lastLogIndex+1, len(rf.logs) = %d   lastLogIndex{%d} = %d",
+                format("error msg:rf.nextIndex[%d] > lastLogIndex+1, len(rf.logs) = %d   lastLogIndex{%d} = %d",
                         server, m_logs.size(), server, lastLogIndex));
         if (*appendNums >= 1 + m_peers.size() / 2) { // 可以commit了
-            // 两种方法保证幂等性，1.赋值为0 	2.上面≥改为==
-
             *appendNums = 0;
-            
             // leader只有在当前term有日志提交的时候才更新commitIndex，因为raft无法保证之前term的Index是否提交
             // 只有当前term有日志提交，之前term的log才可以被提交，只有这样才能保证“领导人完备性{当选领导人的节点拥有之前被提交的所有log，当然也可能有一些没有被提交的}”
-            // rf.leaderUpdateCommitIndex()
             if (args->entries_size() > 0) {
                 DPrintf("args->entries(args->entries_size()-1).logterm(){%d}   m_currentTerm{%d}",
                         args->entries(args->entries_size() - 1).logterm(), m_currentTerm);
