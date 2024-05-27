@@ -132,7 +132,9 @@ public:
     void leaderUpdateCommitIndex();
 
     /**
-     * @brief 对应Index的日志是否匹配，只需要Index和Term就可以知道是否匹配
+     * @brief leader传过来的对应Index的日志是否匹配，只需要Index和Term就可以知道是否匹配
+     * @param logIndex leader传过来的日志的索引
+     * @param logTerm leader传过来的日志的Term
      */
     bool matchLog(int logIndex, int logTerm);
 
@@ -155,6 +157,12 @@ public:
     int getLastLogIndex();
     int getLastLogTerm();
     void getLastLogIndexAndTerm(int *lastLogIndex, int *lastLogTerm);
+
+    /**
+     * @brief 返回该节点的 logIndex 对应的任期
+     * @param logIndex log的逻辑index。注意区别于m_logs的物理index
+     * @return int 节点的 logIndex 对应的任期
+     */
     int getLogTermFromLogIndex(int logIndex);
     int GetRaftStateSize();
 
@@ -201,8 +209,7 @@ public:
 
 public: 
     /**
-     * @brief 重写基类方法,因为rpc远程调用真正调用的是这个方法
-     *        序列化，反序列化等操作rpc框架都已经做完了，因此这里只需要获取值然后真正调用本地方法即可。
+     * @brief 重写基类方法, 远程 follower 节点远程被调用
      */
     void AppendEntries(google::protobuf::RpcController *controller, const ::raftRpcProctoc::AppendEntriesArgs *request,
                        ::raftRpcProctoc::AppendEntriesReply *response, ::google::protobuf::Closure *done) override;
