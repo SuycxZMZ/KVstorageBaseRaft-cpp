@@ -42,6 +42,7 @@ public:  // for rpc
  * @details 1. 初始化成员函数
  *          2. 初始化本server代表的raft节点，发布server和raft节点的rpc方法
  *          3. 获取其他节点信息，并进行连接
+ *          4. kvDB初始化
  * @param me 节点编号
  * @param maxraftstate 快照阈值，raft日志超过这个值时，会触发快照
  * @param nodeInforFileName 节点信息文件名
@@ -89,15 +90,12 @@ KvServer::KvServer(int me, int maxraftstate, std::string nodeInforFileName, shor
         std::string otherNodeIp = ipPortVt[i].first;
         short otherNodePort = ipPortVt[i].second;
         auto *rpc = new RaftRpcUtil(otherNodeIp, otherNodePort);
-        servers.push_back(std::shared_ptr<RaftRpcUtil>(rpc));
+        servers.push_back(std::shared_ptr<RaftRpcUtil>(rpc)); 
     }
     sleep(ipPortVt.size() - me);  // 等待所有节点相互连接成功，再启动raft
     m_raftNode->init(servers, m_me, persister, applyChan);
     // kv的server直接与raft通信，但kv不直接与raft通信，所以需要把ApplyMsg的chan传递下去用于通信，两者的persist也是共用的
 
-    //////////////////////////////////
-
-    // You may need initialization code here.
     // m_kvDB; //kvdb初始化
     m_skipList;
     waitApplyCh;

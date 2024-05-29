@@ -426,7 +426,7 @@ KvServer::KvServer(int me, int maxraftstate, std::string nodeInforFileName, shor
         std::string otherNodeIp = ipPortVt[i].first;
         short otherNodePort = ipPortVt[i].second;
         auto *rpc = new RaftRpcUtil(otherNodeIp, otherNodePort);
-        servers.push_back(std::shared_ptr<RaftRpcUtil>(rpc));
+        servers.push_back(std::shared_ptr<RaftRpcUtil>(rpc)); // 与其他节点通信的rpc通道
 
         std::cout << "node" << m_me << " 连接node" << i << "success!" << std::endl;
     }
