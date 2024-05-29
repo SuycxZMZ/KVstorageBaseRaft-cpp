@@ -371,17 +371,21 @@ void KvServer::Get(google::protobuf::RpcController *controller, const ::raftKVRp
     done->Run();
 }
 
+/**
+ * @brief 构造函数
+ * @param me 节点编号
+ * @param maxraftstate 快照阈值，raft日志超过这个值时，会触发快照
+ * @param nodeInforFileName 节点信息文件名
+ * @param port 监听端口
+*/
 KvServer::KvServer(int me, int maxraftstate, std::string nodeInforFileName, short port) : m_skipList(6) {
     std::shared_ptr<Persister> persister = std::make_shared<Persister>(me);
-
     m_me = me;
     m_maxRaftState = maxraftstate;
-
     applyChan = std::make_shared<LockQueue<ApplyMsg> >();
-
     m_raftNode = std::make_shared<Raft>();
-    ////////////////clerk层面 kvserver开启rpc接受功能
-    //    同时raft与raft节点之间也要开启rpc功能，因此有两个注册
+    // clerk层面 kvserver开启rpc接受功能
+    // 同时raft与raft节点之间也要开启rpc功能，因此有两个注册
     std::thread t([this, port]() -> void {
         // provider是一个rpc网络服务对象。把UserService对象发布到rpc节点上
         RpcProvider provider;

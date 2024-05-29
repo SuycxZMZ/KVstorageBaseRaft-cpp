@@ -53,6 +53,13 @@ private:
 public:
     KvServer() = delete;
 
+    /**
+     * @brief 构造函数
+     * @param me 节点编号
+     * @param maxraftstate 快照阈值，raft日志超过这个值时，会触发快照
+     * @param nodeInforFileName 节点信息文件名
+     * @param port 监听端口
+    */
     KvServer(int me, int maxraftstate, std::string nodeInforFileName, short port);
 
     void StartKVServer();
