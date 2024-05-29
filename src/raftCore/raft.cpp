@@ -101,7 +101,7 @@ void Raft::AppendEntries1(const raftRpcProctoc::AppendEntriesArgs* args, raftRpc
 }
 
 /**
- * @brief 定期向状态机写入日志
+ * @brief 定期向状态机写入日志，将已提交但未应用的日志应用，加入到 applyChan
  */
 void Raft::applierTicker() {
     while (true) {

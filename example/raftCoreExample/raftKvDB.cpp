@@ -12,7 +12,7 @@
 void ShowArgsHelp();
 
 int main(int argc, char **argv) {
-    //////////////////////////////////读取命令参数：节点数量、写入raft节点节点信息到哪个文件
+    // ---------------------- 读取命令参数：节点数量、写入raft节点节点信息到哪个文件 ----------------------
     if (argc < 2) {
         ShowArgsHelp();
         exit(EXIT_FAILURE);
@@ -47,6 +47,8 @@ int main(int argc, char **argv) {
         std::cout << "无法打开 " << configFileName << std::endl;
         exit(EXIT_FAILURE);
     }
+
+    // ---------------------- 进程创建，测试 ----------------------
     for (int i = 0; i < nodeNum; i++) {
         short port = startPort + static_cast<short>(i);
         std::cout << "start to create raftkv node:" << i << "    port:" << port << " pid:" << getpid() << std::endl;
@@ -54,7 +56,6 @@ int main(int argc, char **argv) {
         if (pid == 0) {
             // 如果是子进程
             // 子进程的代码
-
             auto kvServer = new KvServer(i, 500, configFileName, port);
             pause();  // 子进程进入等待状态，不会执行 return 语句
         } else if (pid > 0) {

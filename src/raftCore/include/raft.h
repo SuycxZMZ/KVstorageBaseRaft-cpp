@@ -104,6 +104,9 @@ public:
      */
     void electionTimeOutTicker();
 
+    /**
+     * @brief 返回待提交的日志信息
+    */
     std::vector<ApplyMsg> getApplyLogs();
     int getNewCommandIndex();
     void getPrevLogInfo(int server, int *preIndex, int *preTerm);
