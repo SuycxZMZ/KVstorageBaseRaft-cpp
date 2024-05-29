@@ -101,7 +101,7 @@ void Raft::AppendEntries1(const raftRpcProctoc::AppendEntriesArgs* args, raftRpc
 }
 
 /**
- * @brief 定期向状态机写入日志，非重点函数
+ * @brief 定期向状态机写入日志
  */
 void Raft::applierTicker() {
     while (true) {

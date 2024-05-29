@@ -75,7 +75,7 @@ public:
     void AppendEntries1(const raftRpcProctoc::AppendEntriesArgs *args, raftRpcProctoc::AppendEntriesReply *reply);
 
     /**
-     * @brief 定期向状态机写入日志，非重点函数
+     * @brief 定期向状态机写入日志
      */
     void applierTicker();
 
