@@ -1,10 +1,7 @@
-# 主要流程
-
-## 1. 从使用开始
-
-### KvServer
+## KvServer
 
 执行 raftKvDB main函数中起若干子进程，每个进程根据配置文件参数负责一个 raftServer --> KvServer
+KvServer 负责一个节点的 raft 层与 kvDB 交互，以及与外部的 client 交互。
 
 ```C++
 /**
@@ -107,6 +104,24 @@ KvServer::KvServer(int me, int maxraftstate, std::string nodeInforFileName, shor
     }
     std::thread t2(&KvServer::ReadRaftApplyCommandLoop, this);  // 马上向其他节点宣告自己就是leader
     t2.join();  // 由於ReadRaftApplyCommandLoop一直不會結束，达到一直卡在这的目的
+}
+
+/**
+ * @brief 一直等待raft传来的applyCh
+*/
+void KvServer::ReadRaftApplyCommandLoop() {
+    while (true) {
+        // 如果只操作applyChan不用拿锁，因为applyChan自己带锁
+        auto message = applyChan->Pop();  // 阻塞弹出
+        // listen to every command applied by its raft ,delivery to relative RPC Handler
+        if (message.CommandValid) {
+            // 从raft节点获取命令，操作kvDB
+            GetCommandFromRaft(message);
+        }
+        if (message.SnapshotValid) {
+            GetSnapShotFromRaft(message);
+        }
+    }
 }
 
 ```

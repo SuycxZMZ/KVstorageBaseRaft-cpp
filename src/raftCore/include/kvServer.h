@@ -78,7 +78,7 @@ public:
     void Get(const raftKVRpcProctoc::GetArgs *args,
              raftKVRpcProctoc::GetReply *reply);  // 将 GetArgs 改为rpc调用的，因为是远程客户端，即服务器宕机对客户端来说是无感的
     /**
-     * @brief 从raft节点获取命令
+     * @brief 从raft节点获取命令，操作kvDB
      * @param message
      */
     void GetCommandFromRaft(ApplyMsg message);
@@ -90,7 +90,9 @@ public:
     */
     void PutAppend(const raftKVRpcProctoc::PutAppendArgs *args, raftKVRpcProctoc::PutAppendReply *reply);
 
-    ////一直等待raft传来的applyCh
+    /**
+     * @brief 一直等待raft传来的applyCh
+    */
     void ReadRaftApplyCommandLoop();
 
     void ReadSnapShotToInstall(std::string snapshot);

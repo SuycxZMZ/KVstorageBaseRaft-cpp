@@ -157,6 +157,10 @@ void KvServer::Get(const raftKVRpcProctoc::GetArgs *args, raftKVRpcProctoc::GetR
     m_mtx.unlock();
 }
 
+/**
+ * @brief 从raft节点获取命令，操作kvDB
+ * @param message
+ */
 void KvServer::GetCommandFromRaft(ApplyMsg message) {
     Op op;
     op.parseFromString(message.Command);
@@ -274,6 +278,9 @@ void KvServer::PutAppend(const raftKVRpcProctoc::PutAppendArgs *args, raftKVRpcP
     m_mtx.unlock();
 }
 
+/**
+ * @brief 一直等待raft传来的applyCh
+*/
 void KvServer::ReadRaftApplyCommandLoop() {
     while (true) {
         // 如果只操作applyChan不用拿锁，因为applyChan自己带锁

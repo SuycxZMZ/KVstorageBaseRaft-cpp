@@ -88,27 +88,5 @@ raftCoreRun -n 3 -f test.conf
 > notice:在代码编写过程中可能有一些bug改进，其他分支可能并没有修复这些bug以及相应的改进。注意甄别
 >同时欢迎issue提出这些bug或者pr改进。
 
-## todoList
-
-- [x] 完成raft节点的集群功能
-- [ ] 去除冗余的库：muduo、boost 
-- [ ] 代码精简优化
-- [x] code format
-- [ ] 代码解读 maybe
-
-## 贡献者列表
-
-<!-- readme: contributors -start -->
-<!-- readme: contributors -end -->
-
-## Star History
-
-<a href="https://star-history.com/#youngyangyang04/KVstorageBaseRaft-cpp&Date">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=youngyangyang04/KVstorageBaseRaft-cpp&type=Date&theme=dark" />
-    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=youngyangyang04/KVstorageBaseRaft-cpp&type=Date" />
-    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=youngyangyang04/KVstorageBaseRaft-cpp&type=Date" />
-  </picture>
-</a>
-
+## [项目解析](docs/项目解析.md)
 
