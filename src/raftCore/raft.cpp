@@ -177,6 +177,7 @@ void Raft::doElection() {
  * @brief 发起心跳，只有leader才需要发起心跳
  *        每隔一段时间检查睡眠时间内有没有重置定时器，没有则说明超时了
  *        如果有则设置合适睡眠时间：睡眠到重置时间+超时时间
+ *        对每个发送的 raft 节点，都起一个线程发送
  */
 void Raft::doHeartBeat() {
     std::lock_guard<std::mutex> g(m_mtx);
@@ -295,6 +296,9 @@ void Raft::electionTimeOutTicker() {
     }
 }
 
+/**
+ * @brief 返回待提交的日志信息
+*/
 std::vector<ApplyMsg> Raft::getApplyLogs() {
     std::vector<ApplyMsg> applyMsgs;
     myAssert(m_commitIndex <= getLastLogIndex(),
@@ -742,7 +746,7 @@ bool Raft::sendRequestVote(int server, std::shared_ptr<raftRpcProctoc::RequestVo
 
 
 /**
- * @brief Leader真正发送心跳的函数，执行RPC
+ * @brief Leader真正发送心跳的函数，调用RPC
  * @param server 回复的结点
  * @param args 回复的参数
  * @param reply 回复的响应

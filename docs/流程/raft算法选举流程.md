@@ -1,4 +1,4 @@
-## raft 算法选举主流程
+# raft 算法选举主流程
 
 在 KvServer 构造函数中执行 raft 的构造(默认构造)和初始化(Raft::Init(...) 执行主要的raft节点初始化操作)
 
@@ -207,13 +207,9 @@ bool Raft::sendRequestVote(int server, std::shared_ptr<raftRpcProctoc::RequestVo
     if (*votedNum >= m_peers.size() / 2 + 1) {  // 如果投票成功，并且投票数量大于等于一半，那么就变成leader
         *votedNum = 0;
         if (m_status == Leader) { // 如果已经是leader了，那么是就是了，不会进行下一步处理了
-            myAssert(false, format("[func-sendRequestVote-rf{%d}]  term:{%d} 同一个term当两次领导，error", m_me,
-                                   m_currentTerm));
+            myAssert(false, format(""));
         }
         m_status = Leader; // 第一次变成leader，初始化状态和 nextIndex、matchIndex
-        DPrintf("[func-sendRequestVote rf{%d}] elect success  ,current term:{%d} ,lastLogIndex:{%d}\n", m_me,
-                m_currentTerm, getLastLogIndex());
-
         int lastLogIndex = getLastLogIndex();
         for (int i = 0; i < m_nextIndex.size(); i++) { // 只有leader才需要维护 m_nextIndex 和 m_matchIndex
             m_nextIndex[i] = lastLogIndex + 1;  
