@@ -204,7 +204,7 @@ public:
     std::string persistData();
 
     /**
-     * @brief 发布发来一个新日志
+     * @brief 发布发一个新日志
      */
     void Start(Op command, int *newLogIndex, int *newLogTerm, bool *isLeader);
 
@@ -239,7 +239,7 @@ public:
      * @param peers 与其他raft节点通信的channel
      * @param me 自身raft节点在peers中的索引
      * @param persister 持久化类的 shared_ptr
-     * @param applyCh 与kv-server沟通的channel
+     * @param applyCh 与kv-server沟通的channel，Raft层负责装填
      */
     void init(std::vector<std::shared_ptr<RaftRpcUtil>> peers, int me, std::shared_ptr<Persister> persister,
               std::shared_ptr<LockQueue<ApplyMsg>> applyCh);

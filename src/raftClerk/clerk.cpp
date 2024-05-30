@@ -13,12 +13,15 @@ std::string Clerk::Get(std::string key) {
     m_requestId++;
     auto requestId = m_requestId;
     int server = m_recentLeaderId;
+
+    // 组请求
     raftKVRpcProctoc::GetArgs args;
     args.set_key(key);
     args.set_clientid(m_clientId);
     args.set_requestid(requestId);
 
     while (true) {
+        // 发送请求
         raftKVRpcProctoc::GetReply reply;
         bool ok = m_servers[server]->Get(&args, &reply); 
         if (!ok ||

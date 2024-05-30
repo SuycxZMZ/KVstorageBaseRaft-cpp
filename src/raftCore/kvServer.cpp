@@ -91,36 +91,31 @@ void KvServer::Get(const raftKVRpcProctoc::GetArgs *args, raftKVRpcProctoc::GetR
     m_raftNode->Start(op, &raftIndex, &_,
                       &isLeader);  // raftIndex：raft预计的logIndex
                                    // ，虽然是预计，但是正确情况下是准确的，op的具体内容对raft来说 是隔离的
-
     if (!isLeader) {
         reply->set_err(ErrWrongLeader);
         return;
     }
 
-    // create waitForCh
     m_mtx.lock();
-
     if (waitApplyCh.find(raftIndex) == waitApplyCh.end()) {
         waitApplyCh.insert(std::make_pair(raftIndex, new LockQueue<Op>()));
     }
+    // 拿命令
     auto chForRaftIndex = waitApplyCh[raftIndex];
-
     m_mtx.unlock();  // 直接解锁，等待任务执行完成，不能一直拿锁等待
 
-    // timeout
-    Op raftCommitOp;
-
-    //通过超时pop来限定命令执行时间，如果超过时间还没拿到消息说明命令执行超时了。
-    if (!chForRaftIndex->timeOutPop(CONSENSUS_TIMEOUT, &raftCommitOp)) {
+    Op raftCommitOp; // timeout
+    if (!chForRaftIndex->timeOutPop(CONSENSUS_TIMEOUT, &raftCommitOp)) { // 待执行命令 为空
         int _ = -1;
         bool isLeader = false;
         m_raftNode->GetState(&_, &isLeader);
 
         if (ifRequestDuplicate(op.ClientId, op.RequestId) && isLeader) {
-            // 如果超时，代表raft集群不保证已经commitIndex该日志，但是如果是已经提交过的get请求，是可以再执行的。
-            // 不会违反线性一致性
+            // 待执行命令为空，代表raft集群不保证已经commitIndex该日志。
+            // 但是如果是已经提交过的get请求，是可以再执行的,不会违反线性一致性
             std::string value;
             bool exist = false;
+            // 操作 kvDB
             ExecuteGetOpOnKVDB(op, &value, &exist); 
             if (exist) {
                 reply->set_err(OK);
@@ -132,9 +127,9 @@ void KvServer::Get(const raftKVRpcProctoc::GetArgs *args, raftKVRpcProctoc::GetR
         } else {
             reply->set_err(ErrWrongLeader);  // 返回这个，其实就是让clerk换一个节点重试
         }
-    } else {
+    } else { // 待执行命令 非空
         // raft已经提交了该command（op），可以正式开始执行了
-        // todo 这里还要再次检验的原因：感觉不用检验，因为leader只要正确的提交了，那么这些肯定是符合的
+        // 再次检验
         if (raftCommitOp.ClientId == op.ClientId && raftCommitOp.RequestId == op.RequestId) {
             std::string value;
             bool exist = false;

@@ -2,6 +2,7 @@
 
 执行 raftKvDB main函数中起若干子进程，每个进程根据配置文件参数负责一个 raftServer --> KvServer
 KvServer 负责一个节点的 raft 层与 kvDB 交互，以及与外部的 client 交互。
+只有 leader 节点才能处理 client 发来的请求。
 
 ```C++
 /**
@@ -124,4 +125,83 @@ void KvServer::ReadRaftApplyCommandLoop() {
     }
 }
 
+
+// kvServer真正执行的 Get
+void KvServer::Get(const raftKVRpcProctoc::GetArgs *args, raftKVRpcProctoc::GetReply *reply) {
+    // 根据请求参数生成Op，生成Op是因为raft和raftServer沟通用的是类似于go中的channel的机制
+    Op op;
+    op.Operation = "Get";
+    op.Key = args->key();
+    op.Value = "";
+    op.ClientId = args->clientid();
+    op.RequestId = args->requestid();
+
+    int raftIndex = -1;
+    int _ = -1;
+    bool isLeader = false;
+
+    // raft节点发布一个命令，如果不是leader，也不发布，返回错误
+    m_raftNode->Start(op, &raftIndex, &_,
+                      &isLeader);  // raftIndex：raft预计的logIndex
+                                   // ，虽然是预计，但是正确情况下是准确的，op的具体内容对raft来说 是隔离的
+    if (!isLeader) {
+        reply->set_err(ErrWrongLeader);
+        return;
+    }
+
+    m_mtx.lock();
+    if (waitApplyCh.find(raftIndex) == waitApplyCh.end()) {
+        waitApplyCh.insert(std::make_pair(raftIndex, new LockQueue<Op>()));
+    }
+    // 拿命令
+    auto chForRaftIndex = waitApplyCh[raftIndex];
+    m_mtx.unlock();  // 直接解锁，等待任务执行完成，不能一直拿锁等待
+
+    Op raftCommitOp; // timeout
+    if (!chForRaftIndex->timeOutPop(CONSENSUS_TIMEOUT, &raftCommitOp)) { // 待执行命令 为空
+        int _ = -1;
+        bool isLeader = false;
+        m_raftNode->GetState(&_, &isLeader);
+
+        if (ifRequestDuplicate(op.ClientId, op.RequestId) && isLeader) {
+            // 待执行命令为空，代表raft集群不保证已经commitIndex该日志。
+            // 但是如果是已经提交过的get请求，是可以再执行的,不会违反线性一致性
+            std::string value;
+            bool exist = false;
+            // 操作 kvDB
+            ExecuteGetOpOnKVDB(op, &value, &exist); 
+            if (exist) {
+                reply->set_err(OK);
+                reply->set_value(value);
+            } else {
+                reply->set_err(ErrNoKey);
+                reply->set_value("");
+            } 
+        } else {
+            reply->set_err(ErrWrongLeader);  // 返回这个，其实就是让clerk换一个节点重试
+        }
+    } else { // 待执行命令 非空
+        // raft已经提交了该command（op），可以正式开始执行了
+        // 再次检验
+        if (raftCommitOp.ClientId == op.ClientId && raftCommitOp.RequestId == op.RequestId) {
+            std::string value;
+            bool exist = false;
+            ExecuteGetOpOnKVDB(op, &value, &exist);
+            if (exist) {
+                reply->set_err(OK);
+                reply->set_value(value);
+            } else {
+                reply->set_err(ErrNoKey);
+                reply->set_value("");
+            }
+        } else {
+            reply->set_err(ErrWrongLeader);
+        }
+    }
+    m_mtx.lock();  // todo 這個可以先弄一個defer，因爲刪除優先級並不高，先把rpc發回去更加重要
+    auto tmp = waitApplyCh[raftIndex];
+    waitApplyCh.erase(raftIndex);
+    delete tmp;
+    m_mtx.unlock();
+}
 ```

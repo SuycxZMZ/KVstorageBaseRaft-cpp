@@ -55,7 +55,7 @@ std::chrono::_V2::system_clock::time_point now();
 std::chrono::milliseconds getRandomizedElectionTimeout();
 void sleepNMilliseconds(int N);
 
-// ////////////////////////异步写日志的日志队列
+// 异步写日志的日志队列
 // read is blocking!!! LIKE  go chan
 template <typename T>
 class LockQueue {

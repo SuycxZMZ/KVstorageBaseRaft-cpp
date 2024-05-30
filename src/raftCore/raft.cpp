@@ -854,10 +854,6 @@ void Raft::RequestVote(google::protobuf::RpcController* controller, const ::raft
 
 void Raft::Start(Op command, int* newLogIndex, int* newLogTerm, bool* isLeader) {
     std::lock_guard<std::mutex> lg1(m_mtx);
-    //    m_mtx.lock();
-    //    Defer ec1([this]()->void {
-    //       m_mtx.unlock();
-    //    });
     if (m_status != Leader) {
         DPrintf("[func-Start-rf{%d}]  is not leader");
         *newLogIndex = -1;
@@ -888,7 +884,7 @@ void Raft::Start(Op command, int* newLogIndex, int* newLogTerm, bool* isLeader) 
  * @param peers 与其他raft节点通信的channel
  * @param me 自身raft节点在peers中的索引
  * @param persister 持久化类的 shared_ptr
- * @param applyCh 与kv-server沟通的channel
+ * @param applyCh 与kv-server沟通的channel，Raft层负责装填
  */
 void Raft::init(std::vector<std::shared_ptr<RaftRpcUtil>> peers, int me, std::shared_ptr<Persister> persister,
                 std::shared_ptr<LockQueue<ApplyMsg>> applyCh) {
