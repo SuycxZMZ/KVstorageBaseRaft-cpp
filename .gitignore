@@ -4,6 +4,8 @@
 bin
 cmake-build-debug
 lib
+build
+.vscode
 
 *.out
 *.a
