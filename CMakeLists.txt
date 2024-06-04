@@ -1,5 +1,5 @@
 # 设置cmake的最低版本和项目名称
-cmake_minimum_required(VERSION 3.22)
+cmake_minimum_required(VERSION 3.0)
 project(KVRaftCpp)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -21,9 +21,11 @@ include_directories(${PROJECT_SOURCE_DIR}/src/rpc/include)
 # include_directories(${PROJECT_SOURCE_DIR}/example)
 include_directories(${PROJECT_SOURCE_DIR}/src/raftCore/include)
 include_directories(${PROJECT_SOURCE_DIR}/src/raftRpcPro/include)
-include_directories(${PROJECT_SOURCE_DIR}/src/raftClerk/include)
+
 include_directories(${PROJECT_SOURCE_DIR}/src/skipList/include)
-include_directories(/usr/include)
+
+include_directories(${PROJECT_SOURCE_DIR}/src/raftClerk/include)
+# include_directories(/usr/include)
 
 # 设置项目库文件搜索路径 -L
 link_directories(${PROJECT_SOURCE_DIR}/lib)
@@ -33,7 +35,7 @@ add_subdirectory(src)
 add_subdirectory(example)
 
 add_library(skip_list_on_raft STATIC  ${src_rpc} ${src_fiber} ${src_raftCore} ${src_raftRpcPro} ${src_common})
-target_link_libraries(skip_list_on_raft /home/suycx/Code/tiny-muduo/lib/libtinymuduo.a pthread dl)
+target_link_libraries(skip_list_on_raft /usr/lib/libtinymuduo.a pthread dl)
 # 添加格式化目标 start
 # from : https://blog.csdn.net/guotianqing/article/details/121661067
 
