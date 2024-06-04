@@ -42,7 +42,7 @@ private:
     int m_me; // raft是以集群启动，这个用来标识自己的的编号
     int m_currentTerm; // 记录任期
     int m_votedFor; // 记录当前term给谁投票过
- 
+
     std::vector<raftRpcProctoc::LogEntry> m_logs;   //raft节点保存的全部的日志信息。
     int m_commitIndex;  // 已提交到状态机的日志的index
     int m_lastApplied;  // 已经汇报给状态机（上层应用）的log 的index

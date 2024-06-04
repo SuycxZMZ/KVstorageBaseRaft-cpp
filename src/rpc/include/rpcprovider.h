@@ -13,14 +13,14 @@
 // todo:现在rpc客户端变成了 长连接，因此rpc服务器这边最好提供一个定时器，用以断开很久没有请求的连接。
 // todo：为了配合这个，那么rpc客户端那边每次发送之前也需要真正的
 class RpcProvider {
-   public:
+public:
     // 这里是框架提供给外部使用的，可以发布rpc方法的函数接口
     void NotifyService(google::protobuf::Service *service);
 
     // 启动rpc服务节点，开始提供rpc远程网络调用服务
     void Run(int nodeIndex, short port);
 
-   private:
+private:
     // 组合EventLoop
     muduo::net::EventLoop m_eventLoop;
     std::shared_ptr<muduo::net::TcpServer> m_muduo_server;
@@ -40,6 +40,6 @@ class RpcProvider {
     // Closure的回调操作，用于序列化rpc的响应和网络发送
     void SendRpcResponse(const muduo::net::TcpConnectionPtr &, google::protobuf::Message *);
 
-   public:
+public:
     ~RpcProvider();
 };

@@ -56,16 +56,21 @@ std::string MprpcConfig::Load(const std::string &key) {
 }
 
 // 去掉字符串前后的空格
-void MprpcConfig::Trim(std::string &src_buf) {
-    int idx = src_buf.find_first_not_of(' ');
-    if (idx != -1) {
-        // 说明字符串前面有空格
-        src_buf = src_buf.substr(idx, src_buf.size() - idx);
+void MprpcConfig::Trim(std::string &str) {
+    int readPos = 0; 
+    int writePos = 0; 
+
+    // 遍历原始字符串
+    while (readPos < str.length()) 
+    {
+        // 如果当前字符不是空格，将其复制到处理后的字符串中
+        if (str[readPos] != ' ') 
+        {
+            str[writePos++] = str[readPos];
+        }
+        readPos++; // 移动读指针
     }
-    // 去掉字符串后面多余的空格
-    idx = src_buf.find_last_not_of(' ');
-    if (idx != -1) {
-        // 说明字符串后面有空格
-        src_buf = src_buf.substr(0, idx + 1);
-    }
+
+    // 将处理后的字符串的末尾设置为'\0'，以表示字符串的结束
+    str.resize(writePos);
 }

@@ -43,7 +43,7 @@ int main(int argc, char **argv) {
     RpcProvider provider;
     provider.NotifyService(new FriendService());
 
-    // 启动一个rpc服务发布节点   Run以后，进程进入阻塞状态，等待远程的rpc调用请求
+    // 启动一个rpc服务发布节点 Run以后，进程进入阻塞状态，等待远程的rpc调用请求
     provider.Run(1, 7788);
 
     return 0;

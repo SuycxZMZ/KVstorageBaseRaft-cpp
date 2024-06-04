@@ -72,15 +72,6 @@ void MprpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
     // 最后，将请求参数附加到send_rpc_str后面
     send_rpc_str += args_str;
 
-    // 打印调试信息
-    //    std::cout << "============================================" << std::endl;
-    //    std::cout << "header_size: " << header_size << std::endl;
-    //    std::cout << "rpc_header_str: " << rpc_header_str << std::endl;
-    //    std::cout << "service_name: " << service_name << std::endl;
-    //    std::cout << "method_name: " << method_name << std::endl;
-    //    std::cout << "args_str: " << args_str << std::endl;
-    //    std::cout << "============================================" << std::endl;
-
     // 发送rpc请求
     // 失败会重试连接再发送，重试连接失败会直接return
     while (-1 == send(m_clientFd, send_rpc_str.c_str(), send_rpc_str.size(), 0)) {
