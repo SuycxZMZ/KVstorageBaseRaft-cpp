@@ -1,9 +1,6 @@
 #pragma once
 #include <google/protobuf/descriptor.h>
-#include <muduo/net/EventLoop.h>
-#include <muduo/net/InetAddress.h>
-#include <muduo/net/TcpConnection.h>
-#include <muduo/net/TcpServer.h>
+#include <tinymuduo/tinymuduo.h>
 #include <functional>
 #include <string>
 #include <unordered_map>
@@ -22,8 +19,8 @@ public:
 
 private:
     // 组合EventLoop
-    muduo::net::EventLoop m_eventLoop;
-    std::shared_ptr<muduo::net::TcpServer> m_muduo_server;
+    tinymuduo::EventLoop m_eventLoop;
+    std::shared_ptr<tinymuduo::TcpServer> m_muduo_server;
 
     // service服务类型信息
     struct ServiceInfo {
@@ -34,11 +31,11 @@ private:
     std::unordered_map<std::string, ServiceInfo> m_serviceMap;
 
     // 新的socket连接回调
-    void OnConnection(const muduo::net::TcpConnectionPtr &);
+    void OnConnection(const tinymuduo::TcpConnectionPtr &);
     // 已建立连接用户的读写事件回调
-    void OnMessage(const muduo::net::TcpConnectionPtr &, muduo::net::Buffer *, muduo::Timestamp);
+    void OnMessage(const tinymuduo::TcpConnectionPtr &, tinymuduo::Buffer *, tinymuduo::Timestamp);
     // Closure的回调操作，用于序列化rpc的响应和网络发送
-    void SendRpcResponse(const muduo::net::TcpConnectionPtr &, google::protobuf::Message *);
+    void SendRpcResponse(const tinymuduo::TcpConnectionPtr &, google::protobuf::Message *);
 
 public:
     ~RpcProvider();

@@ -349,6 +349,20 @@ CMakeFiles/skip_list_on_raft.dir/src/raftRpcPro/raftRPC.pb.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/skip_list_on_raft.dir/src/raftRpcPro/raftRPC.pb.cc.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/raftRPC.pb.cc -o CMakeFiles/skip_list_on_raft.dir/src/raftRpcPro/raftRPC.pb.cc.s
 
+CMakeFiles/skip_list_on_raft.dir/src/common/util.cpp.o: CMakeFiles/skip_list_on_raft.dir/flags.make
+CMakeFiles/skip_list_on_raft.dir/src/common/util.cpp.o: /home/suycx/Code/KVstorageBaseRaft-cpp/src/common/util.cpp
+CMakeFiles/skip_list_on_raft.dir/src/common/util.cpp.o: CMakeFiles/skip_list_on_raft.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_21) "Building CXX object CMakeFiles/skip_list_on_raft.dir/src/common/util.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/skip_list_on_raft.dir/src/common/util.cpp.o -MF CMakeFiles/skip_list_on_raft.dir/src/common/util.cpp.o.d -o CMakeFiles/skip_list_on_raft.dir/src/common/util.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/common/util.cpp
+
+CMakeFiles/skip_list_on_raft.dir/src/common/util.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/skip_list_on_raft.dir/src/common/util.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/suycx/Code/KVstorageBaseRaft-cpp/src/common/util.cpp > CMakeFiles/skip_list_on_raft.dir/src/common/util.cpp.i
+
+CMakeFiles/skip_list_on_raft.dir/src/common/util.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/skip_list_on_raft.dir/src/common/util.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/suycx/Code/KVstorageBaseRaft-cpp/src/common/util.cpp -o CMakeFiles/skip_list_on_raft.dir/src/common/util.cpp.s
+
 # Object files for target skip_list_on_raft
 skip_list_on_raft_OBJECTS = \
 "CMakeFiles/skip_list_on_raft.dir/src/rpc/mprpcchannel.cpp.o" \
@@ -370,7 +384,8 @@ skip_list_on_raft_OBJECTS = \
 "CMakeFiles/skip_list_on_raft.dir/src/raftCore/raft.cpp.o" \
 "CMakeFiles/skip_list_on_raft.dir/src/raftCore/raftRpcUtil.cpp.o" \
 "CMakeFiles/skip_list_on_raft.dir/src/raftRpcPro/kvServerRPC.pb.cc.o" \
-"CMakeFiles/skip_list_on_raft.dir/src/raftRpcPro/raftRPC.pb.cc.o"
+"CMakeFiles/skip_list_on_raft.dir/src/raftRpcPro/raftRPC.pb.cc.o" \
+"CMakeFiles/skip_list_on_raft.dir/src/common/util.cpp.o"
 
 # External object files for target skip_list_on_raft
 skip_list_on_raft_EXTERNAL_OBJECTS =
@@ -395,9 +410,10 @@ skip_list_on_raft_EXTERNAL_OBJECTS =
 /home/suycx/Code/KVstorageBaseRaft-cpp/lib/libskip_list_on_raft.a: CMakeFiles/skip_list_on_raft.dir/src/raftCore/raftRpcUtil.cpp.o
 /home/suycx/Code/KVstorageBaseRaft-cpp/lib/libskip_list_on_raft.a: CMakeFiles/skip_list_on_raft.dir/src/raftRpcPro/kvServerRPC.pb.cc.o
 /home/suycx/Code/KVstorageBaseRaft-cpp/lib/libskip_list_on_raft.a: CMakeFiles/skip_list_on_raft.dir/src/raftRpcPro/raftRPC.pb.cc.o
+/home/suycx/Code/KVstorageBaseRaft-cpp/lib/libskip_list_on_raft.a: CMakeFiles/skip_list_on_raft.dir/src/common/util.cpp.o
 /home/suycx/Code/KVstorageBaseRaft-cpp/lib/libskip_list_on_raft.a: CMakeFiles/skip_list_on_raft.dir/build.make
 /home/suycx/Code/KVstorageBaseRaft-cpp/lib/libskip_list_on_raft.a: CMakeFiles/skip_list_on_raft.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_21) "Linking CXX static library /home/suycx/Code/KVstorageBaseRaft-cpp/lib/libskip_list_on_raft.a"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_22) "Linking CXX static library /home/suycx/Code/KVstorageBaseRaft-cpp/lib/libskip_list_on_raft.a"
 	$(CMAKE_COMMAND) -P CMakeFiles/skip_list_on_raft.dir/cmake_clean_target.cmake
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/skip_list_on_raft.dir/link.txt --verbose=$(VERBOSE)
 

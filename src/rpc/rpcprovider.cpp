@@ -63,11 +63,11 @@ void RpcProvider::Run(int nodeIndex, short port) {
     outfile.close();
 
     // 创建服务器
-    muduo::net::InetAddress address(ip, port);
+    tinymuduo::InetAddress address(port, ip);
     // 创建TcpServer对象
-    m_muduo_server = std::make_shared<muduo::net::TcpServer>(&m_eventLoop, address, "RpcProvider");
-    m_muduo_server->setConnectionCallback(std::bind(&RpcProvider::OnConnection, this, std::placeholders::_1));
-    m_muduo_server->setMessageCallback(
+    m_muduo_server = std::make_shared<tinymuduo::TcpServer>(&m_eventLoop, address, "RpcProvider");
+    m_muduo_server->setConnCallBack(std::bind(&RpcProvider::OnConnection, this, std::placeholders::_1));
+    m_muduo_server->setMsgCallBack(
         std::bind(&RpcProvider::OnMessage, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 
     // 设置muduo库的线程数量
@@ -82,7 +82,7 @@ void RpcProvider::Run(int nodeIndex, short port) {
 }
 
 // 新的socket连接回调
-void RpcProvider::OnConnection(const muduo::net::TcpConnectionPtr &conn) {
+void RpcProvider::OnConnection(const tinymuduo::TcpConnectionPtr &conn) {
     // 如果是新连接就什么都不干，即正常的接收连接即可
     if (!conn->connected()) {
         // 和rpc client的连接断开了
@@ -104,9 +104,9 @@ std::string   insert和copy方法
 // 已建立连接用户的读写事件回调 如果远程有一个rpc服务的调用请求，那么OnMessage方法就会响应
 // 这里来的肯定是一个远程调用请求
 // 因此本函数需要：解析请求，根据服务名，方法名，参数，来调用service的来callmethod来调用本地的业务
-void RpcProvider::OnMessage(const muduo::net::TcpConnectionPtr &conn, muduo::net::Buffer *buffer, muduo::Timestamp) {
+void RpcProvider::OnMessage(const tinymuduo::TcpConnectionPtr &conn, tinymuduo::Buffer *buffer, tinymuduo::Timestamp) {
     // 网络上接收的远程rpc调用请求的字符流    Login args
-    std::string recv_buf = buffer->retrieveAllAsString();
+    std::string recv_buf = buffer->retriveAllAsString();
 
     // 使用protobuf的CodedInputStream来解析数据流
     google::protobuf::io::ArrayInputStream array_input(recv_buf.data(), recv_buf.size());
@@ -180,7 +180,7 @@ void RpcProvider::OnMessage(const muduo::net::TcpConnectionPtr &conn, muduo::net
     // 给下面的method方法的调用，绑定一个Closure的回调函数
     // closure是执行完本地方法之后会发生的回调，因此需要完成序列化和反向发送请求的操作
     google::protobuf::Closure *done =
-        google::protobuf::NewCallback<RpcProvider, const muduo::net::TcpConnectionPtr &, google::protobuf::Message *>(
+        google::protobuf::NewCallback<RpcProvider, const tinymuduo::TcpConnectionPtr &, google::protobuf::Message *>(
             this, &RpcProvider::SendRpcResponse, conn, response);
 
     // 在框架上根据远端rpc请求，调用当前rpc节点上发布的方法
@@ -190,7 +190,7 @@ void RpcProvider::OnMessage(const muduo::net::TcpConnectionPtr &conn, muduo::net
 }
 
 // Closure的回调操作，用于序列化rpc的响应和网络发送,发送响应回去
-void RpcProvider::SendRpcResponse(const muduo::net::TcpConnectionPtr &conn, google::protobuf::Message *response) {
+void RpcProvider::SendRpcResponse(const tinymuduo::TcpConnectionPtr &conn, google::protobuf::Message *response) {
     std::string response_str;
     if (response->SerializeToString(&response_str))  // response进行序列化
     {

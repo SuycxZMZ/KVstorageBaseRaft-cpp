@@ -94,6 +94,7 @@ raftCoreRun_EXTERNAL_OBJECTS =
 /home/suycx/Code/KVstorageBaseRaft-cpp/bin/raftCoreRun: example/raftCoreExample/CMakeFiles/raftCoreRun.dir/build.make
 /home/suycx/Code/KVstorageBaseRaft-cpp/bin/raftCoreRun: /home/suycx/Code/KVstorageBaseRaft-cpp/lib/libskip_list_on_raft.a
 /home/suycx/Code/KVstorageBaseRaft-cpp/bin/raftCoreRun: /home/suycx/Code/KVstorageBaseRaft-cpp/lib/librpc_lib.a
+/home/suycx/Code/KVstorageBaseRaft-cpp/bin/raftCoreRun: /home/suycx/Code/tiny-muduo/lib/libtinymuduo.a
 /home/suycx/Code/KVstorageBaseRaft-cpp/bin/raftCoreRun: example/raftCoreExample/CMakeFiles/raftCoreRun.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable /home/suycx/Code/KVstorageBaseRaft-cpp/bin/raftCoreRun"
 	cd /home/suycx/Code/KVstorageBaseRaft-cpp/build/example/raftCoreExample && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/raftCoreRun.dir/link.txt --verbose=$(VERBOSE)

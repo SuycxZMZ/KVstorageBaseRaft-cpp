@@ -1,6 +1,8 @@
 file(REMOVE_RECURSE
   "/home/suycx/Code/KVstorageBaseRaft-cpp/lib/libskip_list_on_raft.a"
   "/home/suycx/Code/KVstorageBaseRaft-cpp/lib/libskip_list_on_raft.pdb"
+  "CMakeFiles/skip_list_on_raft.dir/src/common/util.cpp.o"
+  "CMakeFiles/skip_list_on_raft.dir/src/common/util.cpp.o.d"
   "CMakeFiles/skip_list_on_raft.dir/src/fiber/fd_manager.cpp.o"
   "CMakeFiles/skip_list_on_raft.dir/src/fiber/fd_manager.cpp.o.d"
   "CMakeFiles/skip_list_on_raft.dir/src/fiber/fiber.cpp.o"

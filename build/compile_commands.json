@@ -1,289 +1,241 @@
 [
 {
   "directory": "/home/suycx/Code/KVstorageBaseRaft-cpp/build",
-  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/example -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/skip_list_on_raft.dir/src/rpc/mprpcchannel.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/mprpcchannel.cpp",
+  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/skip_list_on_raft.dir/src/rpc/mprpcchannel.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/mprpcchannel.cpp",
   "file": "/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/mprpcchannel.cpp",
   "output": "CMakeFiles/skip_list_on_raft.dir/src/rpc/mprpcchannel.cpp.o"
 },
 {
   "directory": "/home/suycx/Code/KVstorageBaseRaft-cpp/build",
-  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/example -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/skip_list_on_raft.dir/src/rpc/mprpcconfig.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/mprpcconfig.cpp",
+  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/skip_list_on_raft.dir/src/rpc/mprpcconfig.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/mprpcconfig.cpp",
   "file": "/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/mprpcconfig.cpp",
   "output": "CMakeFiles/skip_list_on_raft.dir/src/rpc/mprpcconfig.cpp.o"
 },
 {
   "directory": "/home/suycx/Code/KVstorageBaseRaft-cpp/build",
-  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/example -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/skip_list_on_raft.dir/src/rpc/mprpccontroller.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/mprpccontroller.cpp",
+  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/skip_list_on_raft.dir/src/rpc/mprpccontroller.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/mprpccontroller.cpp",
   "file": "/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/mprpccontroller.cpp",
   "output": "CMakeFiles/skip_list_on_raft.dir/src/rpc/mprpccontroller.cpp.o"
 },
 {
   "directory": "/home/suycx/Code/KVstorageBaseRaft-cpp/build",
-  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/example -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/skip_list_on_raft.dir/src/rpc/rpcheader.pb.cc.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/rpcheader.pb.cc",
+  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/skip_list_on_raft.dir/src/rpc/rpcheader.pb.cc.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/rpcheader.pb.cc",
   "file": "/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/rpcheader.pb.cc",
   "output": "CMakeFiles/skip_list_on_raft.dir/src/rpc/rpcheader.pb.cc.o"
 },
 {
   "directory": "/home/suycx/Code/KVstorageBaseRaft-cpp/build",
-  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/example -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/skip_list_on_raft.dir/src/rpc/rpcheader.pb.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/rpcheader.pb.cpp",
+  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/skip_list_on_raft.dir/src/rpc/rpcheader.pb.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/rpcheader.pb.cpp",
   "file": "/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/rpcheader.pb.cpp",
   "output": "CMakeFiles/skip_list_on_raft.dir/src/rpc/rpcheader.pb.cpp.o"
 },
 {
   "directory": "/home/suycx/Code/KVstorageBaseRaft-cpp/build",
-  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/example -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/skip_list_on_raft.dir/src/rpc/rpcprovider.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/rpcprovider.cpp",
+  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/skip_list_on_raft.dir/src/rpc/rpcprovider.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/rpcprovider.cpp",
   "file": "/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/rpcprovider.cpp",
   "output": "CMakeFiles/skip_list_on_raft.dir/src/rpc/rpcprovider.cpp.o"
 },
 {
   "directory": "/home/suycx/Code/KVstorageBaseRaft-cpp/build",
-  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/example -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/skip_list_on_raft.dir/src/fiber/fd_manager.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/fd_manager.cpp",
+  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/skip_list_on_raft.dir/src/fiber/fd_manager.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/fd_manager.cpp",
   "file": "/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/fd_manager.cpp",
   "output": "CMakeFiles/skip_list_on_raft.dir/src/fiber/fd_manager.cpp.o"
 },
 {
   "directory": "/home/suycx/Code/KVstorageBaseRaft-cpp/build",
-  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/example -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/skip_list_on_raft.dir/src/fiber/fiber.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/fiber.cpp",
+  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/skip_list_on_raft.dir/src/fiber/fiber.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/fiber.cpp",
   "file": "/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/fiber.cpp",
   "output": "CMakeFiles/skip_list_on_raft.dir/src/fiber/fiber.cpp.o"
 },
 {
   "directory": "/home/suycx/Code/KVstorageBaseRaft-cpp/build",
-  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/example -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/skip_list_on_raft.dir/src/fiber/hook.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/hook.cpp",
+  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/skip_list_on_raft.dir/src/fiber/hook.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/hook.cpp",
   "file": "/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/hook.cpp",
   "output": "CMakeFiles/skip_list_on_raft.dir/src/fiber/hook.cpp.o"
 },
 {
   "directory": "/home/suycx/Code/KVstorageBaseRaft-cpp/build",
-  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/example -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/skip_list_on_raft.dir/src/fiber/iomanager.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/iomanager.cpp",
+  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/skip_list_on_raft.dir/src/fiber/iomanager.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/iomanager.cpp",
   "file": "/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/iomanager.cpp",
   "output": "CMakeFiles/skip_list_on_raft.dir/src/fiber/iomanager.cpp.o"
 },
 {
   "directory": "/home/suycx/Code/KVstorageBaseRaft-cpp/build",
-  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/example -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/skip_list_on_raft.dir/src/fiber/scheduler.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/scheduler.cpp",
+  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/skip_list_on_raft.dir/src/fiber/scheduler.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/scheduler.cpp",
   "file": "/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/scheduler.cpp",
   "output": "CMakeFiles/skip_list_on_raft.dir/src/fiber/scheduler.cpp.o"
 },
 {
   "directory": "/home/suycx/Code/KVstorageBaseRaft-cpp/build",
-  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/example -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/skip_list_on_raft.dir/src/fiber/thread.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/thread.cpp",
+  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/skip_list_on_raft.dir/src/fiber/thread.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/thread.cpp",
   "file": "/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/thread.cpp",
   "output": "CMakeFiles/skip_list_on_raft.dir/src/fiber/thread.cpp.o"
 },
 {
   "directory": "/home/suycx/Code/KVstorageBaseRaft-cpp/build",
-  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/example -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/skip_list_on_raft.dir/src/fiber/timer.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/timer.cpp",
+  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/skip_list_on_raft.dir/src/fiber/timer.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/timer.cpp",
   "file": "/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/timer.cpp",
   "output": "CMakeFiles/skip_list_on_raft.dir/src/fiber/timer.cpp.o"
 },
 {
   "directory": "/home/suycx/Code/KVstorageBaseRaft-cpp/build",
-  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/example -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/skip_list_on_raft.dir/src/fiber/utils.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/utils.cpp",
+  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/skip_list_on_raft.dir/src/fiber/utils.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/utils.cpp",
   "file": "/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/utils.cpp",
   "output": "CMakeFiles/skip_list_on_raft.dir/src/fiber/utils.cpp.o"
 },
 {
   "directory": "/home/suycx/Code/KVstorageBaseRaft-cpp/build",
-  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/example -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/skip_list_on_raft.dir/src/raftCore/Persister.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/Persister.cpp",
+  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/skip_list_on_raft.dir/src/raftCore/Persister.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/Persister.cpp",
   "file": "/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/Persister.cpp",
   "output": "CMakeFiles/skip_list_on_raft.dir/src/raftCore/Persister.cpp.o"
 },
 {
   "directory": "/home/suycx/Code/KVstorageBaseRaft-cpp/build",
-  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/example -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/skip_list_on_raft.dir/src/raftCore/kvServer.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/kvServer.cpp",
+  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/skip_list_on_raft.dir/src/raftCore/kvServer.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/kvServer.cpp",
   "file": "/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/kvServer.cpp",
   "output": "CMakeFiles/skip_list_on_raft.dir/src/raftCore/kvServer.cpp.o"
 },
 {
   "directory": "/home/suycx/Code/KVstorageBaseRaft-cpp/build",
-  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/example -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/skip_list_on_raft.dir/src/raftCore/raft.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/raft.cpp",
+  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/skip_list_on_raft.dir/src/raftCore/raft.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/raft.cpp",
   "file": "/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/raft.cpp",
   "output": "CMakeFiles/skip_list_on_raft.dir/src/raftCore/raft.cpp.o"
 },
 {
   "directory": "/home/suycx/Code/KVstorageBaseRaft-cpp/build",
-  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/example -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/skip_list_on_raft.dir/src/raftCore/raftRpcUtil.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/raftRpcUtil.cpp",
+  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/skip_list_on_raft.dir/src/raftCore/raftRpcUtil.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/raftRpcUtil.cpp",
   "file": "/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/raftRpcUtil.cpp",
   "output": "CMakeFiles/skip_list_on_raft.dir/src/raftCore/raftRpcUtil.cpp.o"
 },
 {
   "directory": "/home/suycx/Code/KVstorageBaseRaft-cpp/build",
-  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/example -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/skip_list_on_raft.dir/src/raftRpcPro/kvServerRPC.pb.cc.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/kvServerRPC.pb.cc",
+  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/skip_list_on_raft.dir/src/raftRpcPro/kvServerRPC.pb.cc.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/kvServerRPC.pb.cc",
   "file": "/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/kvServerRPC.pb.cc",
   "output": "CMakeFiles/skip_list_on_raft.dir/src/raftRpcPro/kvServerRPC.pb.cc.o"
 },
 {
   "directory": "/home/suycx/Code/KVstorageBaseRaft-cpp/build",
-  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/example -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/skip_list_on_raft.dir/src/raftRpcPro/raftRPC.pb.cc.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/raftRPC.pb.cc",
+  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/skip_list_on_raft.dir/src/raftRpcPro/raftRPC.pb.cc.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/raftRPC.pb.cc",
   "file": "/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/raftRPC.pb.cc",
   "output": "CMakeFiles/skip_list_on_raft.dir/src/raftRpcPro/raftRPC.pb.cc.o"
 },
 {
+  "directory": "/home/suycx/Code/KVstorageBaseRaft-cpp/build",
+  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/skip_list_on_raft.dir/src/common/util.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/common/util.cpp",
+  "file": "/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/util.cpp",
+  "output": "CMakeFiles/skip_list_on_raft.dir/src/common/util.cpp.o"
+},
+{
   "directory": "/home/suycx/Code/KVstorageBaseRaft-cpp/build/src/rpc",
-  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/example -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/rpc_lib.dir/mprpcchannel.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/mprpcchannel.cpp",
+  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/rpc_lib.dir/mprpcchannel.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/mprpcchannel.cpp",
   "file": "/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/mprpcchannel.cpp",
   "output": "src/rpc/CMakeFiles/rpc_lib.dir/mprpcchannel.cpp.o"
 },
 {
   "directory": "/home/suycx/Code/KVstorageBaseRaft-cpp/build/src/rpc",
-  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/example -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/rpc_lib.dir/mprpcconfig.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/mprpcconfig.cpp",
+  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/rpc_lib.dir/mprpcconfig.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/mprpcconfig.cpp",
   "file": "/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/mprpcconfig.cpp",
   "output": "src/rpc/CMakeFiles/rpc_lib.dir/mprpcconfig.cpp.o"
 },
 {
   "directory": "/home/suycx/Code/KVstorageBaseRaft-cpp/build/src/rpc",
-  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/example -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/rpc_lib.dir/mprpccontroller.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/mprpccontroller.cpp",
+  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/rpc_lib.dir/mprpccontroller.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/mprpccontroller.cpp",
   "file": "/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/mprpccontroller.cpp",
   "output": "src/rpc/CMakeFiles/rpc_lib.dir/mprpccontroller.cpp.o"
 },
 {
   "directory": "/home/suycx/Code/KVstorageBaseRaft-cpp/build/src/rpc",
-  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/example -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/rpc_lib.dir/rpcheader.pb.cc.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/rpcheader.pb.cc",
+  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/rpc_lib.dir/rpcheader.pb.cc.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/rpcheader.pb.cc",
   "file": "/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/rpcheader.pb.cc",
   "output": "src/rpc/CMakeFiles/rpc_lib.dir/rpcheader.pb.cc.o"
 },
 {
   "directory": "/home/suycx/Code/KVstorageBaseRaft-cpp/build/src/rpc",
-  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/example -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/rpc_lib.dir/rpcheader.pb.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/rpcheader.pb.cpp",
+  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/rpc_lib.dir/rpcheader.pb.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/rpcheader.pb.cpp",
   "file": "/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/rpcheader.pb.cpp",
   "output": "src/rpc/CMakeFiles/rpc_lib.dir/rpcheader.pb.cpp.o"
 },
 {
   "directory": "/home/suycx/Code/KVstorageBaseRaft-cpp/build/src/rpc",
-  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/example -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/rpc_lib.dir/rpcprovider.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/rpcprovider.cpp",
+  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/rpc_lib.dir/rpcprovider.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/rpcprovider.cpp",
   "file": "/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/rpcprovider.cpp",
   "output": "src/rpc/CMakeFiles/rpc_lib.dir/rpcprovider.cpp.o"
 },
 {
   "directory": "/home/suycx/Code/KVstorageBaseRaft-cpp/build/src/rpc",
-  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/example -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/rpc_lib.dir/__/common/util.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/common/util.cpp",
+  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/rpc_lib.dir/__/common/util.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/common/util.cpp",
   "file": "/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/util.cpp",
   "output": "src/rpc/CMakeFiles/rpc_lib.dir/__/common/util.cpp.o"
 },
 {
   "directory": "/home/suycx/Code/KVstorageBaseRaft-cpp/build/src/fiber",
-  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/example -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/fiber_lib.dir/fd_manager.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/fd_manager.cpp",
+  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/fiber_lib.dir/fd_manager.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/fd_manager.cpp",
   "file": "/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/fd_manager.cpp",
   "output": "src/fiber/CMakeFiles/fiber_lib.dir/fd_manager.cpp.o"
 },
 {
   "directory": "/home/suycx/Code/KVstorageBaseRaft-cpp/build/src/fiber",
-  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/example -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/fiber_lib.dir/fiber.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/fiber.cpp",
+  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/fiber_lib.dir/fiber.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/fiber.cpp",
   "file": "/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/fiber.cpp",
   "output": "src/fiber/CMakeFiles/fiber_lib.dir/fiber.cpp.o"
 },
 {
   "directory": "/home/suycx/Code/KVstorageBaseRaft-cpp/build/src/fiber",
-  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/example -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/fiber_lib.dir/hook.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/hook.cpp",
+  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/fiber_lib.dir/hook.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/hook.cpp",
   "file": "/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/hook.cpp",
   "output": "src/fiber/CMakeFiles/fiber_lib.dir/hook.cpp.o"
 },
 {
   "directory": "/home/suycx/Code/KVstorageBaseRaft-cpp/build/src/fiber",
-  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/example -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/fiber_lib.dir/iomanager.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/iomanager.cpp",
+  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/fiber_lib.dir/iomanager.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/iomanager.cpp",
   "file": "/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/iomanager.cpp",
   "output": "src/fiber/CMakeFiles/fiber_lib.dir/iomanager.cpp.o"
 },
 {
   "directory": "/home/suycx/Code/KVstorageBaseRaft-cpp/build/src/fiber",
-  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/example -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/fiber_lib.dir/scheduler.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/scheduler.cpp",
+  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/fiber_lib.dir/scheduler.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/scheduler.cpp",
   "file": "/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/scheduler.cpp",
   "output": "src/fiber/CMakeFiles/fiber_lib.dir/scheduler.cpp.o"
 },
 {
   "directory": "/home/suycx/Code/KVstorageBaseRaft-cpp/build/src/fiber",
-  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/example -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/fiber_lib.dir/thread.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/thread.cpp",
+  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/fiber_lib.dir/thread.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/thread.cpp",
   "file": "/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/thread.cpp",
   "output": "src/fiber/CMakeFiles/fiber_lib.dir/thread.cpp.o"
 },
 {
   "directory": "/home/suycx/Code/KVstorageBaseRaft-cpp/build/src/fiber",
-  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/example -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/fiber_lib.dir/timer.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/timer.cpp",
+  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/fiber_lib.dir/timer.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/timer.cpp",
   "file": "/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/timer.cpp",
   "output": "src/fiber/CMakeFiles/fiber_lib.dir/timer.cpp.o"
 },
 {
   "directory": "/home/suycx/Code/KVstorageBaseRaft-cpp/build/src/fiber",
-  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/example -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/fiber_lib.dir/utils.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/utils.cpp",
+  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/fiber_lib.dir/utils.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/utils.cpp",
   "file": "/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/utils.cpp",
   "output": "src/fiber/CMakeFiles/fiber_lib.dir/utils.cpp.o"
 },
 {
-  "directory": "/home/suycx/Code/KVstorageBaseRaft-cpp/build/example/fiberExample",
-  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/example -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/test_server.dir/server.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/example/fiberExample/server.cpp",
-  "file": "/home/suycx/Code/KVstorageBaseRaft-cpp/example/fiberExample/server.cpp",
-  "output": "example/fiberExample/CMakeFiles/test_server.dir/server.cpp.o"
-},
-{
-  "directory": "/home/suycx/Code/KVstorageBaseRaft-cpp/build/example/fiberExample",
-  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/example -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/test_scheduler.dir/test_scheduler.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/example/fiberExample/test_scheduler.cpp",
-  "file": "/home/suycx/Code/KVstorageBaseRaft-cpp/example/fiberExample/test_scheduler.cpp",
-  "output": "example/fiberExample/CMakeFiles/test_scheduler.dir/test_scheduler.cpp.o"
-},
-{
-  "directory": "/home/suycx/Code/KVstorageBaseRaft-cpp/build/example/fiberExample",
-  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/example -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/test_iomanager.dir/test_iomanager.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/example/fiberExample/test_iomanager.cpp",
-  "file": "/home/suycx/Code/KVstorageBaseRaft-cpp/example/fiberExample/test_iomanager.cpp",
-  "output": "example/fiberExample/CMakeFiles/test_iomanager.dir/test_iomanager.cpp.o"
-},
-{
-  "directory": "/home/suycx/Code/KVstorageBaseRaft-cpp/build/example/fiberExample",
-  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/example -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/test_hook.dir/test_hook.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/example/fiberExample/test_hook.cpp",
-  "file": "/home/suycx/Code/KVstorageBaseRaft-cpp/example/fiberExample/test_hook.cpp",
-  "output": "example/fiberExample/CMakeFiles/test_hook.dir/test_hook.cpp.o"
-},
-{
-  "directory": "/home/suycx/Code/KVstorageBaseRaft-cpp/build/example/rpcExample/callee",
-  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/example -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/provider.dir/friendService.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/example/rpcExample/callee/friendService.cpp",
-  "file": "/home/suycx/Code/KVstorageBaseRaft-cpp/example/rpcExample/callee/friendService.cpp",
-  "output": "example/rpcExample/callee/CMakeFiles/provider.dir/friendService.cpp.o"
-},
-{
-  "directory": "/home/suycx/Code/KVstorageBaseRaft-cpp/build/example/rpcExample/callee",
-  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/example -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/provider.dir/__/friend.pb.cc.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/example/rpcExample/friend.pb.cc",
-  "file": "/home/suycx/Code/KVstorageBaseRaft-cpp/example/rpcExample/friend.pb.cc",
-  "output": "example/rpcExample/callee/CMakeFiles/provider.dir/__/friend.pb.cc.o"
-},
-{
-  "directory": "/home/suycx/Code/KVstorageBaseRaft-cpp/build/example/rpcExample/caller",
-  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/example -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/consumer.dir/callFriendService.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/example/rpcExample/caller/callFriendService.cpp",
-  "file": "/home/suycx/Code/KVstorageBaseRaft-cpp/example/rpcExample/caller/callFriendService.cpp",
-  "output": "example/rpcExample/caller/CMakeFiles/consumer.dir/callFriendService.cpp.o"
-},
-{
-  "directory": "/home/suycx/Code/KVstorageBaseRaft-cpp/build/example/rpcExample/caller",
-  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/example -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/consumer.dir/__/friend.pb.cc.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/example/rpcExample/friend.pb.cc",
-  "file": "/home/suycx/Code/KVstorageBaseRaft-cpp/example/rpcExample/friend.pb.cc",
-  "output": "example/rpcExample/caller/CMakeFiles/consumer.dir/__/friend.pb.cc.o"
-},
-{
   "directory": "/home/suycx/Code/KVstorageBaseRaft-cpp/build/example/raftCoreExample",
-  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/example -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/raftCoreRun.dir/raftKvDB.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/example/raftCoreExample/raftKvDB.cpp",
-  "file": "/home/suycx/Code/KVstorageBaseRaft-cpp/example/raftCoreExample/raftKvDB.cpp",
-  "output": "example/raftCoreExample/CMakeFiles/raftCoreRun.dir/raftKvDB.cpp.o"
-},
-{
-  "directory": "/home/suycx/Code/KVstorageBaseRaft-cpp/build/example/raftCoreExample",
-  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/example -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/callerMain.dir/__/__/src/raftClerk/clerk.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/clerk.cpp",
+  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/callerMain.dir/__/__/src/raftClerk/clerk.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/clerk.cpp",
   "file": "/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/clerk.cpp",
   "output": "example/raftCoreExample/CMakeFiles/callerMain.dir/__/__/src/raftClerk/clerk.cpp.o"
 },
 {
   "directory": "/home/suycx/Code/KVstorageBaseRaft-cpp/build/example/raftCoreExample",
-  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/example -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/callerMain.dir/__/__/src/raftClerk/raftServerRpcUtil.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/raftServerRpcUtil.cpp",
+  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/callerMain.dir/__/__/src/raftClerk/raftServerRpcUtil.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/raftServerRpcUtil.cpp",
   "file": "/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/raftServerRpcUtil.cpp",
   "output": "example/raftCoreExample/CMakeFiles/callerMain.dir/__/__/src/raftClerk/raftServerRpcUtil.cpp.o"
 },
 {
   "directory": "/home/suycx/Code/KVstorageBaseRaft-cpp/build/example/raftCoreExample",
-  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/example -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/callerMain.dir/caller.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/example/raftCoreExample/caller.cpp",
+  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/callerMain.dir/caller.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/example/raftCoreExample/caller.cpp",
   "file": "/home/suycx/Code/KVstorageBaseRaft-cpp/example/raftCoreExample/caller.cpp",
   "output": "example/raftCoreExample/CMakeFiles/callerMain.dir/caller.cpp.o"
 },
 {
   "directory": "/home/suycx/Code/KVstorageBaseRaft-cpp/build/example/raftCoreExample",
-  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/example -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/callerMain.dir/__/__/src/common/util.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/common/util.cpp",
+  "command": "/usr/bin/c++  -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/fiber/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/rpc/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftCore/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftRpcPro/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/raftClerk/include -I/home/suycx/Code/KVstorageBaseRaft-cpp/src/skipList/include -g -std=gnu++20 -o CMakeFiles/callerMain.dir/__/__/src/common/util.cpp.o -c /home/suycx/Code/KVstorageBaseRaft-cpp/src/common/util.cpp",
   "file": "/home/suycx/Code/KVstorageBaseRaft-cpp/src/common/util.cpp",
   "output": "example/raftCoreExample/CMakeFiles/callerMain.dir/__/__/src/common/util.cpp.o"
 }

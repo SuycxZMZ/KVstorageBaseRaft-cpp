@@ -117,20 +117,6 @@ depend:
 .PHONY : depend
 
 # Convenience name for target.
-example/raftCoreExample/CMakeFiles/raftCoreRun.dir/rule:
-	cd /home/suycx/Code/KVstorageBaseRaft-cpp/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 example/raftCoreExample/CMakeFiles/raftCoreRun.dir/rule
-.PHONY : example/raftCoreExample/CMakeFiles/raftCoreRun.dir/rule
-
-# Convenience name for target.
-raftCoreRun: example/raftCoreExample/CMakeFiles/raftCoreRun.dir/rule
-.PHONY : raftCoreRun
-
-# fast build rule for target.
-raftCoreRun/fast:
-	cd /home/suycx/Code/KVstorageBaseRaft-cpp/build && $(MAKE) $(MAKESILENT) -f example/raftCoreExample/CMakeFiles/raftCoreRun.dir/build.make example/raftCoreExample/CMakeFiles/raftCoreRun.dir/build
-.PHONY : raftCoreRun/fast
-
-# Convenience name for target.
 example/raftCoreExample/CMakeFiles/callerMain.dir/rule:
 	cd /home/suycx/Code/KVstorageBaseRaft-cpp/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 example/raftCoreExample/CMakeFiles/callerMain.dir/rule
 .PHONY : example/raftCoreExample/CMakeFiles/callerMain.dir/rule
@@ -240,30 +226,6 @@ caller.cpp.s:
 	cd /home/suycx/Code/KVstorageBaseRaft-cpp/build && $(MAKE) $(MAKESILENT) -f example/raftCoreExample/CMakeFiles/callerMain.dir/build.make example/raftCoreExample/CMakeFiles/callerMain.dir/caller.cpp.s
 .PHONY : caller.cpp.s
 
-raftKvDB.o: raftKvDB.cpp.o
-.PHONY : raftKvDB.o
-
-# target to build an object file
-raftKvDB.cpp.o:
-	cd /home/suycx/Code/KVstorageBaseRaft-cpp/build && $(MAKE) $(MAKESILENT) -f example/raftCoreExample/CMakeFiles/raftCoreRun.dir/build.make example/raftCoreExample/CMakeFiles/raftCoreRun.dir/raftKvDB.cpp.o
-.PHONY : raftKvDB.cpp.o
-
-raftKvDB.i: raftKvDB.cpp.i
-.PHONY : raftKvDB.i
-
-# target to preprocess a source file
-raftKvDB.cpp.i:
-	cd /home/suycx/Code/KVstorageBaseRaft-cpp/build && $(MAKE) $(MAKESILENT) -f example/raftCoreExample/CMakeFiles/raftCoreRun.dir/build.make example/raftCoreExample/CMakeFiles/raftCoreRun.dir/raftKvDB.cpp.i
-.PHONY : raftKvDB.cpp.i
-
-raftKvDB.s: raftKvDB.cpp.s
-.PHONY : raftKvDB.s
-
-# target to generate assembly for a file
-raftKvDB.cpp.s:
-	cd /home/suycx/Code/KVstorageBaseRaft-cpp/build && $(MAKE) $(MAKESILENT) -f example/raftCoreExample/CMakeFiles/raftCoreRun.dir/build.make example/raftCoreExample/CMakeFiles/raftCoreRun.dir/raftKvDB.cpp.s
-.PHONY : raftKvDB.cpp.s
-
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -273,7 +235,6 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... callerMain"
-	@echo "... raftCoreRun"
 	@echo "... __/__/src/common/util.o"
 	@echo "... __/__/src/common/util.i"
 	@echo "... __/__/src/common/util.s"
@@ -286,9 +247,6 @@ help:
 	@echo "... caller.o"
 	@echo "... caller.i"
 	@echo "... caller.s"
-	@echo "... raftKvDB.o"
-	@echo "... raftKvDB.i"
-	@echo "... raftKvDB.s"
 .PHONY : help
 
 

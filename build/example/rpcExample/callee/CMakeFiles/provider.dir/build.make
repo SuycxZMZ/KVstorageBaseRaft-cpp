@@ -109,6 +109,7 @@ provider_EXTERNAL_OBJECTS =
 /home/suycx/Code/KVstorageBaseRaft-cpp/bin/provider: example/rpcExample/callee/CMakeFiles/provider.dir/__/friend.pb.cc.o
 /home/suycx/Code/KVstorageBaseRaft-cpp/bin/provider: example/rpcExample/callee/CMakeFiles/provider.dir/build.make
 /home/suycx/Code/KVstorageBaseRaft-cpp/bin/provider: /home/suycx/Code/KVstorageBaseRaft-cpp/lib/librpc_lib.a
+/home/suycx/Code/KVstorageBaseRaft-cpp/bin/provider: /home/suycx/Code/tiny-muduo/lib/libtinymuduo.a
 /home/suycx/Code/KVstorageBaseRaft-cpp/bin/provider: example/rpcExample/callee/CMakeFiles/provider.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/suycx/Code/KVstorageBaseRaft-cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX executable /home/suycx/Code/KVstorageBaseRaft-cpp/bin/provider"
 	cd /home/suycx/Code/KVstorageBaseRaft-cpp/build/example/rpcExample/callee && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/provider.dir/link.txt --verbose=$(VERBOSE)
