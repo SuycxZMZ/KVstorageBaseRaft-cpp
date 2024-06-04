@@ -1,6 +1,8 @@
 #!/bin/bash
 set -x
 
+sh configureproto.sh
+
 # 检查是否有 cmake-build-debug 目录存在，如果没有，则创建该目录。如果存在，则清除其中的内容
 if [ ! -d "cmake-build-debug" ]; then
     mkdir cmake-build-debug
