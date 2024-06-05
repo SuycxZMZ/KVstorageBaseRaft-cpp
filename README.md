@@ -43,8 +43,8 @@ make -j4
 
 之后在目录bin就有对应的可执行文件生成：
 
-- callerMain(consumer)
-- raftCoreRun(provider)
+- `callerMain`(consumer)
+- `raftCoreRun`(provider)
   
 注意先运行provider，再运行consumer
 运行时在bin目录下提供了一个`test.config`配置文件，按照两个可执行文件打印的 help 信息进行加载，启动raft集群和测试客户端代码
