@@ -1,6 +1,6 @@
 #include <iostream>
-#include "clerk.h"
-#include "util.h"
+#include "raftClerk/clerk.h"
+#include "common/util.h"
 int main() {
     Clerk client;
     client.Init("test.conf");

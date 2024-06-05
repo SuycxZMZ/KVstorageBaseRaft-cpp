@@ -1,10 +1,10 @@
 //
 // Created by swx on 23-12-28.
 //
+#include "raftCore/raft.h"
+#include "raftCore/kvServer.h"
+
 #include <iostream>
-#include "raft.h"
-// #include "kvServer.h"
-#include <kvServer.h>
 #include <unistd.h>
 #include <iostream>
 #include <random>
