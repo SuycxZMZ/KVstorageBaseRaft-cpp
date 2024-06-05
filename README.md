@@ -1,4 +1,6 @@
-# [原KVstorageBaseRaft-cpp项目简介](docs/README.md)
+# KVstorageBaseRaft-cpp
+
+## [原KVstorageBaseRaft-cpp项目简介](docs/README.md)
 
 ## 改进
 
