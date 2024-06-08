@@ -1,12 +1,10 @@
-#include "mprpcchannel.h"
+#include "KVrpcchannel.h"
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <unistd.h>
 #include <cerrno>
 #include <string>
-#include "mprpccontroller.h"
-#include "rpcheader.pb.h"
 #include "common/util.h"
 
 /*
@@ -15,7 +13,7 @@ header_size + service_name method_name args_size + args
 // 所有通过stub代理对象调用的rpc方法，都会走到这里了，
 // 统一通过rpcChannel来调用方法
 // 统一做rpc方法调用的数据数据序列化和网络发送
-void MprpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
+void KVrpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
                               google::protobuf::RpcController* controller, const google::protobuf::Message* request,
                               google::protobuf::Message* response, google::protobuf::Closure* done) {
     if (m_clientFd == -1) {
@@ -43,7 +41,7 @@ void MprpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
         controller->SetFailed("serialize request error!");
         return;
     }
-    RPC::RpcHeader rpcHeader;
+    sylar_rpc::RpcHeader rpcHeader;
     rpcHeader.set_service_name(service_name);
     rpcHeader.set_method_name(method_name);
     rpcHeader.set_args_size(args_size);
@@ -115,7 +113,7 @@ void MprpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
     }
 }
 
-bool MprpcChannel::newConnect(const char* ip, uint16_t port, string* errMsg) {
+bool KVrpcChannel::newConnect(const char* ip, uint16_t port, string* errMsg) {
     int clientfd = socket(AF_INET, SOCK_STREAM, 0);
     if (-1 == clientfd) {
         char errtxt[512] = {0};
@@ -142,7 +140,7 @@ bool MprpcChannel::newConnect(const char* ip, uint16_t port, string* errMsg) {
     return true;
 }
 
-MprpcChannel::MprpcChannel(string ip, short port, bool connectNow) : m_ip(ip), m_port(port), m_clientFd(-1) {
+KVrpcChannel::KVrpcChannel(string ip, short port, bool connectNow) : m_ip(ip), m_port(port), m_clientFd(-1) {
     // 使用tcp编程，完成rpc方法的远程调用，使用的是短连接，因此每次都要重新连接上去，待改成长连接。
     // 没有连接或者连接已经断开，那么就要重新连接呢,会一直不断地重试
     // 读取配置文件rpcserver的信息

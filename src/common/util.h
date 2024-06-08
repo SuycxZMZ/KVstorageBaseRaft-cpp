@@ -58,7 +58,7 @@ void sleepNMilliseconds(int N);
 // read is blocking!!! LIKE  go chan
 template <typename T>
 class LockQueue {
-   public:
+public:
     // 多个worker线程都会写日志queue
     void Push(const T& data) {
         std::lock_guard<std::mutex> lock(m_mutex);  // 使用lock_gurad，即RAII的思想保证锁正确释放
@@ -102,7 +102,7 @@ class LockQueue {
         return true;
     }
 
-   private:
+private:
     std::queue<T> m_queue;
     std::mutex m_mutex;
     std::condition_variable m_condvariable;

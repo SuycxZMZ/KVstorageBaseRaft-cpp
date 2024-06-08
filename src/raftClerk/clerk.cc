@@ -78,7 +78,7 @@ void Clerk::Append(std::string key, std::string value) { PutAppend(key, value, "
 // 初始化客户端
 void Clerk::Init(std::string configFileName) {
     // 获取所有raft节点ip、port ，并进行连接
-    MprpcConfig config; 
+    sylar::rpc::MprpcConfig config; 
     config.LoadConfigFile(configFileName.c_str());
     std::vector<std::pair<std::string, short>> ipPortVt;
     for (int i = 0; i < INT_MAX - 1; ++i) {

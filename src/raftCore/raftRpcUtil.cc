@@ -4,24 +4,24 @@
 
 #include "raftRpcUtil.h"
 
-#include "rpc/mprpcchannel.h"
-#include "rpc/mprpccontroller.h"
+#include "rpc/KVrpcchannel.h"
+#include "sylar/rpc/rpccontroller.h"
 
 bool RaftRpcUtil::AppendEntries(raftRpcProctoc::AppendEntriesArgs *args, raftRpcProctoc::AppendEntriesReply *response) {
-    MprpcController controller;
+    sylar::rpc::MprpcController controller;
     stub_->AppendEntries(&controller, args, response, nullptr);
     return !controller.Failed();
 }
 
 bool RaftRpcUtil::InstallSnapshot(raftRpcProctoc::InstallSnapshotRequest *args,
                                   raftRpcProctoc::InstallSnapshotResponse *response) {
-    MprpcController controller;
+    sylar::rpc::MprpcController controller;
     stub_->InstallSnapshot(&controller, args, response, nullptr);
     return !controller.Failed();
 }
 
 bool RaftRpcUtil::RequestVote(raftRpcProctoc::RequestVoteArgs *args, raftRpcProctoc::RequestVoteReply *response) {
-    MprpcController controller;
+    sylar::rpc::MprpcController controller;
     stub_->RequestVote(&controller, args, response, nullptr);
     return !controller.Failed();
 }
@@ -31,7 +31,7 @@ bool RaftRpcUtil::RequestVote(raftRpcProctoc::RequestVoteArgs *args, raftRpcProc
 RaftRpcUtil::RaftRpcUtil(std::string ip, short port) {
     //*********************************************  */
     // 发送rpc设置
-    stub_ = new raftRpcProctoc::raftRpc_Stub(new MprpcChannel(ip, port, true));
+    stub_ = new raftRpcProctoc::raftRpc_Stub(new KVrpcChannel(ip, port, true));
 }
 
 RaftRpcUtil::~RaftRpcUtil() { delete stub_; }

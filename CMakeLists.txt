@@ -9,15 +9,10 @@ endif()
 
 # only build examples if this is the main project
 if(CMAKE_PROJECT_NAME STREQUAL "KVRaftCpp")
-    option(KVRaftCpp_BUILD_EXAMPLES "Build Muduo examples" ON)
+    option(KVRaftCpp_BUILD_EXAMPLES "Build KVRaftCpp examples" ON)
 endif()
 
-set(CXX_FLAGS
-    -g
-    -D_FILE_OFFSET_BITS=64
-    # -MMD
-    -std=c++20
-    )
+set(CXX_FLAGS -g -D_FILE_OFFSET_BITS=64 -std=c++20)
 
 set(CMAKE_CXX_FLAGS_DEBUG "-O0")
 set(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG")
@@ -27,7 +22,10 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 include_directories(${PROJECT_SOURCE_DIR}/src)
 
 # 设置项目库文件搜索路径 -L
-link_directories(${PROJECT_SOURCE_DIR}/lib)
+link_directories(
+    ${PROJECT_SOURCE_DIR}/lib 
+    /usr/local/lib            
+)
 
 add_subdirectory(src)
 if (KVRaftCpp_BUILD_EXAMPLES)
