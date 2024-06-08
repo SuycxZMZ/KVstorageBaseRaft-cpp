@@ -24,10 +24,16 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG")
 
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
-include_directories(${PROJECT_SOURCE_DIR}/src)
+include_directories(
+    ${PROJECT_SOURCE_DIR}/src
+    /usr/local/include
+)
 
 # 设置项目库文件搜索路径 -L
-link_directories(${PROJECT_SOURCE_DIR}/lib)
+link_directories(
+    ${PROJECT_SOURCE_DIR}/lib
+    /usr/local/lib
+)
 
 add_subdirectory(src)
 if (KVRaftCpp_BUILD_EXAMPLES)

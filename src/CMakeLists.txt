@@ -8,5 +8,5 @@ file(GLOB KVRAFT_SRC_LIST
 )
 
 add_library(skip_list_on_raft STATIC  ${KVRAFT_SRC_LIST})
-target_link_libraries(skip_list_on_raft /usr/lib/libtinymuduo.a pthread dl)
+target_link_libraries(skip_list_on_raft tinymuduo pthread dl)
 
