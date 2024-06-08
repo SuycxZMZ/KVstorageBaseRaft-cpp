@@ -1,13 +1,13 @@
-# KVstorageBaseRaft-cpp
+# sylarbased分支
+
+[集成rpc服务的sylar框架仓库及说明](https://github.com/SuycxZMZ/sylar-from-suycx)
 
 ## [原KVstorageBaseRaft-cpp项目简介](docs/README.md)
 
 ## 改进
 
 - raft核心代码注释补全，[主干详细代码执行流说明](docs/项目解析.md)
-- 移除boost依赖重写muduo网络库，主要组件均已实现，支持更好用的异步日志系统
-- 使用重写的muduo网络库实现rpc，[详细解析](https://github.com/SuycxZMZ/MpRPC-Cpp)
-- 优化代码组织结构，移除多余的include文件夹，更清爽的cmake代码结构，减少重复编译和路径污染
+- 使用集成rpc服务的sylar网络框架重构
 
 ## 使用
 
