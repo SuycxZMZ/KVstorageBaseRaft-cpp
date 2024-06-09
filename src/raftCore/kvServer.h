@@ -19,6 +19,7 @@
 #include <mutex>
 #include <unordered_map>
 #include "raftRpcPro/kvServerRPC.pb.h"
+#include "rpc/KVrpcprovider.h"
 #include "raft.h"
 #include "skipList/skipList.h"
 
@@ -50,6 +51,9 @@ private:
     // last SnapShot point , raftIndex
     int m_lastSnapShotRaftLogIndex;
 
+    // kvserver的调度器
+    // std::unique_ptr<sylar::IOManager> m_KvServerIoManager = nullptr;
+    std::shared_ptr<KVRpcProvider> m_KvRpcProvider = nullptr;
 public:
     KvServer() = delete;
 
@@ -106,6 +110,10 @@ public:
     void GetSnapShotFromRaft(ApplyMsg message);
 
     std::string MakeSnapShot();
+
+    /// @brief 初始化本节点的底层rpc,发布远程方法，并开启
+    /// @param port 节点端口号
+    void InitRpcAndRun(short port);
 
 public:  // for rpc
     /**

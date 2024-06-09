@@ -1,7 +1,5 @@
 #include "kvServer.h"
-
 #include "rpc/KVrpcprovider.h"
-
 #include "sylar/rpc/rpcconfig.h"
 
 void KvServer::DprintfKVDB() {
@@ -373,6 +371,19 @@ void KvServer::Get(google::protobuf::RpcController *controller, const ::raftKVRp
     done->Run();
 }
 
+
+void KvServer::InitRpcAndRun(short port) {
+    // provider是一个rpc网络服务对象。把UserService对象发布到rpc节点上
+    m_KvRpcProvider = std::make_shared<KVRpcProvider>();
+    
+    m_KvRpcProvider->NotifyService(this);
+    m_KvRpcProvider->NotifyService(
+        this->m_raftNode.get());  // todo：这里获取了原始指针，后面检查一下有没有泄露的问题 或者 shareptr释放的问题
+    // 启动一个rpc服务发布节点   Run以后，进程进入阻塞状态，等待远程的rpc调用请求
+    m_KvRpcProvider->KVRpcProviderRunInit(m_me, port);
+    m_KvRpcProvider->Run();   
+}
+
 /**
  * @brief 构造函数
  * @param me 节点编号
@@ -388,20 +399,23 @@ KvServer::KvServer(int me, int maxraftstate, std::string nodeInforFileName, shor
     m_raftNode = std::make_shared<Raft>();
     // clerk层面 kvserver开启rpc接受功能
     // 同时raft与raft节点之间也要开启rpc功能，因此有两个注册
-    std::thread t([this, port]() -> void {
-        // provider是一个rpc网络服务对象。把UserService对象发布到rpc节点上
-        KVRpcProvider provider;
-        provider.NotifyService(this);
-        provider.NotifyService(
-            this->m_raftNode.get());  // todo：这里获取了原始指针，后面检查一下有没有泄露的问题 或者 shareptr释放的问题
-        // 启动一个rpc服务发布节点   Run以后，进程进入阻塞状态，等待远程的rpc调用请求
-        provider.KVRpcProviderRunInit(m_me, port);
-        provider.Run();
-    });
+    // std::thread t([this, port]() -> void {
+    //     // provider是一个rpc网络服务对象。把UserService对象发布到rpc节点上
+    //     KVRpcProvider provider;
+    //     provider.NotifyService(this);
+    //     provider.NotifyService(
+    //         this->m_raftNode.get());  // todo：这里获取了原始指针，后面检查一下有没有泄露的问题 或者 shareptr释放的问题
+    //     // 启动一个rpc服务发布节点   Run以后，进程进入阻塞状态，等待远程的rpc调用请求
+    //     provider.KVRpcProviderRunInit(m_me, port);
+    //     provider.Run();
+    // });
+    std::thread t(std::bind(&KvServer::InitRpcAndRun, this, port));
     t.detach();
 
-    ////开启rpc远程调用能力，需要注意必须要保证所有节点都开启rpc接受功能之后才能开启rpc远程调用能力
-    ////这里使用睡眠来保证
+    // m_KvServerIoManager->schedule(std::bind(&KvServer::InitRpcAndRun, this, port));
+
+    //开启rpc远程调用能力，需要注意必须要保证所有节点都开启rpc接受功能之后才能开启rpc远程调用能力
+    //这里使用睡眠来保证
     std::cout << "raftServer node:" << m_me << " start to sleep to wait all ohter raftnode start!!!!" << std::endl;
     sleep(6);
     std::cout << "raftServer node:" << m_me << " wake up!!!! start to connect other raftnode" << std::endl;
