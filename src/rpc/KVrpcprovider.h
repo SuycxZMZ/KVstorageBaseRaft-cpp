@@ -17,6 +17,9 @@ public:
     /// @brief 重写基类方法，初始化rpcserver
     virtual void ToRun() override;
 
+    /// @brief 重写基类方法，让调度器run起来
+    virtual void Run() override;
+
     /// @brief 初始化rpc节点信息
     /// @param nodeIndex 节点索引
     /// @param port 端口号

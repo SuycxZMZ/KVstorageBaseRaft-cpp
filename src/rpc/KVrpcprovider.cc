@@ -46,7 +46,7 @@ void KVRpcProvider::ToRun() {
     while(!server->bind(addrs, fails)) {
         sleep(2);
     }
-    std::cout << "bind success, " << m_ipPort;
+    std::cout << "bind success, " << m_ipPort << std::endl;
 
     // 开启 tcpserver
     server->start();
@@ -59,6 +59,11 @@ void KVRpcProvider::ToRun() {
     while (m_isrunning) {
         sleep(5);
     }
+}
+
+void KVRpcProvider::Run() {
+    m_isrunning = true;
+    m_iom.schedule(std::bind(&KVRpcProvider::ToRun, this));
 }
 
 KVRpcProvider::~KVRpcProvider() {
