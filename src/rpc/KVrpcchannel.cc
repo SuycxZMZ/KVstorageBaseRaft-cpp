@@ -28,52 +28,67 @@ void KVrpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
         }
     }
 
-    const google::protobuf::ServiceDescriptor* sd = method->service();
-    std::string service_name = sd->name();     // service_name
-    std::string method_name = method->name();  // method_name
+    // 获取服务名和方法名
+    const google::protobuf::ServiceDescriptor* service_desc = method->service();
+    std::string service_name = service_desc->name();
+    std::string method_name = method->name();
 
-    // 获取参数的序列化字符串长度 args_size
-    uint32_t args_size{};
+    // 序列化 request 请求参数
+    uint32_t args_size = 0;
     std::string args_str;
-    if (request->SerializeToString(&args_str)) {
-        args_size = args_str.size();
-    } else {
-        controller->SetFailed("serialize request error!");
+    if (!request->SerializeToString(&args_str))
+    {
+        controller->SetFailed("Serialize request args_str error !!!");
+        // std::cout << "Serialize request args_str error !!!" << std::endl;
         return;
     }
-    sylar_rpc::RpcHeader rpcHeader;
-    rpcHeader.set_service_name(service_name);
-    rpcHeader.set_method_name(method_name);
-    rpcHeader.set_args_size(args_size);
+    args_size = args_str.size();
+
+    // set rpcheader
+    sylar_rpc::RpcHeader rpcheader;
+    rpcheader.set_service_name(service_name);
+    rpcheader.set_method_name(method_name);
+    rpcheader.set_args_size(args_size);
 
     std::string rpc_header_str;
-    if (!rpcHeader.SerializeToString(&rpc_header_str)) {
+    if (!rpcheader.SerializeToString(&rpc_header_str)) {
         controller->SetFailed("serialize rpc header error!");
         return;
     }
 
-    // 使用protobuf的CodedOutputStream来构建发送的数据流
-    std::string send_rpc_str;  // 用来存储最终发送的数据
-    {
-        // 创建一个StringOutputStream用于写入send_rpc_str
-        google::protobuf::io::StringOutputStream string_output(&send_rpc_str);
-        google::protobuf::io::CodedOutputStream coded_output(&string_output);
+    uint32_t rpcheader_size = rpc_header_str.size();
 
-        // 先写入header的长度（变长编码）
-        coded_output.WriteVarint32(static_cast<uint32_t>(rpc_header_str.size()));
+    // 组装 rpc 请求帧
+    std::string rpc_send_str;
+    // rpcheader_size
+    rpc_send_str.insert(0, std::string((char*)&rpcheader_size, 4));
+    // rpcheader
+    rpc_send_str += rpc_header_str;
+    // args
+    rpc_send_str += args_str;
 
-        // 不需要手动写入header_size，因为上面的WriteVarint32已经包含了header的长度信息
-        // 然后写入rpc_header本身
-        coded_output.WriteString(rpc_header_str);
-    }
+    // // 使用protobuf的CodedOutputStream来构建发送的数据流
+    // std::string send_rpc_str;  // 用来存储最终发送的数据
+    // {
+    //     // 创建一个StringOutputStream用于写入send_rpc_str
+    //     google::protobuf::io::StringOutputStream string_output(&send_rpc_str);
+    //     google::protobuf::io::CodedOutputStream coded_output(&string_output);
 
-    // 最后，将请求参数附加到send_rpc_str后面
-    send_rpc_str += args_str;
+    //     // 先写入header的长度（变长编码）
+    //     coded_output.WriteVarint32(static_cast<uint32_t>(rpc_header_str.size()));
+
+    //     // 不需要手动写入header_size，因为上面的WriteVarint32已经包含了header的长度信息
+    //     // 然后写入rpc_header本身
+    //     coded_output.WriteString(rpc_header_str);
+    // }
+
+    // // 最后，将请求参数附加到send_rpc_str后面
+    // send_rpc_str += args_str;
 
     // 发送rpc请求
     // 失败会重试连接再发送，重试连接失败会直接return
     std::cout << " --------------- before stub send -------------- \n"; 
-    while (-1 == send(m_clientFd, send_rpc_str.c_str(), send_rpc_str.size(), 0)) {
+    while (-1 == send(m_clientFd, rpc_send_str.c_str(), rpc_send_str.size(), 0)) {
         char errtxt[512] = {0};
         sprintf(errtxt, "send error! errno:%d", errno);
         std::cout << "尝试重新连接，对方ip：" << m_ip << " 对方端口" << m_port << std::endl;
