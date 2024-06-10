@@ -37,28 +37,19 @@ void KVRpcProvider::KVRpcProviderRunInit(int nodeIndex, short port) {
 }
 
 void KVRpcProvider::ToRun() {
-    sylar::TcpServer::ptr server(new sylar::rpc::RpcTcpServer(this));
+    m_TcpServer = std::make_shared<sylar::rpc::RpcTcpServer>(this); 
     auto addr = sylar::Address::LookupAny(m_ipPort);
     SYLAR_ASSERT(addr);
     std::vector<sylar::Address::ptr> addrs;
     addrs.push_back(addr);
     std::vector<sylar::Address::ptr> fails;
-    while(!server->bind(addrs, fails)) {
+    while(!m_TcpServer->bind(addrs, fails)) {
         sleep(2);
     }
     std::cout << "bind success, " << m_ipPort << std::endl;
 
     // 开启 tcpserver
-    server->start();
-    
-    // [FIXME]
-    // 由于 tcpserver 是基于协程的，本函数如果不sleep，执行完就退出了，
-    // 创建的临时server就会被销毁，这里先sleep一下
-    // 其实这个sleep是被hook的，协程会被切走干正事，5秒切一下相当于心跳了
-    // 也不会有太大消耗，还没想到特别好的办法
-    while (m_isrunning) {
-        sleep(5);
-    }
+    m_TcpServer->start();
 }
 
 void KVRpcProvider::Run() {

@@ -5,6 +5,7 @@
 #include <functional>
 #include <string>
 #include <unordered_map>
+#include <memory>
 #include "google/protobuf/service.h"
 #include "sylar/rpc/rpcprovider.h"
 
