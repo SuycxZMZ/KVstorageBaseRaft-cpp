@@ -148,6 +148,15 @@ void RpcProvider::OnMessage(const tinymuduo::TcpConnectionPtr &conn, tinymuduo::
         return;
     }
 
+    // // [DEBUG INFO]
+    // std::cout << "\n-----------------------------\n" 
+    //             << "header_size : " << header_size << "\n"
+    //             << "service_name : " << service_name << "\n"
+    //             << "method_name : " << method_name << "\n"
+    //             << "args_size : " << args_size << "\n"
+    //             << "args_str : " << args_str << "\n"
+    //             << "-----------------------------\n" ;
+
     // 获取service对象和method对象
     auto it = m_serviceMap.find(service_name);
     if (it == m_serviceMap.end()) {
