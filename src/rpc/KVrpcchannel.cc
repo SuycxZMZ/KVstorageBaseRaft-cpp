@@ -67,6 +67,8 @@ void KVrpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
     // args
     rpc_send_str += args_str;
 
+    // std::cout << "--------------- 组好的rpc请求字符流：" << rpc_send_str << std::endl;
+
     // // 使用protobuf的CodedOutputStream来构建发送的数据流
     // std::string send_rpc_str;  // 用来存储最终发送的数据
     // {
@@ -87,7 +89,7 @@ void KVrpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
 
     // 发送rpc请求
     // 失败会重试连接再发送，重试连接失败会直接return
-    std::cout << " --------------- before stub send -------------- \n"; 
+    // std::cout << " --------------- before stub send -------------- \n"; 
     while (-1 == send(m_clientFd, rpc_send_str.c_str(), rpc_send_str.size(), 0)) {
         char errtxt[512] = {0};
         sprintf(errtxt, "send error! errno:%d", errno);
@@ -101,13 +103,13 @@ void KVrpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
             return;
         }
     }
-    std::cout << " --------------- after stub send -------------- \n";
+    // std::cout << " --------------- after stub send -------------- \n";
     /*
     从时间节点来说，这里将请求发送过去之后rpc服务的提供者就会开始处理，返回的时候就代表着已经返回响应了
     */
 
     // 接收rpc请求的响应值
-    std::cout << " --------------- before stub recv -------------- \n";
+    // std::cout << " --------------- before stub recv -------------- \n";
     char recv_buf[1024] = {0};
     int recv_size = 0;
     if (-1 == (recv_size = recv(m_clientFd, recv_buf, 1024, 0))) {
@@ -118,7 +120,7 @@ void KVrpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
         controller->SetFailed(errtxt);
         return;
     }
-    std::cout << " --------------- after stub recv -------------- \n";
+    // std::cout << " --------------- after stub recv -------------- \n";
     // 反序列化rpc调用的响应数据
     // std::string response_str(recv_buf, 0, recv_size); //
     // bug：出现问题，recv_buf中遇到\0后面的数据就存不下来了，导致反序列化失败 if

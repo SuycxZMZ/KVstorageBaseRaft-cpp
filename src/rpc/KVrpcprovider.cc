@@ -5,6 +5,7 @@
 #include <cstring>
 #include <fstream>
 #include <string>
+#include <memory>
 
 #include "sylar/rpc/rpcheader.pb.h"
 // #include "common/util.h"
@@ -20,7 +21,9 @@ void KVRpcProvider::KVRpcProviderRunInit(int nodeIndex, short port) {
     for (int i = 0; hent->h_addr_list[i]; i++) {
         ipC = inet_ntoa(*(struct in_addr *)(hent->h_addr_list[i]));  // IP地址
     }
-    std::string ip = std::string(ipC);
+    // 测试[FIXME]
+    // std::string ip = std::string(ipC);
+    std::string ip = "127.0.0.1";
     // 写入文件 "test.conf"
     std::string node = "node" + std::to_string(nodeIndex);
     std::ofstream outfile;
@@ -37,7 +40,7 @@ void KVRpcProvider::KVRpcProviderRunInit(int nodeIndex, short port) {
 }
 
 void KVRpcProvider::ToRun() {
-    m_TcpServer = std::make_shared<sylar::rpc::RpcTcpServer>(this); 
+    m_TcpServer.reset(new sylar::rpc::RpcTcpServer(this)); 
     auto addr = sylar::Address::LookupAny(m_ipPort);
     SYLAR_ASSERT(addr);
     std::vector<sylar::Address::ptr> addrs;
@@ -46,10 +49,29 @@ void KVRpcProvider::ToRun() {
     while(!m_TcpServer->bind(addrs, fails)) {
         sleep(2);
     }
-    std::cout << "bind success, " << m_ipPort << std::endl;
+    std::cout << " -------------------- bind success, " << m_ipPort << std::endl;
 
     // 开启 tcpserver
     m_TcpServer->start();
+    while (m_isrunning) {
+        sleep(5);
+    }
+    // sylar::rpc::RpcTcpServer server(this);
+    // auto addr = sylar::Address::LookupAny(m_ipPort);
+    // SYLAR_ASSERT(addr);
+    // std::vector<sylar::Address::ptr> addrs;
+    // addrs.push_back(addr);
+    // std::vector<sylar::Address::ptr> fails;
+    // while(!server.bind(addrs, fails)) {
+    //     sleep(2);
+    // }
+    // std::cout << "------------ bind success, " << m_ipPort << std::endl;
+
+    // // 开启 tcpserver
+    // server.start();
+    // while (m_isrunning) {
+    //     sleep(5);
+    // }
 }
 
 void KVRpcProvider::Run() {

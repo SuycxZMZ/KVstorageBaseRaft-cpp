@@ -64,9 +64,11 @@ private:
     int m_lastSnapshotIncludeTerm; // 最后一个日志的Term
 
     // 协程
-    std::unique_ptr<sylar::IOManager> m_ioManager = nullptr;
+    sylar::IOManager m_ioManager;
 
 public:
+    Raft();
+
     /**
      * @brief 日志同步 + 心跳 rpc ，重点关注。follow 节点执行的操作
      * @param args 接收的rpc参数

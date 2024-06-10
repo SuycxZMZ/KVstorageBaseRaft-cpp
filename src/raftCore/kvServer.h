@@ -53,7 +53,7 @@ private:
 
     // kvserver的调度器
     // std::unique_ptr<sylar::IOManager> m_KvServerIoManager = nullptr;
-    std::shared_ptr<KVRpcProvider> m_KvRpcProvider = nullptr;
+    std::shared_ptr<KVRpcProvider> m_KvRpcProvider;
 public:
     KvServer() = delete;
 

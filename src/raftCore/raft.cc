@@ -5,6 +5,8 @@
 #include "common/config.h"
 #include "common/util.h"
 
+Raft::Raft() : m_ioManager(FIBER_THREAD_NUM, FIBER_USE_CALLER_THREAD) {}
+
 /**
  * @brief 日志同步 + 心跳 rpc ，重点关注。follow 节点执行的操作
  * @param args 接收的rpc参数
@@ -724,6 +726,7 @@ bool Raft::sendRequestVote(int server, std::shared_ptr<raftRpcProctoc::RequestVo
     }
     // ---------------- term 相等且投票成功的逻辑 ---------------- //
     *votedNum = *votedNum + 1; // 如果投票成功，记录投票的结点数量，这里在lg锁的保护范围内，操作*votedNum是线程安全的
+    printf(" ------------- raftnode {%d} get %d vote\n", m_me, *votedNum);
     if (*votedNum >= m_peers.size() / 2 + 1) {  // 如果投票成功，并且投票数量大于等于一半，那么就变成leader
         *votedNum = 0;
         if (m_status == Leader) { // 如果已经是leader了，那么是就是了，不会进行下一步处理了
@@ -925,9 +928,9 @@ void Raft::init(std::vector<std::shared_ptr<RaftRpcUtil>> peers, int me, std::sh
     DPrintf("[Init&ReInit] Sever %d, term %d, lastSnapshotIncludeIndex {%d} , lastSnapshotIncludeTerm {%d}", m_me,
             m_currentTerm, m_lastSnapshotIncludeIndex, m_lastSnapshotIncludeTerm);
     m_mtx.unlock();
-    m_ioManager = std::make_unique<sylar::IOManager>(FIBER_THREAD_NUM, FIBER_USE_CALLER_THREAD);
-    m_ioManager->schedule([this]() -> void { this->leaderHearBeatTicker(); }); // leader 心跳定时器
-    m_ioManager->schedule([this]() -> void { this->electionTimeOutTicker(); }); // 选举超时定时器，触发就开始发起选举
+    // m_ioManager = std::make_unique<sylar::IOManager>(FIBER_THREAD_NUM, FIBER_USE_CALLER_THREAD);
+    m_ioManager.schedule([this]() -> void { this->leaderHearBeatTicker(); }); // leader 心跳定时器
+    m_ioManager.schedule([this]() -> void { this->electionTimeOutTicker(); }); // 选举超时定时器，触发就开始发起选举
 
     // 定期向状态机写入日志。
     // applierTicker时间受到数据库响应延迟和两次apply之间请求数量的影响,
