@@ -151,6 +151,7 @@ void Raft::doElection() {
         //发送投票 RPC
         for (int i = 0; i < m_peers.size(); i++) {
             if (i == m_me) {
+                // std::cout << "\n --------- 不向自己发起投票 --------- \n";
                 continue;
             }
             int lastLogIndex = -1, lastLogTerm = -1;
@@ -695,10 +696,10 @@ bool Raft::sendRequestVote(int server, std::shared_ptr<raftRpcProctoc::RequestVo
                            std::shared_ptr<raftRpcProctoc::RequestVoteReply> reply, std::shared_ptr<int> votedNum) {
 
     auto start = now();
-    DPrintf("[func-sendRequestVote rf{%d}] 向server{%d} 發送 RequestVote 開始", m_me, m_currentTerm, getLastLogIndex());
+    DPrintf("[func-sendRequestVote rf{%d}] 向server{%d} 發送 RequestVote 開始", m_me, server, getLastLogIndex());
     bool ok = m_peers[server]->RequestVote(args.get(), reply.get()); // 发送请求投票，远程调用raft节点的投票
     // std::cout << "---------- RequestVote ok = " << ok <<  " ---------- \n";
-    DPrintf("[func-sendRequestVote rf{%d}] 向server{%d} 發送 RequestVote 完畢，耗時:{%d} ms", m_me, m_currentTerm,
+    DPrintf("[func-sendRequestVote rf{%d}] 向server{%d} 發送 RequestVote 完畢，耗時:{%d} ms", m_me, server,
             getLastLogIndex(), now() - start);
 
     if (!ok) {
