@@ -11,6 +11,9 @@
 // #include "common/util.h"
 #include "sylar/macro.h"
 
+KVRpcProvider::KVRpcProvider(sylar::IOManager::ptr _iom) : sylar::rpc::RpcProvider(_iom) {
+}
+
 void KVRpcProvider::KVRpcProviderRunInit(int nodeIndex, short port) {
     // 获取可用ip
     char *ipC;
@@ -23,7 +26,7 @@ void KVRpcProvider::KVRpcProviderRunInit(int nodeIndex, short port) {
     }
     // 测试[FIXME]
     // std::string ip = std::string(ipC);
-    std::string ip = "127.0.0.1";
+    std::string ip = "0.0.0.0";
     // 写入文件 "test.conf"
     std::string node = "node" + std::to_string(nodeIndex);
     std::ofstream outfile;
@@ -39,8 +42,9 @@ void KVRpcProvider::KVRpcProviderRunInit(int nodeIndex, short port) {
     m_ipPort = ip + ":" + std::to_string(port);
 }
 
-void KVRpcProvider::ToRun() {
-    m_TcpServer.reset(new sylar::rpc::RpcTcpServer(this)); 
+void KVRpcProvider::InnerStart() {
+    m_isrunning = true;
+    std::cout << " --------------- 绑定到子类函数 \n";
     auto addr = sylar::Address::LookupAny(m_ipPort);
     SYLAR_ASSERT(addr);
     std::vector<sylar::Address::ptr> addrs;
@@ -49,38 +53,15 @@ void KVRpcProvider::ToRun() {
     while(!m_TcpServer->bind(addrs, fails)) {
         sleep(2);
     }
-    std::cout << " -------------------- bind success, " << m_ipPort << std::endl;
+    std::cout << " --------------- bind success, " << m_ipPort << " at:" << getpid() << std::endl;
 
     // 开启 tcpserver
     m_TcpServer->start();
-    while (m_isrunning) {
-        sleep(5);
-    }
-    // sylar::rpc::RpcTcpServer server(this);
-    // auto addr = sylar::Address::LookupAny(m_ipPort);
-    // SYLAR_ASSERT(addr);
-    // std::vector<sylar::Address::ptr> addrs;
-    // addrs.push_back(addr);
-    // std::vector<sylar::Address::ptr> fails;
-    // while(!server.bind(addrs, fails)) {
-    //     sleep(2);
-    // }
-    // std::cout << "------------ bind success, " << m_ipPort << std::endl;
-
-    // // 开启 tcpserver
-    // server.start();
-    // while (m_isrunning) {
-    //     sleep(5);
-    // }
-}
-
-void KVRpcProvider::Run() {
-    m_isrunning = true;
-    m_iom.schedule(std::bind(&KVRpcProvider::ToRun, this));
+    sleep(1);
 }
 
 KVRpcProvider::~KVRpcProvider() {
     std::cout << "[func - RpcProvider::~RpcProvider()]: ip和port信息：" << m_ipPort << std::endl;
     m_isrunning = false;
-    m_iom.stop();
+    m_iom->stop();
 }

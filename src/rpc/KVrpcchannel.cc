@@ -50,47 +50,39 @@ void KVrpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
     rpcheader.set_method_name(method_name);
     rpcheader.set_args_size(args_size);
 
-    std::string rpc_header_str;
-    if (!rpcheader.SerializeToString(&rpc_header_str)) {
-        controller->SetFailed("serialize rpc header error!");
+    // 序列化 rpcheader
+    std::string rpcheader_str;
+    if (!rpcheader.SerializeToString(&rpcheader_str))
+    {
+        controller->SetFailed("Serialize request rpcheader error !!!");
+        // std::cout << "Serialize request rpcheader error !!!" << std::endl;
         return;
     }
-
-    uint32_t rpcheader_size = rpc_header_str.size();
+    uint32_t rpcheader_size = rpcheader_str.size();
 
     // 组装 rpc 请求帧
     std::string rpc_send_str;
     // rpcheader_size
     rpc_send_str.insert(0, std::string((char*)&rpcheader_size, 4));
     // rpcheader
-    rpc_send_str += rpc_header_str;
+    rpc_send_str += rpcheader_str;
     // args
     rpc_send_str += args_str;
 
-    // std::cout << "--------------- 组好的rpc请求字符流：" << rpc_send_str << std::endl;
-
-    // // 使用protobuf的CodedOutputStream来构建发送的数据流
-    // std::string send_rpc_str;  // 用来存储最终发送的数据
-    // {
-    //     // 创建一个StringOutputStream用于写入send_rpc_str
-    //     google::protobuf::io::StringOutputStream string_output(&send_rpc_str);
-    //     google::protobuf::io::CodedOutputStream coded_output(&string_output);
-
-    //     // 先写入header的长度（变长编码）
-    //     coded_output.WriteVarint32(static_cast<uint32_t>(rpc_header_str.size()));
-
-    //     // 不需要手动写入header_size，因为上面的WriteVarint32已经包含了header的长度信息
-    //     // 然后写入rpc_header本身
-    //     coded_output.WriteString(rpc_header_str);
-    // }
-
-    // // 最后，将请求参数附加到send_rpc_str后面
-    // send_rpc_str += args_str;
+    // // [DEBUG INFO]
+    // std::cout << "------------- send info ----------- \n" 
+    //          << "header_size : " << rpcheader_size << "\n"
+    //          << "service_name : " << service_name << "\n"
+    //          << "method_name : " << method_name << "\n"
+    //          << "args_size : " << args_size << "\n"
+    //          << "args_str : " << args_str << "\n"
+    //          << "------------- send info ----------- \n";
 
     // 发送rpc请求
     // 失败会重试连接再发送，重试连接失败会直接return
     // std::cout << " --------------- before stub send -------------- \n"; 
-    while (-1 == send(m_clientFd, rpc_send_str.c_str(), rpc_send_str.size(), 0)) {
+    // std::cout << "------------------- send : " << method_name << std::endl;
+    while (send(m_clientFd, rpc_send_str.c_str(), rpc_send_str.size(), 0) <= 0) {
         char errtxt[512] = {0};
         sprintf(errtxt, "send error! errno:%d", errno);
         std::cout << "尝试重新连接，对方ip：" << m_ip << " 对方端口" << m_port << std::endl;
@@ -103,13 +95,13 @@ void KVrpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
             return;
         }
     }
-    // std::cout << " --------------- after stub send -------------- \n";
+    // std::cout << "------------------- Already send : " << method_name << "-------------------" << std::endl;
+    // std::cout << " --------------- send -------------- \n";
     /*
     从时间节点来说，这里将请求发送过去之后rpc服务的提供者就会开始处理，返回的时候就代表着已经返回响应了
     */
 
     // 接收rpc请求的响应值
-    // std::cout << " --------------- before stub recv -------------- \n";
     char recv_buf[1024] = {0};
     int recv_size = 0;
     if (-1 == (recv_size = recv(m_clientFd, recv_buf, 1024, 0))) {
@@ -120,7 +112,7 @@ void KVrpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
         controller->SetFailed(errtxt);
         return;
     }
-    // std::cout << " --------------- after stub recv -------------- \n";
+    // std::cout << "------------------- Already recv : " << method_name << " reply" << std::endl;
     // 反序列化rpc调用的响应数据
     // std::string response_str(recv_buf, 0, recv_size); //
     // bug：出现问题，recv_buf中遇到\0后面的数据就存不下来了，导致反序列化失败 if
@@ -129,6 +121,7 @@ void KVrpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
         char errtxt[1050] = {0};
         sprintf(errtxt, "parse error! response_str:%s", recv_buf);
         controller->SetFailed(errtxt);
+        // std::cout << "----------------- 响应失败 \n"; 
         return;
     }
 }
@@ -163,11 +156,6 @@ bool KVrpcChannel::newConnect(const char* ip, uint16_t port, string* errMsg) {
 KVrpcChannel::KVrpcChannel(string ip, short port, bool connectNow) : m_ip(ip), m_port(port), m_clientFd(-1) {
     // 使用tcp编程，完成rpc方法的远程调用，使用的是短连接，因此每次都要重新连接上去，待改成长连接。
     // 没有连接或者连接已经断开，那么就要重新连接呢,会一直不断地重试
-    // 读取配置文件rpcserver的信息
-    // std::string ip = MprpcApplication::GetInstance().GetConfig().Load("rpcserverip");
-    // uint16_t port = atoi(MprpcApplication::GetInstance().GetConfig().Load("rpcserverport").c_str());
-    // rpc调用方想调用service_name的method_name服务，需要查询zk上该服务所在的host信息
-    //  /UserServiceRpc/Login
     if (!connectNow) {
         return;
     }  // 可以允许延迟连接
@@ -175,7 +163,7 @@ KVrpcChannel::KVrpcChannel(string ip, short port, bool connectNow) : m_ip(ip), m
     auto rt = newConnect(ip.c_str(), port, &errMsg);
     int tryCount = 3;
     while (!rt && tryCount--) {
-        std::cout << errMsg << std::endl;
+        std::cout << "--------------------- errMsg:" << errMsg << "connect peers error ---------------" << std::endl;
         rt = newConnect(ip.c_str(), port, &errMsg);
     }
 }

@@ -14,12 +14,10 @@
 // todo：为了配合这个，那么rpc客户端那边每次发送之前也需要真正的
 class KVRpcProvider : public sylar::rpc::RpcProvider {
 public:
-    
-    /// @brief 重写基类方法，初始化rpcserver
-    virtual void ToRun() override;
+    KVRpcProvider(sylar::IOManager::ptr iom);
 
-    /// @brief 重写基类方法，让调度器run起来
-    virtual void Run() override;
+    /// @brief 开启 tcpserver
+    virtual void InnerStart() override;
 
     /// @brief 初始化rpc节点信息
     /// @param nodeIndex 节点索引
