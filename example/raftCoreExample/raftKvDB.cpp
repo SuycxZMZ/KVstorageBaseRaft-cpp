@@ -1,17 +1,35 @@
-//
-// Created by swx on 23-12-28.
-//
 #include "raftCore/raft.h"
 #include "raftCore/kvServer.h"
 
 #include <iostream>
 #include <unistd.h>
-#include <iostream>
+#include <fstream>
 #include <random>
+#include <signal.h>
+#include <sys/wait.h>
+#include <thread>
 
-void ShowArgsHelp();
+// SIGCHLD signal handler
+void handle_sigchld(int sig) {
+    (void)sig;  // silence unused parameter warning
+    while (waitpid(-1, nullptr, WNOHANG) > 0);
+}
+
+void ShowArgsHelp() {
+    std::cout << "format: command -n <nodeNum> -f <configFileName>" << std::endl;
+}
 
 int main(int argc, char **argv) {
+    // Set up the SIGCHLD handler to reap zombie processes
+    struct sigaction sa;
+    sa.sa_handler = &handle_sigchld;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = SA_RESTART | SA_NOCLDSTOP;
+    if (sigaction(SIGCHLD, &sa, nullptr) == -1) {
+        perror("sigaction");
+        exit(EXIT_FAILURE);
+    }
+
     // ---------------------- 读取命令参数：节点数量、写入raft节点节点信息到哪个文件 ----------------------
     if (argc < 2) {
         ShowArgsHelp();
@@ -57,7 +75,8 @@ int main(int argc, char **argv) {
             // 如果是子进程
             // 子进程的代码
             auto kvServer = new KvServer(i, 500, configFileName, port);
-            pause();  // 子进程进入等待状态，不会执行 return 语句
+            std::cout << "-------------sb 出来了 \n";
+            pause();  // 子进程进入等待状态
         } else if (pid > 0) {
             // 如果是父进程
             // 父进程的代码
@@ -68,8 +87,7 @@ int main(int argc, char **argv) {
             exit(EXIT_FAILURE);
         }
     }
-    pause();
+
+    pause();  // 父进程进入等待状态
     return 0;
 }
-
-void ShowArgsHelp() { std::cout << "format: command -n <nodeNum> -f <configFileName>" << std::endl; }

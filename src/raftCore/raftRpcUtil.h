@@ -19,10 +19,10 @@ public:
     bool InstallSnapshot(raftRpcProctoc::InstallSnapshotRequest *args,
                          raftRpcProctoc::InstallSnapshotResponse *response);
     bool RequestVote(raftRpcProctoc::RequestVoteArgs *args, raftRpcProctoc::RequestVoteReply *response);
-    /**
-     * @param ip  远端ip
-     * @param port  远端端口
-     */
+
+    /// @brief RaftRpcUtil 构造函数
+    /// @param ip 对端ip
+    /// @param port 对端端口号
     RaftRpcUtil(std::string ip, short port);
     ~RaftRpcUtil();
 };

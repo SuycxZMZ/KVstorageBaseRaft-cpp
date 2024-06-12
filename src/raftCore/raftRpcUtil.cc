@@ -3,7 +3,6 @@
 //
 
 #include "raftRpcUtil.h"
-
 #include "rpc/KVrpcchannel.h"
 #include "sylar/rpc/rpccontroller.h"
 
@@ -22,9 +21,7 @@ bool RaftRpcUtil::InstallSnapshot(raftRpcProctoc::InstallSnapshotRequest *args,
 
 bool RaftRpcUtil::RequestVote(raftRpcProctoc::RequestVoteArgs *args, raftRpcProctoc::RequestVoteReply *response) {
     sylar::rpc::MprpcController controller;
-    // std::cout << "\n ---------- RequestVote before ---------- \n";
     stub_->RequestVote(&controller, args, response, nullptr);
-    // std::cout << "\n ---------- RequestVote after ---------- \n";
     return !controller.Failed();
 }
 
@@ -36,4 +33,7 @@ RaftRpcUtil::RaftRpcUtil(std::string ip, short port) {
     stub_ = new raftRpcProctoc::raftRpc_Stub(new KVrpcChannel(ip, port, true));
 }
 
-RaftRpcUtil::~RaftRpcUtil() { delete stub_; }
+RaftRpcUtil::~RaftRpcUtil() { 
+    std::cout << "--------------- [RaftRpcUtil::~RaftRpcUtil()] ------------------- \n";
+    delete stub_; 
+}

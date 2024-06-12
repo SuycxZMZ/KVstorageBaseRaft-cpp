@@ -7,7 +7,7 @@
 #include <fstream>
 #include <mutex>
 class Persister {
-   private:
+private:
     std::mutex m_mtx;
     std::string m_raftState;
     std::string m_snapshot;
@@ -33,7 +33,7 @@ class Persister {
      */
     long long m_raftStateSize;
 
-   public:
+public:
     void Save(std::string raftstate, std::string snapshot);
     std::string ReadSnapshot();
     void SaveRaftState(const std::string& data);
@@ -42,7 +42,7 @@ class Persister {
     explicit Persister(int me);
     ~Persister();
 
-   private:
+private:
     void clearRaftState();
     void clearSnapshot();
     void clearRaftStateAndSnapshot();

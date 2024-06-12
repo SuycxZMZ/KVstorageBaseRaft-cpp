@@ -1,6 +1,7 @@
 #include "kvServer.h"
 #include "rpc/KVrpcprovider.h"
 #include "sylar/rpc/rpcconfig.h"
+#include "common/config.h"
 
 void KvServer::DprintfKVDB() {
     if (!Debug) {
@@ -291,6 +292,7 @@ void KvServer::ReadRaftApplyCommandLoop() {
             GetSnapShotFromRaft(message);
         }
     }
+    std::cout << "Error !!! ReadRaftApplyCommandLoop() end" << std::endl;
 }
 
 // raft会与persist层交互，kvserver层也会，因为kvserver层开始的时候需要恢复kvdb的状态
@@ -378,7 +380,7 @@ void KvServer::InitRpcAndRun(short port) {
         this->m_raftNode.get());  // todo：这里获取了原始指针，后面检查一下有没有泄露的问题 或者 shareptr释放的问题
     // 启动一个rpc服务发布节点   Run以后，进程进入阻塞状态，等待远程的rpc调用请求
     m_KvRpcProvider->KVRpcProviderRunInit(m_me, port);
-    m_KvRpcProvider->Run();   
+    m_KvRpcProvider->Run(); 
 }
 
 /**
@@ -388,16 +390,26 @@ void KvServer::InitRpcAndRun(short port) {
  * @param nodeInforFileName 节点信息文件名
  * @param port 监听端口
 */
-KvServer::KvServer(int me, int maxraftstate, std::string nodeInforFileName, short port) : m_skipList(6) {
-    std::shared_ptr<Persister> persister = std::make_shared<Persister>(me);
-    m_me = me;
-    m_maxRaftState = maxraftstate;
-    applyChan = std::make_shared<LockQueue<ApplyMsg> >();
-    m_raftNode = std::make_shared<Raft>();
-    m_KvRpcProvider.reset(new KVRpcProvider());
-    
-    std::thread t(std::bind(&KvServer::InitRpcAndRun, this, port));
-    t.detach();
+KvServer::KvServer(int me, int maxraftstate, std::string nodeInforFileName, short port) : 
+        m_me(me),
+        applyChan(std::make_shared<LockQueue<ApplyMsg> >()),
+        m_maxRaftState(maxraftstate),
+        m_skipList(6),  
+        m_iom(std::make_shared<sylar::IOManager>(FIBER_THREAD_NUM, false)),
+        m_raftNode(std::make_shared<Raft>(m_iom)),
+        m_KvRpcProvider(std::make_shared<KVRpcProvider>(m_iom))
+{
+    sleep(6);
+    // std::thread t(std::bind(&KvServer::InitRpcAndRun, this, port));
+    // t.detach();
+    m_iom->schedule([this, port]() -> void {
+        this->m_KvRpcProvider->NotifyService(this);
+        this->m_KvRpcProvider->NotifyService(
+            this->m_raftNode.get());  // todo：这里获取了原始指针，后面检查一下有没有泄露的问题 或者 shareptr释放的问题
+        // 启动一个rpc服务发布节点   Run以后，进程进入阻塞状态，等待远程的rpc调用请求
+        this->m_KvRpcProvider->KVRpcProviderRunInit(m_me, port);
+        this->m_KvRpcProvider->InnerStart();
+    });
 
     // m_KvServerIoManager->schedule(std::bind(&KvServer::InitRpcAndRun, this, port));
 
@@ -406,7 +418,7 @@ KvServer::KvServer(int me, int maxraftstate, std::string nodeInforFileName, shor
     std::cout << "raftServer node:" << m_me << " start to sleep to wait all ohter raftnode start!!!!" << std::endl;
     sleep(6);
     std::cout << "raftServer node:" << m_me << " wake up!!!! start to connect other raftnode" << std::endl;
-    // 获取所有raft节点ip、port ，并进行连接  ,要排除自己
+    // 获取所有raft节点ip、port,并进行连接,要排除自己
     sylar::rpc::MprpcConfig config;
     config.LoadConfigFile(nodeInforFileName.c_str());
     std::vector<std::pair<std::string, short> > ipPortVt;
@@ -429,16 +441,15 @@ KvServer::KvServer(int me, int maxraftstate, std::string nodeInforFileName, shor
         }
         std::string otherNodeIp = ipPortVt[i].first;
         short otherNodePort = ipPortVt[i].second;
-        auto *rpc = new RaftRpcUtil(otherNodeIp, otherNodePort);
-        servers.push_back(std::shared_ptr<RaftRpcUtil>(rpc)); // 与其他节点通信的rpc通道
-
-        std::cout << "node" << m_me << " 连接node" << i << "success!" << std::endl;
+        // RaftRpcUtil *rpc = new RaftRpcUtil(otherNodeIp, otherNodePort);
+        servers.emplace_back(std::make_shared<RaftRpcUtil>(otherNodeIp, otherNodePort)); // 与其他节点通信的rpc通道
+        std::cout << "node" << m_me << " 连接node" << i << " success!" << std::endl;
     }
     sleep(ipPortVt.size() - me);  // 等待所有节点相互连接成功，再启动raft
+    std::shared_ptr<Persister> persister(new Persister(me));
+
     m_raftNode->init(servers, m_me, persister, applyChan);
     // kv的server直接与raft通信，但kv不直接与raft通信，所以需要把ApplyMsg的chan传递下去用于通信，两者的persist也是共用的
-
-    //////////////////////////////////
 
     // You may need initialization code here.
     // m_kvDB; //kvdb初始化
@@ -450,6 +461,7 @@ KvServer::KvServer(int me, int maxraftstate, std::string nodeInforFileName, shor
     if (!snapshot.empty()) {
         ReadSnapShotToInstall(snapshot);
     }
+
     std::thread t2(&KvServer::ReadRaftApplyCommandLoop, this);  // 马上向其他节点宣告自己就是leader
     t2.join();  // 由於ReadRaftApplyCommandLoop一直不會結束，达到一直卡在这的目的
 }

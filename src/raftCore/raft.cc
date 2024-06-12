@@ -2,10 +2,18 @@
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/archive/text_oarchive.hpp>
 #include <memory>
+#include <atomic>
 #include "common/config.h"
 #include "common/util.h"
 
-Raft::Raft() : m_ioManager(FIBER_THREAD_NUM, FIBER_USE_CALLER_THREAD) {}
+Raft::Raft(sylar::IOManager::ptr _iom) : 
+        m_iom(_iom),
+        m_raftInnerWorker(std::make_shared<sylar::IOManager>(2, false))
+{}
+Raft::~Raft() {
+    std::cout << "----------[Raft::~Raft()] \n";
+}
+
 
 /**
  * @brief 日志同步 + 心跳 rpc ，重点关注。follow 节点执行的操作
@@ -15,6 +23,8 @@ Raft::Raft() : m_ioManager(FIBER_THREAD_NUM, FIBER_USE_CALLER_THREAD) {}
 void Raft::AppendEntries1(const raftRpcProctoc::AppendEntriesArgs* args, raftRpcProctoc::AppendEntriesReply* reply) { 
     std::lock_guard<std::mutex> locker(m_mtx);
     reply->set_appstate(AppNormal);  // 能接收到代表网络是正常的
+
+    std::cout << "---------- 收到了 AppendEntries rpc请求 ---------- \n";
 
     //	不同的人收到AppendEntries的反应是不同的，要注意无论什么时候收到rpc请求和响应都要检查term
     if (args->term() < m_currentTerm) {
@@ -169,9 +179,11 @@ void Raft::doElection() {
             auto requestVoteReply = std::make_shared<raftRpcProctoc::RequestVoteReply>();
 
             // 发送，使用匿名函数执行避免其拿到锁
-            std::thread t(&Raft::sendRequestVote, this,
-                          i, requestVoteArgs, requestVoteReply, votedNum);
-            t.detach();
+            m_raftInnerWorker->schedule(std::bind(&Raft::sendRequestVote, this,
+                          i, requestVoteArgs, requestVoteReply, votedNum));
+            // std::thread t(&Raft::sendRequestVote, this,
+            //               i, requestVoteArgs, requestVoteReply, votedNum);
+            // t.detach();
         }
     }
 }
@@ -186,7 +198,7 @@ void Raft::doHeartBeat() {
     std::lock_guard<std::mutex> g(m_mtx);
     if (m_status == Leader) {
         DPrintf("[func-Raft::doHeartBeat()-Leader: {%d}] Leader的心跳定时器触发了且拿到mutex，开始发送AE\n", m_me);
-        auto appendNums = std::make_shared<int>(1);  // 正确返回的节点的数量
+        auto appendNums = std::make_shared<std::atomic_int32_t>(1);  // 正确返回的节点的数量
         // 对Follower发送心跳
         // todo 这里肯定是要修改的，最好使用一个单独的goruntime来负责管理发送log，因为后面的log发送涉及优化之类的
         // 最少要单独写一个函数来管理，而不是在这一坨
@@ -198,8 +210,9 @@ void Raft::doHeartBeat() {
             myAssert(m_nextIndex[i] >= 1, format("rf.nextIndex[%d] = {%d}", i, m_nextIndex[i]));
             // 日志压缩加入后要判断是发送快照还是发送心跳
             if (m_nextIndex[i] <= m_lastSnapshotIncludeIndex) {
-                std::thread t(&Raft::leaderSendSnapShot, this, i);  // 创建新线程并执行b函数，并传递参数
-                t.detach();
+                // std::thread t(&Raft::leaderSendSnapShot, this, i);  // 创建新线程并执行b函数，并传递参数
+                // t.detach();
+                m_raftInnerWorker->schedule(std::bind(&Raft::leaderSendSnapShot, this, i));
                 continue;
             }
 
@@ -241,9 +254,12 @@ void Raft::doHeartBeat() {
                 std::make_shared<raftRpcProctoc::AppendEntriesReply>();
             appendEntriesReply->set_appstate(Disconnected);
 
-            std::thread t(&Raft::sendAppendEntries, this, i, appendEntriesArgs, appendEntriesReply,
-                          appendNums);  // 创建新线程并执行b函数，并传递参数
-            t.detach();
+
+            m_raftInnerWorker->schedule(std::bind(&Raft::sendAppendEntries, this, i, appendEntriesArgs, appendEntriesReply,
+                          appendNums));
+            // std::thread t(&Raft::sendAppendEntries, this, i, appendEntriesArgs, appendEntriesReply,
+            //               appendNums);  // 创建新线程并执行b函数，并传递参数
+            // t.detach();
         }
 
         // leader发送心跳，重置心跳时间，
@@ -550,6 +566,7 @@ void Raft::persist() {
  * @param reply 请求投票的响应
  */
 void Raft::RequestVote(const raftRpcProctoc::RequestVoteArgs* args, raftRpcProctoc::RequestVoteReply* reply) {
+    // std::cout << "---------- 收到了 RequestVote rpc请求 ---------- \n";
     std::lock_guard<std::mutex> lg(m_mtx);
     DEFER { // 应该先持久化，再撤销lock
         persist();
@@ -726,7 +743,7 @@ bool Raft::sendRequestVote(int server, std::shared_ptr<raftRpcProctoc::RequestVo
     }
     // ---------------- term 相等且投票成功的逻辑 ---------------- //
     *votedNum = *votedNum + 1; // 如果投票成功，记录投票的结点数量，这里在lg锁的保护范围内，操作*votedNum是线程安全的
-    printf(" ------------- raftnode {%d} get %d vote\n", m_me, *votedNum);
+    // printf(" ------------- raftnode {%d} get %d vote\n", m_me, *votedNum);
     if (*votedNum >= m_peers.size() / 2 + 1) {  // 如果投票成功，并且投票数量大于等于一半，那么就变成leader
         *votedNum = 0;
         if (m_status == Leader) { // 如果已经是leader了，那么是就是了，不会进行下一步处理了
@@ -742,8 +759,14 @@ bool Raft::sendRequestVote(int server, std::shared_ptr<raftRpcProctoc::RequestVo
             m_nextIndex[i] = lastLogIndex + 1;  
             m_matchIndex[i] = 0;                // 每换一个领导都是从0开始 ？
         }
-        std::thread t(&Raft::doHeartBeat, this);  // 马上向其他节点宣告自己就是leader
-        t.detach();
+
+        // while (1) {
+        //     std::cout << "------------------- before doHeartBeat tick ------------------- \n";
+        //     sleep(1);
+        // }
+        m_raftInnerWorker->schedule(std::bind(&Raft::doHeartBeat, this));
+        // std::thread t(&Raft::doHeartBeat, this);  // 马上向其他节点宣告自己就是leader
+        // t.detach();
         persist();
     }
     return true;
@@ -760,7 +783,7 @@ bool Raft::sendRequestVote(int server, std::shared_ptr<raftRpcProctoc::RequestVo
  */
 bool Raft::sendAppendEntries(int server, std::shared_ptr<raftRpcProctoc::AppendEntriesArgs> args,
                              std::shared_ptr<raftRpcProctoc::AppendEntriesReply> reply,
-                             std::shared_ptr<int> appendNums) {
+                             std::shared_ptr<std::atomic_int32_t> appendNums) {
     // 如果append失败应该不断的retries ,直到这个log成功的被store
     DPrintf("[func-Raft::sendAppendEntries-raft{%d}] leader 向节点{%d}发送AE rpc開始 ， args->entries_size():{%d}",
             m_me, server, args->entries_size());
@@ -843,6 +866,7 @@ bool Raft::sendAppendEntries(int server, std::shared_ptr<raftRpcProctoc::AppendE
 void Raft::AppendEntries(google::protobuf::RpcController* controller,
                          const ::raftRpcProctoc::AppendEntriesArgs* request,
                          ::raftRpcProctoc::AppendEntriesReply* response, ::google::protobuf::Closure* done) {
+    std::cout << "-------------- override AppendEntries \n";                       
     AppendEntries1(request, response);
     done->Run();
 }
@@ -851,12 +875,12 @@ void Raft::InstallSnapshot(google::protobuf::RpcController* controller,
                            const ::raftRpcProctoc::InstallSnapshotRequest* request,
                            ::raftRpcProctoc::InstallSnapshotResponse* response, ::google::protobuf::Closure* done) {
     InstallSnapshot(request, response);
-
     done->Run();
 }
 
 void Raft::RequestVote(google::protobuf::RpcController* controller, const ::raftRpcProctoc::RequestVoteArgs* request,
                        ::raftRpcProctoc::RequestVoteReply* response, ::google::protobuf::Closure* done) {
+    // std::cout << "-------------- override RequestVote \n";
     RequestVote(request, response);
     done->Run();
 }
@@ -929,8 +953,13 @@ void Raft::init(std::vector<std::shared_ptr<RaftRpcUtil>> peers, int me, std::sh
             m_currentTerm, m_lastSnapshotIncludeIndex, m_lastSnapshotIncludeTerm);
     m_mtx.unlock();
     // m_ioManager = std::make_unique<sylar::IOManager>(FIBER_THREAD_NUM, FIBER_USE_CALLER_THREAD);
-    m_ioManager.schedule([this]() -> void { this->leaderHearBeatTicker(); }); // leader 心跳定时器
-    m_ioManager.schedule([this]() -> void { this->electionTimeOutTicker(); }); // 选举超时定时器，触发就开始发起选举
+    m_raftInnerWorker->schedule([this]() -> void { this->leaderHearBeatTicker(); }); // leader 心跳定时器
+    m_raftInnerWorker->schedule([this]() -> void { this->electionTimeOutTicker(); }); // 选举超时定时器，触发就开始发起选举
+
+    // while (1) {
+    //     std::cout << "----------------- Raft::init tick -------------------- \n";
+    //     sleep(1);
+    // }
 
     // 定期向状态机写入日志。
     // applierTicker时间受到数据库响应延迟和两次apply之间请求数量的影响,

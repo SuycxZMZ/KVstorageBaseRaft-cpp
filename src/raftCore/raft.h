@@ -10,6 +10,7 @@
 #include <mutex>
 #include <string>
 #include <thread>
+#include <atomic>
 #include <vector>
 #include "ApplyMsg.h"
 #include "Persister.h"
@@ -64,10 +65,16 @@ private:
     int m_lastSnapshotIncludeTerm; // 最后一个日志的Term
 
     // 协程
-    sylar::IOManager m_ioManager;
-
+    sylar::IOManager::ptr m_iom;
+    sylar::IOManager::ptr m_raftInnerWorker;
 public:
-    Raft();
+    Raft() = delete;
+
+    /// @brief raft节点构造函数
+    /// @param iom 指向全局调度器的智能指针
+    Raft(sylar::IOManager::ptr iom);
+
+    ~Raft();
 
     /**
      * @brief 日志同步 + 心跳 rpc ，重点关注。follow 节点执行的操作
@@ -196,7 +203,7 @@ public:
      * @param return 返回是否成功
      */
     bool sendAppendEntries(int server, std::shared_ptr<raftRpcProctoc::AppendEntriesArgs> args,
-                           std::shared_ptr<raftRpcProctoc::AppendEntriesReply> reply, std::shared_ptr<int> appendNums);
+                           std::shared_ptr<raftRpcProctoc::AppendEntriesReply> reply, std::shared_ptr<std::atomic_int32_t> appendNums);
 
     /**
      * @brief 给上层的kvserver层发送消息
@@ -216,14 +223,16 @@ public:
     /**
      * @brief 重写基类方法, 远程 follower 节点远程被调用
      */
-    void AppendEntries(google::protobuf::RpcController *controller, const ::raftRpcProctoc::AppendEntriesArgs *request,
-                       ::raftRpcProctoc::AppendEntriesReply *response, ::google::protobuf::Closure *done) override;
+    virtual void AppendEntries(google::protobuf::RpcController *controller, 
+                       const ::raftRpcProctoc::AppendEntriesArgs *request,
+                       ::raftRpcProctoc::AppendEntriesReply *response, 
+                       ::google::protobuf::Closure *done) override;
 
     /**
      * @brief 重写基类方法,因为rpc远程调用真正调用的是这个方法
      *        序列化，反序列化等操作rpc框架都已经做完了，因此这里只需要获取值然后真正调用本地方法即可。
      */
-    void InstallSnapshot(google::protobuf::RpcController *controller,
+    virtual void InstallSnapshot(google::protobuf::RpcController *controller,
                          const ::raftRpcProctoc::InstallSnapshotRequest *request,
                          ::raftRpcProctoc::InstallSnapshotResponse *response,
                          ::google::protobuf::Closure *done) override;
@@ -232,8 +241,10 @@ public:
      * @brief 重写基类方法,因为rpc远程调用真正调用的是这个方法
      *        序列化，反序列化等操作rpc框架都已经做完了，因此这里只需要获取值然后真正调用本地方法即可。
      */
-    void RequestVote(google::protobuf::RpcController *controller, const ::raftRpcProctoc::RequestVoteArgs *request,
-                     ::raftRpcProctoc::RequestVoteReply *response, ::google::protobuf::Closure *done) override;
+    virtual void RequestVote(google::protobuf::RpcController *controller, 
+                     const ::raftRpcProctoc::RequestVoteArgs *request,
+                     ::raftRpcProctoc::RequestVoteReply *response, 
+                     ::google::protobuf::Closure *done) override;
 
 public:
     /**

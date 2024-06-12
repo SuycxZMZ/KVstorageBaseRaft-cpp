@@ -90,6 +90,7 @@ Persister::Persister(const int me)
 }
 
 Persister::~Persister() {
+    std::cout << "------------- [Persister::~Persister()] \n";
     if (m_raftStateOutStream.is_open()) {
         m_raftStateOutStream.close();
     }

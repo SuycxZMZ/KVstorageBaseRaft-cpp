@@ -33,8 +33,7 @@
 class KvServer : raftKVRpcProctoc::kvServerRpc {
 private:
     std::mutex m_mtx;
-    int m_me;
-    std::shared_ptr<Raft> m_raftNode;                 // raft节点
+    int m_me;   // 节点编号
     std::shared_ptr<LockQueue<ApplyMsg> > applyChan;  // kvServer中拿到的消息，server用这些消息与raft打交道，由Raft::applierTicker线程填充
     int m_maxRaftState;                               // snapshot if log grows this big
 
@@ -50,10 +49,9 @@ private:
 
     // last SnapShot point , raftIndex
     int m_lastSnapShotRaftLogIndex;
-
-    // kvserver的调度器
-    // std::unique_ptr<sylar::IOManager> m_KvServerIoManager = nullptr;
-    std::shared_ptr<KVRpcProvider> m_KvRpcProvider;
+    sylar::IOManager::ptr m_iom; // 全局协程调度器指针
+    std::shared_ptr<Raft> m_raftNode; // raft节点                
+    std::shared_ptr<KVRpcProvider> m_KvRpcProvider; // one kvServer per rpcprovider
 public:
     KvServer() = delete;
 
