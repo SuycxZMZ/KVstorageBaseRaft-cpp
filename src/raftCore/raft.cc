@@ -759,11 +759,6 @@ bool Raft::sendRequestVote(int server, std::shared_ptr<raftRpcProctoc::RequestVo
             m_nextIndex[i] = lastLogIndex + 1;  
             m_matchIndex[i] = 0;                // 每换一个领导都是从0开始 ？
         }
-
-        // while (1) {
-        //     std::cout << "------------------- before doHeartBeat tick ------------------- \n";
-        //     sleep(1);
-        // }
         m_raftInnerWorker->schedule(std::bind(&Raft::doHeartBeat, this));
         // std::thread t(&Raft::doHeartBeat, this);  // 马上向其他节点宣告自己就是leader
         // t.detach();
@@ -953,9 +948,8 @@ void Raft::init(std::vector<std::shared_ptr<RaftRpcUtil>> peers, int me, std::sh
             m_currentTerm, m_lastSnapshotIncludeIndex, m_lastSnapshotIncludeTerm);
     m_mtx.unlock();
     // m_ioManager = std::make_unique<sylar::IOManager>(FIBER_THREAD_NUM, FIBER_USE_CALLER_THREAD);
-    m_raftInnerWorker->schedule([this]() -> void { this->leaderHearBeatTicker(); }); // leader 心跳定时器
+    // m_raftInnerWorker->schedule([this]() -> void { this->leaderHearBeatTicker(); }); // leader 心跳定时器
     m_raftInnerWorker->schedule([this]() -> void { this->electionTimeOutTicker(); }); // 选举超时定时器，触发就开始发起选举
-
     // while (1) {
     //     std::cout << "----------------- Raft::init tick -------------------- \n";
     //     sleep(1);
@@ -964,8 +958,10 @@ void Raft::init(std::vector<std::shared_ptr<RaftRpcUtil>> peers, int me, std::sh
     // 定期向状态机写入日志。
     // applierTicker时间受到数据库响应延迟和两次apply之间请求数量的影响,
     // 这个随着数据量增多可能不太合理，最好其还是启用一个线程。
-    std::thread t3(&Raft::applierTicker, this); 
-    t3.detach();
+    // std::thread t3(&Raft::applierTicker, this); 
+    // t3.detach();
+    // [FIXME]
+    m_raftInnerWorker->schedule([this]() -> void { this->applierTicker(); });
 }
 
 std::string Raft::persistData() {

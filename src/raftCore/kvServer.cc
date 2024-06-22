@@ -405,8 +405,8 @@ KvServer::KvServer(int me, int maxraftstate, std::string nodeInforFileName, shor
     m_iom->schedule([this, port]() -> void {
         this->m_KvRpcProvider->NotifyService(this);
         this->m_KvRpcProvider->NotifyService(
-            this->m_raftNode.get());  // todo：这里获取了原始指针，后面检查一下有没有泄露的问题 或者 shareptr释放的问题
-        // 启动一个rpc服务发布节点   Run以后，进程进入阻塞状态，等待远程的rpc调用请求
+            this->m_raftNode.get()); 
+        // 启动一个rpc服务发布节点
         this->m_KvRpcProvider->KVRpcProviderRunInit(m_me, port);
         this->m_KvRpcProvider->InnerStart();
     });
@@ -449,7 +449,10 @@ KvServer::KvServer(int me, int maxraftstate, std::string nodeInforFileName, shor
     std::shared_ptr<Persister> persister(new Persister(me));
 
     m_raftNode->init(servers, m_me, persister, applyChan);
-    // kv的server直接与raft通信，但kv不直接与raft通信，所以需要把ApplyMsg的chan传递下去用于通信，两者的persist也是共用的
+    // while (true) {
+    //     std::cout << "------------------ test -----------------" << std::endl;
+    //     sleep(2);
+    // }
 
     // You may need initialization code here.
     // m_kvDB; //kvdb初始化
