@@ -95,8 +95,6 @@ void KVrpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
             return;
         }
     }
-    // std::cout << "------------------- Already send : " << method_name << "-------------------" << std::endl;
-    // std::cout << " --------------- send -------------- \n";
     /*
     从时间节点来说，这里将请求发送过去之后rpc服务的提供者就会开始处理，返回的时候就代表着已经返回响应了
     */
@@ -112,7 +110,6 @@ void KVrpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
         controller->SetFailed(errtxt);
         return;
     }
-    // std::cout << "------------------- Already recv : " << method_name << " reply" << std::endl;
     // 反序列化rpc调用的响应数据
     // std::string response_str(recv_buf, 0, recv_size); //
     // bug：出现问题，recv_buf中遇到\0后面的数据就存不下来了，导致反序列化失败 if

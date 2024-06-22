@@ -448,6 +448,8 @@ KvServer::KvServer(int me, int maxraftstate, std::string nodeInforFileName, shor
     sleep(ipPortVt.size() - me);  // 等待所有节点相互连接成功，再启动raft
     std::shared_ptr<Persister> persister(new Persister(me));
 
+    sleep(60);
+
     m_raftNode->init(servers, m_me, persister, applyChan);
     // while (true) {
     //     std::cout << "------------------ test -----------------" << std::endl;
