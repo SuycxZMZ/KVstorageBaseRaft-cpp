@@ -86,7 +86,7 @@ void KvServer::Get(const raftKVRpcProctoc::GetArgs *args, raftKVRpcProctoc::GetR
 
     int raftIndex = -1;
     int _ = -1;
-    bool isLeader = false;
+    int isLeader = 0;
     m_raftNode->Start(op, &raftIndex, &_,
                       &isLeader);  // raftIndex：raft预计的logIndex
                                    // ，虽然是预计，但是正确情况下是准确的，op的具体内容对raft来说 是隔离的
@@ -106,7 +106,7 @@ void KvServer::Get(const raftKVRpcProctoc::GetArgs *args, raftKVRpcProctoc::GetR
     Op raftCommitOp; // timeout
     if (!chForRaftIndex->timeOutPop(CONSENSUS_TIMEOUT, &raftCommitOp)) { // 待执行命令 为空
         int _ = -1;
-        bool isLeader = false;
+        int isLeader = 0;
         m_raftNode->GetState(&_, &isLeader);
 
         if (ifRequestDuplicate(op.ClientId, op.RequestId) && isLeader) {
@@ -210,11 +210,11 @@ void KvServer::PutAppend(const raftKVRpcProctoc::PutAppendArgs *args, raftKVRpcP
     op.RequestId = args->requestid();
     int raftIndex = -1;
     int _ = -1;
-    bool isleader = false;
+    int isleader = 0; 
 
     m_raftNode->Start(op, &raftIndex, &_, &isleader);
 
-    if (!isleader) {
+    if (0 == isleader) {
         DPrintf(
             "[func -KvServer::PutAppend -kvserver{%d}]From Client %s (Request %d) To Server %d, key %s, raftIndex %d , "
             "but "
@@ -448,7 +448,7 @@ KvServer::KvServer(int me, int maxraftstate, std::string nodeInforFileName, shor
     sleep(ipPortVt.size() - me);  // 等待所有节点相互连接成功，再启动raft
     std::shared_ptr<Persister> persister(new Persister(me));
 
-    sleep(60);
+    // sleep(60);
 
     m_raftNode->init(servers, m_me, persister, applyChan);
     // while (true) {

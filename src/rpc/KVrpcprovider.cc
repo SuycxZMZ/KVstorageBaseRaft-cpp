@@ -57,7 +57,7 @@ void KVRpcProvider::InnerStart() {
 
     // 开启 tcpserver
     m_TcpServer->start();
-    sleep(1);
+    // sleep(1);
 }
 
 KVRpcProvider::~KVRpcProvider() {
