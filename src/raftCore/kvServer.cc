@@ -86,9 +86,7 @@ void KvServer::Get(const raftKVRpcProctoc::GetArgs *args, raftKVRpcProctoc::GetR
 
     int raftIndex = -1;
     int _ = -1;
-    int isLeader = 0;
-    m_raftNode->Start(op, &raftIndex, &_,
-                      &isLeader);  // raftIndex：raft预计的logIndex
+    int isLeader = m_raftNode->Start(op, &raftIndex, &_);  // raftIndex：raft预计的logIndex
                                    // ，虽然是预计，但是正确情况下是准确的，op的具体内容对raft来说 是隔离的
     if (!isLeader) {
         reply->set_err(ErrWrongLeader);
@@ -106,9 +104,7 @@ void KvServer::Get(const raftKVRpcProctoc::GetArgs *args, raftKVRpcProctoc::GetR
     Op raftCommitOp; // timeout
     if (!chForRaftIndex->timeOutPop(CONSENSUS_TIMEOUT, &raftCommitOp)) { // 待执行命令 为空
         int _ = -1;
-        int isLeader = 0;
-        m_raftNode->GetState(&_, &isLeader);
-
+        int isLeader = m_raftNode->GetState(&_);
         if (ifRequestDuplicate(op.ClientId, op.RequestId) && isLeader) {
             // 待执行命令为空，代表raft集群不保证已经commitIndex该日志。
             // 但是如果是已经提交过的get请求，是可以再执行的,不会违反线性一致性
@@ -210,9 +206,7 @@ void KvServer::PutAppend(const raftKVRpcProctoc::PutAppendArgs *args, raftKVRpcP
     op.RequestId = args->requestid();
     int raftIndex = -1;
     int _ = -1;
-    int isleader = 0; 
-
-    m_raftNode->Start(op, &raftIndex, &_, &isleader);
+    int isleader = m_raftNode->Start(op, &raftIndex, &_);
 
     if (0 == isleader) {
         DPrintf(
@@ -448,7 +442,7 @@ KvServer::KvServer(int me, int maxraftstate, std::string nodeInforFileName, shor
     sleep(ipPortVt.size() - me);  // 等待所有节点相互连接成功，再启动raft
     std::shared_ptr<Persister> persister(new Persister(me));
 
-    // sleep(60);
+    sleep(30);
 
     m_raftNode->init(servers, m_me, persister, applyChan);
     // while (true) {

@@ -362,14 +362,14 @@ void Raft::getPrevLogInfo(int server, int* preIndex, int* preTerm) {
 
 // GetState return currentTerm and whether this server
 // believes it is the Leader.
-void Raft::GetState(int* term, int* isLeader) {
+bool Raft::GetState(int* term) {
     m_mtx.lock();
     DEFER {
         // todo 暂时不清楚会不会导致死锁
         m_mtx.unlock();
     };
     *term = m_currentTerm;
-    *isLeader = (m_status == Leader);
+    return m_status == Raft::Status::Leader;
 }
 
 void Raft::InstallSnapshot(const raftRpcProctoc::InstallSnapshotRequest* args,
@@ -879,14 +879,13 @@ void Raft::RequestVote(google::protobuf::RpcController* controller, const ::raft
     done->Run();
 }
 
-void Raft::Start(Op command, int* newLogIndex, int* newLogTerm, int* isLeader) {
+bool Raft::Start(Op command, int* newLogIndex, int* newLogTerm) {
     std::lock_guard<std::mutex> lg1(m_mtx);
     if (m_status != Leader) {
         DPrintf("[func-Start-rf{%d}]  is not leader");
         *newLogIndex = -1;
         *newLogTerm = -1;
-        *isLeader = 0;
-        return;
+        return false;
     }
 
     raftRpcProctoc::LogEntry newLogEntry;
@@ -903,7 +902,7 @@ void Raft::Start(Op command, int* newLogIndex, int* newLogTerm, int* isLeader) {
     persist();
     *newLogIndex = newLogEntry.logindex();
     *newLogTerm = newLogEntry.logterm();
-    *isLeader = 1;
+    return true;
 }
 
 /**
@@ -917,7 +916,7 @@ void Raft::init(std::vector<std::shared_ptr<RaftRpcUtil>> peers, int me, std::sh
                 std::shared_ptr<LockQueue<ApplyMsg>> applyCh) {
     m_peers = peers; // 需要与其他raft节点通信类
     m_persister = persister; // 持久化类
-    // m_persister->SaveRaftState("fucker");
+    m_persister->SaveRaftState("fucker");
     m_me = me; // 标记自己，不能给自己发送rpc
     m_mtx.lock(); // 上锁
     this->applyChan = applyCh; // 与kv-server沟通

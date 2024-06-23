@@ -123,7 +123,8 @@ public:
     /**
      * @brief 看当前节点是否是leader
      */
-    void GetState(int *term, int *isLeader);
+    // void GetState(int *term, int *isLeader);
+    bool GetState(int *term);
     void InstallSnapshot(const raftRpcProctoc::InstallSnapshotRequest *args,
                          raftRpcProctoc::InstallSnapshotResponse *reply);
 
@@ -215,7 +216,8 @@ public:
     /**
      * @brief 发布发一个新日志
      */
-    void Start(Op command, int *newLogIndex, int *newLogTerm, int *isLeader);
+    // void Start(Op command, int *newLogIndex, int *newLogTerm, int *isLeader);
+    bool Start(Op command, int *newLogIndex, int *newLogTerm);
 
     void Snapshot(int index, std::string snapshot);
 
