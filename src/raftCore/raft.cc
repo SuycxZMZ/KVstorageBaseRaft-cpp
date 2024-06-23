@@ -177,11 +177,11 @@ void Raft::doElection() {
             auto requestVoteReply = std::make_shared<raftRpcProctoc::RequestVoteReply>();
 
             // 发送，使用匿名函数执行避免其拿到锁
-            // m_iom->schedule(std::bind(&Raft::sendRequestVote, this,
-            //               i, requestVoteArgs, requestVoteReply, votedNum));
-            std::thread t(&Raft::sendRequestVote, this,
-                          i, requestVoteArgs, requestVoteReply, votedNum);
-            t.detach();
+            m_iom->schedule(std::bind(&Raft::sendRequestVote, this,
+                          i, requestVoteArgs, requestVoteReply, votedNum));
+            // std::thread t(&Raft::sendRequestVote, this,
+            //               i, requestVoteArgs, requestVoteReply, votedNum);
+            // t.detach();
         }
     }
 }
@@ -208,9 +208,9 @@ void Raft::doHeartBeat() {
             myAssert(m_nextIndex[i] >= 1, format("rf.nextIndex[%d] = {%d}", i, m_nextIndex[i]));
             // 日志压缩加入后要判断是发送快照还是发送心跳
             if (m_nextIndex[i] <= m_lastSnapshotIncludeIndex) {
-                std::thread t(&Raft::leaderSendSnapShot, this, i);  // 创建新线程并执行b函数，并传递参数
-                t.detach();
-                // m_iom->schedule(std::bind(&Raft::leaderSendSnapShot, this, i));
+                // std::thread t(&Raft::leaderSendSnapShot, this, i);  // 创建新线程并执行b函数，并传递参数
+                // t.detach();
+                m_iom->schedule(std::bind(&Raft::leaderSendSnapShot, this, i));
                 continue;
             }
 
@@ -253,11 +253,11 @@ void Raft::doHeartBeat() {
             appendEntriesReply->set_appstate(Disconnected);
 
 
-            // m_iom->schedule(std::bind(&Raft::sendAppendEntries, this, i, appendEntriesArgs, appendEntriesReply,
-            //               appendNums));
-            std::thread t(&Raft::sendAppendEntries, this, i, appendEntriesArgs, appendEntriesReply,
-                          appendNums);  // 创建新线程并执行b函数，并传递参数
-            t.detach();
+            m_iom->schedule(std::bind(&Raft::sendAppendEntries, this, i, appendEntriesArgs, appendEntriesReply,
+                          appendNums));
+            // std::thread t(&Raft::sendAppendEntries, this, i, appendEntriesArgs, appendEntriesReply,
+            //               appendNums);  // 创建新线程并执行b函数，并传递参数
+            // t.detach();
         }
 
         // leader发送心跳，重置心跳时间，
@@ -758,9 +758,9 @@ bool Raft::sendRequestVote(int server, std::shared_ptr<raftRpcProctoc::RequestVo
             m_nextIndex[i] = lastLogIndex + 1;  
             m_matchIndex[i] = 0;                // 每换一个领导都是从0开始 ？
         }
-        // m_iom->schedule(std::bind(&Raft::doHeartBeat, this));
-        std::thread t(&Raft::doHeartBeat, this);  // 马上向其他节点宣告自己就是leader
-        t.detach();
+        m_iom->schedule(std::bind(&Raft::doHeartBeat, this));
+        // std::thread t(&Raft::doHeartBeat, this);  // 马上向其他节点宣告自己就是leader
+        // t.detach();
         persist();
     }
     return true;
