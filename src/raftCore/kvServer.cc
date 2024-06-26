@@ -236,8 +236,9 @@ void KvServer::PutAppend(const raftKVRpcProctoc::PutAppendArgs *args, raftKVRpcP
     if (!chForRaftIndex->timeOutPop(CONSENSUS_TIMEOUT, &raftCommitOp)) {
         DPrintf(
             "[func -KvServer::PutAppend -kvserver{%d}]TIMEOUT PUTAPPEND !!!! Server %d , get Command <-- Index:%d , "
-            "ClientId %s, RequestId %s, Opreation %s Key :%s, Value :%s",
-            m_me, m_me, raftIndex, &op.ClientId, op.RequestId, &op.Operation, &op.Key, &op.Value);
+            "ClientId %s, RequestId %d, Opreation %s Key :%s, Value :%s",
+            m_me, m_me, raftIndex, 
+            op.ClientId.c_str(), op.RequestId, op.Operation.c_str(), op.Key.c_str(), op.Value.c_str());
 
         if (ifRequestDuplicate(op.ClientId, op.RequestId)) {
             reply->set_err(OK);  // 超时了,但因为是重复的请求，返回ok，实际上就算没有超时，在真正执行的时候也要判断是否重复
