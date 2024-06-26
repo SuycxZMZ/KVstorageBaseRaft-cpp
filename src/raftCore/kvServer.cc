@@ -394,8 +394,6 @@ KvServer::KvServer(int me, int maxraftstate, std::string nodeInforFileName, shor
         m_KvRpcProvider(std::make_shared<KVRpcProvider>(m_iom))
 {
     sleep(6);
-    // std::thread t(std::bind(&KvServer::InitRpcAndRun, this, port));
-    // t.detach();
     m_iom->schedule([this, port]() -> void {
         this->m_KvRpcProvider->NotifyService(this);
         this->m_KvRpcProvider->NotifyService(
@@ -445,10 +443,6 @@ KvServer::KvServer(int me, int maxraftstate, std::string nodeInforFileName, shor
     sleep(3);
 
     m_raftNode->init(servers, m_me, persister, applyChan);
-    // while (true) {
-    //     std::cout << "------------------ test -----------------" << std::endl;
-    //     sleep(2);
-    // }
 
     // You may need initialization code here.
     // m_kvDB; //kvdb初始化

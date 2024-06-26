@@ -4,7 +4,6 @@
 #include "Persister.h"
 #include "common/util.h"
 
-// todo:会涉及反复打开文件的操作，没有考虑如果文件出现问题会怎么办？？
 void Persister::Save(const std::string raftstate, const std::string snapshot) {
     std::lock_guard<std::mutex> lg(m_mtx);
     clearRaftStateAndSnapshot();
@@ -42,7 +41,6 @@ void Persister::SaveRaftState(const std::string &data) {
 
 long long Persister::RaftStateSize() {
     std::lock_guard<std::mutex> lg(m_mtx);
-
     return m_raftStateSize;
 }
 
