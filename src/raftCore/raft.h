@@ -164,7 +164,10 @@ public:
     void RequestVote(const raftRpcProctoc::RequestVoteArgs *args, raftRpcProctoc::RequestVoteReply *reply);
 
     /**
-     * @brief 判断当前节点是否含有最新的日志
+     * @brief 判断传入的日志参数是否比自身的新
+     * @param index 传入要比较的日志index
+     * @param term 传入要比较的日志任期term
+     * @return 传入的日志参数比自身的新返回true 否则返回false
      */
     bool UpToDate(int index, int term);
     int getLastLogIndex();

@@ -9,7 +9,7 @@
 Raft::Raft(sylar::IOManager::ptr _iom) : m_iom(_iom)
 {}
 Raft::~Raft() {
-    std::cout << "----------[Raft::~Raft()] \n";
+    std::cout << "----------[Raft::~Raft()]---------- \n";
 }
 
 
@@ -240,8 +240,11 @@ void Raft::doHeartBeat() {
                 std::make_shared<raftRpcProctoc::AppendEntriesReply>();
             appendEntriesReply->set_appstate(Disconnected);
 
-            m_iom->schedule(std::bind(&Raft::sendAppendEntries, this, i, appendEntriesArgs, appendEntriesReply,
-                          appendNums));
+//             m_iom->schedule(std::bind(&Raft::sendAppendEntries, this, i, appendEntriesArgs, appendEntriesReply,appendNums));
+             // m_iom->schedule([&]() -> void { sendAppendEntries(i, appendEntriesArgs, appendEntriesReply,appendNums); });
+             m_iom->schedule([this, i, appendEntriesArgs, appendEntriesReply,appendNums]() -> void {
+                 sendAppendEntries(i, appendEntriesArgs, appendEntriesReply,appendNums);
+             });
         }
 
         // leader发送心跳，重置心跳时间，
@@ -528,7 +531,7 @@ void Raft::persist() {
 
 
 /**
- * @brief 变成 candidate 之后需要让其他结点给自己投票，candidate通过该函数远程调用远端节点的投票函数
+ * @brief 服务提供方，也就是RPC请求的对端提供的方法
  * @param args 请求投票的参数
  * @param reply 请求投票的响应
  */
@@ -537,8 +540,9 @@ void Raft::RequestVote(const raftRpcProctoc::RequestVoteArgs* args, raftRpcProct
     DEFER { // 应该先持久化，再撤销lock
         persist();
     };
+
     // 对args的term的三种情况分别进行处理，大于小于等于自己的term都是不同的处理
-    //  reason: 出现网络分区，该竞选者已经OutOfDate(过时）
+    // reason: 出现网络分区，竞选者已经过时，发送拒绝reply并不过多处理该请求
     if (args->term() < m_currentTerm) {
         reply->set_term(m_currentTerm);
         reply->set_votestate(Expire);
@@ -551,19 +555,15 @@ void Raft::RequestVote(const raftRpcProctoc::RequestVoteArgs* args, raftRpcProct
         m_status = Follower;
         m_currentTerm = args->term();
         m_votedFor = -1;
-
-        // 重置定时器：收到leader的ae，开始选举，透出票
-        // 这时候更新了term之后，votedFor也要置为-1
     }
     myAssert(args->term() == m_currentTerm,
              format("[func--rf{%d}] 前面校验过args.Term==rf.currentTerm，这里却不等", m_me));
-
     // 现在节点任期都是相同的(任期小的也已经更新到新的args的term了)，还需要检查log的term和index是不是匹配的了
     int lastLogTerm = getLastLogTerm();
 
-    // 只有没投票，且candidate的日志的新的程度 ≥ 接受者的日志新的程度 才会授票
+    // 只有没投票，且candidate的日志的新的程度 ≥ 接受者的日志新的程度 才会给请求方投票
+    // 日志太旧了
     if (!UpToDate(args->lastlogindex(), args->lastlogterm())) {
-        // 日志太旧了
         if (args->lastlogterm() < lastLogTerm) {
         } else {
         }
@@ -573,6 +573,7 @@ void Raft::RequestVote(const raftRpcProctoc::RequestVoteArgs* args, raftRpcProct
         return;
     }
 
+    // ------------------------------ 对方的日志较新 ------------------------------ //
     // 当因为网络质量不好导致的请求丢失重发就有可能！！！！
     // 因此需要避免重复投票
     if (m_votedFor != -1 && m_votedFor != args->candidateid()) {
@@ -591,8 +592,6 @@ void Raft::RequestVote(const raftRpcProctoc::RequestVoteArgs* args, raftRpcProct
 }
 
 bool Raft::UpToDate(int index, int term) {
-    // lastEntry := rf.log[len(rf.log)-1]
-
     int lastIndex = -1;
     int lastTerm = -1;
     getLastLogIndexAndTerm(&lastIndex, &lastTerm);
