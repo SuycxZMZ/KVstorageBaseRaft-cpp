@@ -14,7 +14,7 @@ Raft::~Raft() {
 
 
 /**
- * @brief 日志同步 + 心跳 rpc ，重点关注。follow 节点执行的操作
+ * @brief 日志同步 + 心跳 rpc ，重点关注。远端的follow节点执行的操作
  * @param args 接收的rpc参数
  * @param reply 回复的rpc参数
  */
@@ -239,12 +239,8 @@ void Raft::doHeartBeat() {
             const std::shared_ptr<raftRpcProctoc::AppendEntriesReply> appendEntriesReply =
                 std::make_shared<raftRpcProctoc::AppendEntriesReply>();
             appendEntriesReply->set_appstate(Disconnected);
-
-//             m_iom->schedule(std::bind(&Raft::sendAppendEntries, this, i, appendEntriesArgs, appendEntriesReply,appendNums));
-             // m_iom->schedule([&]() -> void { sendAppendEntries(i, appendEntriesArgs, appendEntriesReply,appendNums); });
-             m_iom->schedule([this, i, appendEntriesArgs, appendEntriesReply,appendNums]() -> void {
-                 sendAppendEntries(i, appendEntriesArgs, appendEntriesReply,appendNums);
-             });
+            auto bindfunc = std::bind(&Raft::sendAppendEntries, this, i, appendEntriesArgs, appendEntriesReply,appendNums);
+            m_iom->schedule([bindfunc]() -> void{bindfunc(); });
         }
 
         // leader发送心跳，重置心跳时间，
