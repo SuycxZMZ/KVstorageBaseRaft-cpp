@@ -80,8 +80,6 @@ void KVrpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
 
     // 发送rpc请求
     // 失败会重试连接再发送，重试连接失败会直接return
-    // std::cout << " --------------- before stub send -------------- \n"; 
-    // std::cout << "------------------- send : " << method_name << std::endl;
     while (send(m_clientFd, rpc_send_str.c_str(), rpc_send_str.size(), 0) <= 0) {
         char errtxt[512] = {0};
         sprintf(errtxt, "send error! errno:%d", errno);
