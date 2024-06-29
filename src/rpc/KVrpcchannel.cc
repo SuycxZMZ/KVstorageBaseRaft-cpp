@@ -58,12 +58,15 @@ void KVrpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
         // std::cout << "Serialize request rpcheader error !!!" << std::endl;
         return;
     }
+    uint32_t send_all_size = SEND_RPC_HEADERSIZE + rpcheader_str.size() + args_str.size();
     uint32_t rpcheader_size = rpcheader_str.size();
 
     // 组装 rpc 请求帧
     std::string rpc_send_str;
+    // 包大小
+    rpc_send_str += std::string((char*)&send_all_size, 4);
     // rpcheader_size
-    rpc_send_str.insert(0, std::string((char*)&rpcheader_size, 4));
+    rpc_send_str += std::string((char*)&rpcheader_size, 4);
     // rpcheader
     rpc_send_str += rpcheader_str;
     // args
