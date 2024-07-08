@@ -871,7 +871,7 @@ void Raft::init(std::vector<std::shared_ptr<RaftRpcUtil>> peers, int me, std::sh
                 std::shared_ptr<LockQueue<ApplyMsg>> applyCh) {
     m_peers = peers; // 需要与其他raft节点通信类
     m_persister = persister; // 持久化类
-    m_persister->SaveRaftState("fucker");
+    // m_persister->SaveRaftState("fucker");
     m_me = me; // 标记自己，不能给自己发送rpc
     m_mtx.lock(); // 上锁
     this->applyChan = applyCh; // 与kv-server沟通
