@@ -181,7 +181,10 @@ int SkipList<K, V>::insert_element(const K key, const V value) {
     memset(update, 0, sizeof(Node<K, V> *) * (_max_level + 1));
 
     // start form highest level of skip list
+    // 从最大层开始查找，找到前一节点，通过--i，移动到下层再开始查找
     for (int i = _skip_list_level; i >= 0; i--) {
+        // 跳出第一个条件是找到当前层的最后一个节点了，要往下走
+        // 跳出第二个条件是当前节点的下一个节点的值 大于 key，找到插入点了。此时当前节点小于key，就一路往下走，记下所有插入点
         while (current->forward[i] != NULL && current->forward[i]->get_key() < key) {
             current = current->forward[i];
         }
@@ -216,6 +219,7 @@ int SkipList<K, V>::insert_element(const K key, const V value) {
         Node<K, V> *inserted_node = create_node(key, value, random_level);
 
         // insert node
+        // 在插入点，插入 当前节点的指针，同时对当前节点的 forward 赋值，指向右侧节点
         for (int i = 0; i <= random_level; i++) {
             inserted_node->forward[i] = update[i]->forward[i];
             update[i]->forward[i] = inserted_node;
@@ -403,6 +407,7 @@ bool SkipList<K, V>::search_element(K key, V &value) {
     Node<K, V> *current = _header;
 
     // start from highest level of skip list
+    // 从最大层开始查找，找到前一节点，通过--i，移动到下层再开始查找
     for (int i = _skip_list_level; i >= 0; i--) {
         while (current->forward[i] && current->forward[i]->get_key() < key) {
             current = current->forward[i];
