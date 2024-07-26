@@ -4,10 +4,10 @@ cmake_minimum_required(VERSION 3.10)
 project(KVRaftCpp)
 
 if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE "Debug")
+    set(CMAKE_BUILD_TYPE "Debug")
 endif()
 
-# only build examples if this is the main project
+# 编译example选项，其实没什么用，也不会拿这个项目来当库
 if(CMAKE_PROJECT_NAME STREQUAL "KVRaftCpp")
     option(KVRaftCpp_BUILD_EXAMPLES "Build KVRaftCpp examples" ON)
 endif()
