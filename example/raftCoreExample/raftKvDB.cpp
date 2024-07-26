@@ -1,6 +1,6 @@
-//
-// Created by swx on 23-12-28.
-//
+/// 理论上起来的几个子进程杀掉一个是不影响其他节点子进程的
+/// 因为进程是隔离的，所以其他进程也不会挂，还没高强度测试
+/// 节点下线再上线的场景还没想好怎么来模拟
 #include "raftCore/raft.h"
 #include "raftCore/kvServer.h"
 
@@ -54,13 +54,11 @@ int main(int argc, char **argv) {
         std::cout << "start to create raftkv node:" << i << "    port:" << port << " pid:" << getpid() << std::endl;
         pid_t pid = fork();  // 创建新进程
         if (pid == 0) {
-            // 如果是子进程
-            // 子进程的代码
+            // 子进程
             auto kvServer = new KvServer(i, 500, configFileName, port);
-            pause();  // 子进程进入等待状态，不会执行 return 语句
+            pause();  // 子进程进入等待状态，不执行 return 语句
         } else if (pid > 0) {
-            // 如果是父进程
-            // 父进程的代码
+            // 父进程
             sleep(1);
         } else {
             // 如果创建进程失败
