@@ -174,8 +174,11 @@ void Raft::doElection() {
             requestVoteArgs->set_lastlogterm(lastLogTerm);
             auto requestVoteReply = std::make_shared<raftRpcProctoc::RequestVoteReply>();
 
-            m_iom->schedule(std::bind(&Raft::sendRequestVote, this,
+            std::thread t_sendRV(std::bind(&Raft::sendRequestVote, this,
                           i, requestVoteArgs, requestVoteReply, votedNum));
+            t_sendRV.detach();
+            // m_iom->schedule(std::bind(&Raft::sendRequestVote, this,
+            //               i, requestVoteArgs, requestVoteReply, votedNum));
         }
     }
 }
@@ -198,7 +201,9 @@ void Raft::doHeartBeat() {
             myAssert(m_nextIndex[i] >= 1, format("rf.nextIndex[%d] = {%d}", i, m_nextIndex[i]));
             // 日志压缩加入后要判断是发送快照还是发送心跳
             if (m_nextIndex[i] <= m_lastSnapshotIncludeIndex) {
-                m_iom->schedule(std::bind(&Raft::leaderSendSnapShot, this, i));
+                // m_iom->schedule(std::bind(&Raft::leaderSendSnapShot, this, i));
+                std::thread t_sendSnap(std::bind(&Raft::leaderSendSnapShot, this, i));
+                t_sendSnap.detach();
                 continue;
             }
 
@@ -239,8 +244,10 @@ void Raft::doHeartBeat() {
             const std::shared_ptr<raftRpcProctoc::AppendEntriesReply> appendEntriesReply =
                 std::make_shared<raftRpcProctoc::AppendEntriesReply>();
             appendEntriesReply->set_appstate(Disconnected);
-            auto bindfunc = std::bind(&Raft::sendAppendEntries, this, i, appendEntriesArgs, appendEntriesReply,appendNums);
-            m_iom->schedule([bindfunc]() -> void{bindfunc(); });
+            // auto bindfunc = std::bind(&Raft::sendAppendEntries, this, i, appendEntriesArgs, appendEntriesReply,appendNums);
+            // m_iom->schedule([bindfunc]() -> void{bindfunc(); });
+            std::thread t_sendAE(std::bind(&Raft::sendAppendEntries, this, i, appendEntriesArgs, appendEntriesReply,appendNums));
+            t_sendAE.detach();
         }
 
         // leader发送心跳，重置心跳时间，
