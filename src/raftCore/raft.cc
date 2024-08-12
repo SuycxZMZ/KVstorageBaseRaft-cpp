@@ -174,6 +174,7 @@ void Raft::doElection() {
             requestVoteArgs->set_lastlogterm(lastLogTerm);
             auto requestVoteReply = std::make_shared<raftRpcProctoc::RequestVoteReply>();
 
+            // 在for循环中 --> 候选者可能会起 (n - 1) 个线程发送投票RPC
             std::thread t_sendRV(std::bind(&Raft::sendRequestVote, this,
                           i, requestVoteArgs, requestVoteReply, votedNum));
             t_sendRV.detach();
@@ -193,6 +194,7 @@ void Raft::doHeartBeat() {
         auto appendNums = std::make_shared<std::atomic_int32_t>(1);  // 正确返回的节点的数量
         // 对Follower发送心跳
         // 最少要单独写一个函数来管理，而不是在这一坨
+        // 这里 做心跳处理，leader 会起 (n - 1) 个线程发送AE
         for (int i = 0; i < m_peers.size(); i++) {
             if (i == m_me) {
                 continue;
@@ -350,19 +352,15 @@ void Raft::getPrevLogInfo(int server, int* preIndex, int* preTerm) {
 // GetState return currentTerm and whether this server
 // believes it is the Leader.
 bool Raft::GetState(int* term) {
-    m_mtx.lock();
-    DEFER {
-        // todo 暂时不清楚会不会导致死锁
-        m_mtx.unlock();
-    };
+    // todo 暂时不清楚会不会导致死锁
+    std::lock_guard<std::mutex> lock(m_mtx);
     *term = m_currentTerm;
     return m_status == Raft::Status::Leader;
 }
 
 void Raft::InstallSnapshot(const raftRpcProctoc::InstallSnapshotRequest* args,
                            raftRpcProctoc::InstallSnapshotResponse* reply) {
-    m_mtx.lock();
-    DEFER { m_mtx.unlock(); };
+    std::lock_guard<std::mutex> lock(m_mtx);
     if (args->term() < m_currentTerm) {
         reply->set_term(m_currentTerm);
         return;
@@ -403,7 +401,7 @@ void Raft::InstallSnapshot(const raftRpcProctoc::InstallSnapshotRequest* args,
     msg.SnapshotIndex = args->lastsnapshotincludeindex();
 
     applyChan->Push(msg);
-    std::thread t(&Raft::pushMsgToKvServer, this, msg);  // 创建新线程并执行b函数，并传递参数
+    std::thread t(&Raft::pushMsgToKvServer, this, msg); 
     t.detach();
     // 看下这里能不能再优化
     // 持久化
@@ -468,8 +466,7 @@ void Raft::leaderSendSnapShot(int server) {
     raftRpcProctoc::InstallSnapshotResponse reply;
     m_mtx.unlock();
     bool ok = m_peers[server]->InstallSnapshot(&args, &reply);
-    m_mtx.lock();
-    DEFER { m_mtx.unlock(); };
+    std::lock_guard<std::mutex> lock(m_mtx);
     if (!ok) {
         return;
     }
@@ -914,7 +911,6 @@ void Raft::init(std::vector<std::shared_ptr<RaftRpcUtil>> peers, int me, std::sh
 
     // 定期向状态机写入日志。
     // applierTicker时间受到数据库响应延迟和两次apply之间请求数量的影响,
-    // [FIXME]
     std::thread t3([this]() -> void { this->applierTicker(); });
     t3.detach();
 }

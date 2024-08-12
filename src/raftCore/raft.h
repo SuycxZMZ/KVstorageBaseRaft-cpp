@@ -125,6 +125,14 @@ public:
      */
     // void GetState(int *term, int *isLeader);
     bool GetState(int *term);
+
+    /**
+     * @brief 接收leader发来的快照请求，同步快照到本机
+     * 
+     * @param args 接收参数
+     * @param reply 填写reply
+     * @return void 
+     */
     void InstallSnapshot(const raftRpcProctoc::InstallSnapshotRequest *args,
                          raftRpcProctoc::InstallSnapshotResponse *reply);
 
