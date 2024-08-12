@@ -6,11 +6,11 @@
 #include "common/config.h"
 #include "common/util.h"
 
-Raft::Raft(sylar::IOManager::ptr _iom) : m_iom(_iom)
-{}
-Raft::~Raft() {
-    std::cout << "----------[Raft::~Raft()]---------- \n";
-}
+// sylar::threadpool t_pool(MAX_NODE_NUM);
+
+Raft::Raft(sylar::IOManager::ptr _iom) : m_iom(_iom), m_pool(calculate_pool_size()) {}
+
+Raft::~Raft() { std::cout << "----------[Raft::~Raft()]---------- \n"; }
 
 
 /**
@@ -175,9 +175,15 @@ void Raft::doElection() {
             auto requestVoteReply = std::make_shared<raftRpcProctoc::RequestVoteReply>();
 
             // 在for循环中 --> 候选者可能会起 (n - 1) 个线程发送投票RPC
-            std::thread t_sendRV(std::bind(&Raft::sendRequestVote, this,
-                          i, requestVoteArgs, requestVoteReply, votedNum));
-            t_sendRV.detach();
+            m_pool.commit_with_timeout(
+                [task = std::bind(&Raft::sendRequestVote, this, i, requestVoteArgs, requestVoteReply, votedNum)]() {
+                    task(); // 忽略返回值
+                }, 
+                maxRandomizedElectionTime
+            );
+            // std::thread t_sendRV(std::bind(&Raft::sendRequestVote, this,
+            //               i, requestVoteArgs, requestVoteReply, votedNum));
+            // t_sendRV.detach();
             // m_iom->schedule(std::bind(&Raft::sendRequestVote, this,
             //               i, requestVoteArgs, requestVoteReply, votedNum));
         }
@@ -204,8 +210,9 @@ void Raft::doHeartBeat() {
             // 日志压缩加入后要判断是发送快照还是发送心跳
             if (m_nextIndex[i] <= m_lastSnapshotIncludeIndex) {
                 // m_iom->schedule(std::bind(&Raft::leaderSendSnapShot, this, i));
-                std::thread t_sendSnap(std::bind(&Raft::leaderSendSnapShot, this, i));
-                t_sendSnap.detach();
+                m_pool.commit_with_timeout(std::bind(&Raft::leaderSendSnapShot, this, i), HeartBeatTimeout);
+                // std::thread t_sendSnap(std::bind(&Raft::leaderSendSnapShot, this, i));
+                // t_sendSnap.detach();
                 continue;
             }
 
@@ -248,8 +255,14 @@ void Raft::doHeartBeat() {
             appendEntriesReply->set_appstate(Disconnected);
             // auto bindfunc = std::bind(&Raft::sendAppendEntries, this, i, appendEntriesArgs, appendEntriesReply,appendNums);
             // m_iom->schedule([bindfunc]() -> void{bindfunc(); });
-            std::thread t_sendAE(std::bind(&Raft::sendAppendEntries, this, i, appendEntriesArgs, appendEntriesReply,appendNums));
-            t_sendAE.detach();
+            m_pool.commit_with_timeout(
+                [task = std::bind(&Raft::sendAppendEntries, this, i, appendEntriesArgs, appendEntriesReply,appendNums)]() {
+                    task();
+                }, 
+                HeartBeatTimeout
+            );
+            // std::thread t_sendAE(std::bind(&Raft::sendAppendEntries, this, i, appendEntriesArgs, appendEntriesReply,appendNums));
+            // t_sendAE.detach();
         }
 
         // leader发送心跳，重置心跳时间，

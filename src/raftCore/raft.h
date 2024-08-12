@@ -20,6 +20,8 @@
 #include "sylar/sylar.h"
 #include "raftRpcUtil.h"
 #include "common/util.h"
+#include "threadPool/threadpool.h"
+
 /// @brief //////////// 网络状态表示  todo：可以在rpc中删除该字段，实际生产中是用不到的.
 /// 方便网络分区的时候debug，网络异常的时候为disconnected，只要网络正常就为AppNormal，防止matchIndex[]数组异常减小
 constexpr int Disconnected = 0;
@@ -30,6 +32,10 @@ constexpr int Killed = 0;
 constexpr int Voted = 1;   // 本轮已经投过票了
 constexpr int Expire = 2;  // 投票（消息、竞选者）过期
 constexpr int Normal = 3;
+
+constexpr int calculate_pool_size() {
+    return static_cast<int>(MAX_NODE_NUM * 1.5);
+}
 
 /**
  * @brief Raft 核心类
@@ -67,6 +73,8 @@ private:
     // 协程
     sylar::IOManager::ptr m_iom;
     // sylar::IOManager::ptr m_raftInnerWorker;
+
+    sylar::threadpool m_pool;
 public:
     Raft() = delete;
 
@@ -300,5 +308,7 @@ private:
         std::unordered_map<std::string, int> umap;
     };
 };
+
+// typedef sylar::SingletonPtr<sylar::threadpool> t_pool;
 
 #endif  // RAFT_H
