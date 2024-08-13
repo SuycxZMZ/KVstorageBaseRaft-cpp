@@ -21,12 +21,14 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O2 -DNDEBUG")
 
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
-include_directories(${PROJECT_SOURCE_DIR}/src)
+include_directories(
+    /usr/local/include
+    ${PROJECT_SOURCE_DIR}/src)
 
 # 设置项目库文件搜索路径 -L
 link_directories(
-    ${PROJECT_SOURCE_DIR}/lib 
-    /usr/local/lib            
+    /usr/local/lib
+    ${PROJECT_SOURCE_DIR}/lib            
 )
 
 add_subdirectory(src)
