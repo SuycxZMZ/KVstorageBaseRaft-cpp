@@ -21,4 +21,7 @@ const int CONSENSUS_TIMEOUT = 500 * debugMul;  // ms
 const int FIBER_THREAD_NUM = 1;              // 协程库中线程池大小
 const bool FIBER_USE_CALLER_THREAD = false;  // 是否使用caller_thread执行调度任务
 
+// 推荐节点数量
+const int MAX_NODE_NUM = 5;
+
 #endif  // CONFIG_H
