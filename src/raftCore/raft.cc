@@ -5,6 +5,9 @@
 #include "common/config.h"
 #include "common/util.h"
 
+// 初始化线程池
+Raft::Raft() : m_pool(MAX_NODE_NUM) {}
+
 /**
  * @brief 日志同步 + 心跳 rpc ，重点关注。follow 节点执行的操作
  * @param args 接收的rpc参数
@@ -166,9 +169,15 @@ void Raft::doElection() {
             auto requestVoteReply = std::make_shared<raftRpcProctoc::RequestVoteReply>();
 
             // 发送，使用匿名函数执行避免其拿到锁
-            std::thread t(&Raft::sendRequestVote, this,
-                          i, requestVoteArgs, requestVoteReply, votedNum);
-            t.detach();
+            m_pool.commit_with_timeout(
+                [task = std::bind(&Raft::sendRequestVote, this, i, requestVoteArgs, requestVoteReply, votedNum)] () {
+                    task();
+                }, 
+                maxRandomizedElectionTime
+            );
+            // std::thread t(&Raft::sendRequestVote, this,
+            //               i, requestVoteArgs, requestVoteReply, votedNum);
+            // t.detach();
         }
     }
 }
@@ -195,8 +204,14 @@ void Raft::doHeartBeat() {
             myAssert(m_nextIndex[i] >= 1, format("rf.nextIndex[%d] = {%d}", i, m_nextIndex[i]));
             // 日志压缩加入后要判断是发送快照还是发送心跳
             if (m_nextIndex[i] <= m_lastSnapshotIncludeIndex) {
-                std::thread t(&Raft::leaderSendSnapShot, this, i);  // 创建新线程并执行b函数，并传递参数
-                t.detach();
+                m_pool.commit_with_timeout(
+                    [task = std::bind(&Raft::leaderSendSnapShot, this, i)] () {
+                        task();
+                    },
+                    HeartBeatTimeout
+                );
+                // std::thread t(&Raft::leaderSendSnapShot, this, i);  // 创建新线程并执行b函数，并传递参数
+                // t.detach();
                 continue;
             }
 
@@ -238,9 +253,16 @@ void Raft::doHeartBeat() {
                 std::make_shared<raftRpcProctoc::AppendEntriesReply>();
             appendEntriesReply->set_appstate(Disconnected);
 
-            std::thread t(&Raft::sendAppendEntries, this, i, appendEntriesArgs, appendEntriesReply,
-                          appendNums);  // 创建新线程并执行b函数，并传递参数
-            t.detach();
+
+            m_pool.commit_with_timeout(
+                [task = std::bind(&Raft::sendAppendEntries, this, i, appendEntriesArgs, appendEntriesReply, appendNums)] () {
+                    task();
+                },
+                HeartBeatTimeout
+            );
+            // std::thread t(&Raft::sendAppendEntries, this, i, appendEntriesArgs, appendEntriesReply,
+            //               appendNums);  // 创建新线程并执行b函数，并传递参数
+            // t.detach();
         }
 
         // leader发送心跳，重置心跳时间，

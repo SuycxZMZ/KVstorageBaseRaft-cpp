@@ -19,6 +19,8 @@
 #include "fiber/monsoon.h"
 #include "raftRpcUtil.h"
 #include "common/util.h"
+#include "threadPool/threadPool.h"
+
 /// @brief //////////// 网络状态表示  todo：可以在rpc中删除该字段，实际生产中是用不到的.
 /// 方便网络分区的时候debug，网络异常的时候为disconnected，只要网络正常就为AppNormal，防止matchIndex[]数组异常减小
 constexpr int Disconnected = 0;
@@ -65,8 +67,11 @@ private:
 
     // 协程
     std::unique_ptr<monsoon::IOManager> m_ioManager = nullptr;
+    sylar::threadpool m_pool;
 
 public:
+    Raft();
+
     /**
      * @brief 日志同步 + 心跳 rpc ，重点关注。follow 节点执行的操作
      * @param args 接收的rpc参数
