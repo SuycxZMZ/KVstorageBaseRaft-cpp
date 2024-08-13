@@ -945,9 +945,9 @@ void Raft::init(std::vector<std::shared_ptr<RaftRpcUtil>> peers, int me, std::sh
     DPrintf("[Init&ReInit] Sever %d, term %d, lastSnapshotIncludeIndex {%d} , lastSnapshotIncludeTerm {%d}", m_me,
             m_currentTerm, m_lastSnapshotIncludeIndex, m_lastSnapshotIncludeTerm);
     m_mtx.unlock();
-    m_ioManager = std::make_unique<monsoon::IOManager>(FIBER_THREAD_NUM, FIBER_USE_CALLER_THREAD);
-    m_ioManager->scheduler([this]() -> void { this->leaderHearBeatTicker(); }); // leader 心跳定时器
-    m_ioManager->scheduler([this]() -> void { this->electionTimeOutTicker(); }); // 选举超时定时器，触发就开始发起选举
+    m_ioManager = std::make_unique<sylar::IOManager>(FIBER_THREAD_NUM, FIBER_USE_CALLER_THREAD);
+    m_ioManager->schedule([this]() -> void { this->leaderHearBeatTicker(); }); // leader 心跳定时器
+    m_ioManager->schedule([this]() -> void { this->electionTimeOutTicker(); }); // 选举超时定时器，触发就开始发起选举
 
     // 定期向状态机写入日志。
     // applierTicker时间受到数据库响应延迟和两次apply之间请求数量的影响,
