@@ -181,11 +181,6 @@ void Raft::doElection() {
                 }, 
                 maxRandomizedElectionTime
             );
-            // std::thread t_sendRV(std::bind(&Raft::sendRequestVote, this,
-            //               i, requestVoteArgs, requestVoteReply, votedNum));
-            // t_sendRV.detach();
-            // m_iom->schedule(std::bind(&Raft::sendRequestVote, this,
-            //               i, requestVoteArgs, requestVoteReply, votedNum));
         }
     }
 }
@@ -211,8 +206,6 @@ void Raft::doHeartBeat() {
             if (m_nextIndex[i] <= m_lastSnapshotIncludeIndex) {
                 // m_iom->schedule(std::bind(&Raft::leaderSendSnapShot, this, i));
                 m_pool.commit_with_timeout(std::bind(&Raft::leaderSendSnapShot, this, i), HeartBeatTimeout);
-                // std::thread t_sendSnap(std::bind(&Raft::leaderSendSnapShot, this, i));
-                // t_sendSnap.detach();
                 continue;
             }
 
@@ -253,16 +246,12 @@ void Raft::doHeartBeat() {
             const std::shared_ptr<raftRpcProctoc::AppendEntriesReply> appendEntriesReply =
                 std::make_shared<raftRpcProctoc::AppendEntriesReply>();
             appendEntriesReply->set_appstate(Disconnected);
-            // auto bindfunc = std::bind(&Raft::sendAppendEntries, this, i, appendEntriesArgs, appendEntriesReply,appendNums);
-            // m_iom->schedule([bindfunc]() -> void{bindfunc(); });
             m_pool.commit_with_timeout(
                 [task = std::bind(&Raft::sendAppendEntries, this, i, appendEntriesArgs, appendEntriesReply,appendNums)]() {
                     task();
                 }, 
                 HeartBeatTimeout
             );
-            // std::thread t_sendAE(std::bind(&Raft::sendAppendEntries, this, i, appendEntriesArgs, appendEntriesReply,appendNums));
-            // t_sendAE.detach();
         }
 
         // leader发送心跳，重置心跳时间，
@@ -918,7 +907,6 @@ void Raft::init(std::vector<std::shared_ptr<RaftRpcUtil>> peers, int me, std::sh
     DPrintf("[Init&ReInit] Sever %d, term %d, lastSnapshotIncludeIndex {%d} , lastSnapshotIncludeTerm {%d}", m_me,
             m_currentTerm, m_lastSnapshotIncludeIndex, m_lastSnapshotIncludeTerm);
     m_mtx.unlock();
-    // m_ioManager = std::make_unique<sylar::IOManager>(FIBER_THREAD_NUM, FIBER_USE_CALLER_THREAD);
     m_iom->schedule(std::bind(&Raft::leaderHearBeatTicker, this)); // leader 心跳定时器
     m_iom->schedule(std::bind(&Raft::electionTimeOutTicker, this)); // 选举超时定时器，触发就开始发起选举
 

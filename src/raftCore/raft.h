@@ -33,6 +33,11 @@ constexpr int Voted = 1;   // 本轮已经投过票了
 constexpr int Expire = 2;  // 投票（消息、竞选者）过期
 constexpr int Normal = 3;
 
+/**
+ * @brief 工具函数，计算线程池的大小 编译期计算
+ * 
+ * @return constexpr int 
+ */
 constexpr int calculate_pool_size() {
     return static_cast<int>(MAX_NODE_NUM * 1.5);
 }
