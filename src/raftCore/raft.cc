@@ -6,7 +6,10 @@
 #include "common/util.h"
 
 // 初始化线程池
-Raft::Raft() : m_pool(MAX_NODE_NUM) {}
+Raft::Raft() : 
+    m_pool(MAX_NODE_NUM), 
+    m_ioManager(std::make_unique<sylar::IOManager>(FIBER_THREAD_NUM, FIBER_USE_CALLER_THREAD)) 
+    {}
 
 /**
  * @brief 日志同步 + 心跳 rpc ，重点关注。follow 节点执行的操作
@@ -175,9 +178,6 @@ void Raft::doElection() {
                 }, 
                 maxRandomizedElectionTime
             );
-            // std::thread t(&Raft::sendRequestVote, this,
-            //               i, requestVoteArgs, requestVoteReply, votedNum);
-            // t.detach();
         }
     }
 }
@@ -210,8 +210,6 @@ void Raft::doHeartBeat() {
                     },
                     HeartBeatTimeout
                 );
-                // std::thread t(&Raft::leaderSendSnapShot, this, i);  // 创建新线程并执行b函数，并传递参数
-                // t.detach();
                 continue;
             }
 
@@ -260,9 +258,6 @@ void Raft::doHeartBeat() {
                 },
                 HeartBeatTimeout
             );
-            // std::thread t(&Raft::sendAppendEntries, this, i, appendEntriesArgs, appendEntriesReply,
-            //               appendNums);  // 创建新线程并执行b函数，并传递参数
-            // t.detach();
         }
 
         // leader发送心跳，重置心跳时间，
@@ -945,7 +940,6 @@ void Raft::init(std::vector<std::shared_ptr<RaftRpcUtil>> peers, int me, std::sh
     DPrintf("[Init&ReInit] Sever %d, term %d, lastSnapshotIncludeIndex {%d} , lastSnapshotIncludeTerm {%d}", m_me,
             m_currentTerm, m_lastSnapshotIncludeIndex, m_lastSnapshotIncludeTerm);
     m_mtx.unlock();
-    m_ioManager = std::make_unique<sylar::IOManager>(FIBER_THREAD_NUM, FIBER_USE_CALLER_THREAD);
     m_ioManager->schedule([this]() -> void { this->leaderHearBeatTicker(); }); // leader 心跳定时器
     m_ioManager->schedule([this]() -> void { this->electionTimeOutTicker(); }); // 选举超时定时器，触发就开始发起选举
 
