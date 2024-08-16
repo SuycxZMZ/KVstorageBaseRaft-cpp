@@ -1,7 +1,3 @@
-//
-// Created by swx on 23-6-1.
-//
-
 #ifndef SKIP_LIST_ON_RAFT_KVSERVER_H
 #define SKIP_LIST_ON_RAFT_KVSERVER_H
 
@@ -24,7 +20,7 @@
 #include "skipList/skipList.h"
 
 /**
- * @brief kvServer负责与外部clerk通信
+ * @brief kvServer负责与外部客户端和其他raft节点通信
  *        一个外部请求的处理可以简单的看成两步：
  *        1.接收外部请求。
  *        2.本机内部与raft和kvDB协商如何处理该请求。
@@ -33,19 +29,18 @@
 class KvServer : raftKVRpcProctoc::kvServerRpc {
 private:
     std::mutex m_mtx;
-    int m_me;   // 节点编号
-    std::shared_ptr<LockQueue<ApplyMsg> > applyChan;  // kvServer中拿到的消息，server用这些消息与raft打交道，由Raft::applierTicker线程填充
+    int m_me;                                         // 节点编号
+    std::shared_ptr<LockQueue<ApplyMsg> > m_applyChan;  // kvServer中拿到的消息，server用这些消息与raft打交道，由Raft::applierTicker线程填充
     int m_maxRaftState;                               // snapshot if log grows this big
 
     // Your definitions here.
-    std::string m_serializedKVData;                      // todo ： 序列化后的kv数据，理论上可以不用，但是目前没有找到特别好的替代方法
+    std::string m_serializedKVData;                      // TODO ： 序列化后的kv数据，理论上可以不用，但是目前没有找到特别好的替代方法
     SkipList<std::string, std::string> m_skipList;       // skipList，用于存储kv数据
     std::unordered_map<std::string, std::string> m_kvDB; // kvDB，用unordered_map来替代
 
-    std::unordered_map<int, LockQueue<Op> *> waitApplyCh;//？？？字段含义   waitApplyCh是一个map，键是int，值是Op类型的管道
-    // index(raft) -> chan  //？？？字段含义   waitApplyCh是一个map，键是int，值是Op类型的管道
+    std::unordered_map<int, LockQueue<Op> *> m_waitApplyCh;// 字段含义 waitApplyCh是一个map，键 是int，值 是Op类型的阻塞队列
 
-    std::unordered_map<std::string, int> m_lastRequestId;  // clientid -> requestID 一个kV服务器可能连接多个client
+    std::unordered_map<std::string, int> m_lastRequestClientAndId;  // <clientid -> requestID> 一个kV服务器可能连接多个client
 
     // last SnapShot point , raftIndex
     int m_lastSnapShotRaftLogIndex;
@@ -76,9 +71,11 @@ public:
 
     /**
      * @brief rpc 实际调用内部实现
+     *        将 GetArgs 改为rpc调用的，因为是远程客户端，即服务器宕机对客户端来说是无感的
     */
     void Get(const raftKVRpcProctoc::GetArgs *args,
-             raftKVRpcProctoc::GetReply *reply);  // 将 GetArgs 改为rpc调用的，因为是远程客户端，即服务器宕机对客户端来说是无感的
+             raftKVRpcProctoc::GetReply *reply);  
+
     /**
      * @brief 从raft节点获取命令，操作kvDB
      * @param message
@@ -125,7 +122,7 @@ public:  // for rpc
     void Get(google::protobuf::RpcController *controller, const ::raftKVRpcProctoc::GetArgs *request,
              ::raftKVRpcProctoc::GetReply *response, ::google::protobuf::Closure *done) override;
 
-/////////////////serialiazation start ///////////////////////////////
+///////////////// serialiazation ///////////////////////////////
 // notice ： func serialize
 private:
     friend class boost::serialization::access;
@@ -139,7 +136,7 @@ private:
         ar & m_serializedKVData;
 
         // ar & m_kvDB;
-        ar & m_lastRequestId;
+        ar & m_lastSnapShotRaftLogIndex;
     }
 
     std::string getSnapshotData() {
@@ -159,7 +156,7 @@ private:
         m_serializedKVData.clear();
     }
 
-    /////////////////serialiazation end ///////////////////////////////
+    ///////////////// serialiazation ///////////////////////////////
 };
 
 #endif  // SKIP_LIST_ON_RAFT_KVSERVER_H
