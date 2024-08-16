@@ -20,7 +20,7 @@ private:
     std::vector<std::shared_ptr<raftServerRpcUtil>> m_servers;  // 与所有KV节点通信的stub
     std::string m_clientId;
     int m_requestId; 
-    int m_recentLeaderId;  // 只是有可能是领导
+    int m_curLeaderId;  // 只是有可能是领导
 
     std::string Uuid() {
         return std::to_string(rand()) + std::to_string(rand()) + std::to_string(rand()) + std::to_string(rand());
