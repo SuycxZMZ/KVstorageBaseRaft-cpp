@@ -1,6 +1,11 @@
 #ifndef APPLYMSG_H
 #define APPLYMSG_H
 #include <string>
+
+/**
+ * @brief 应用到状态机的信息
+ * 
+ */
 class ApplyMsg {
 public:
     bool CommandValid;
@@ -12,7 +17,7 @@ public:
     int SnapshotIndex;
 
 public:
-    // 两个valid最开始要赋予false！！
+    // 两个valid最开始要赋予false
     ApplyMsg()
         : CommandValid(false),
           Command(),

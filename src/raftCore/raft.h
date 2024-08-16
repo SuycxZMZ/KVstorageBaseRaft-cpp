@@ -75,10 +75,9 @@ private:
     int m_lastSnapshotIncludeIndex; // 最后一个日志的Index
     int m_lastSnapshotIncludeTerm; // 最后一个日志的Term
 
-    // 协程
+    // 协程调度器
     sylar::IOManager::ptr m_iom;
-    // sylar::IOManager::ptr m_raftInnerWorker;
-
+    // 工作线程池，主要用来发送AE和投票请求
     sylar::threadpool m_pool;
 public:
     Raft() = delete;

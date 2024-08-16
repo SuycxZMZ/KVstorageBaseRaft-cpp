@@ -6,12 +6,8 @@
 #include "common/config.h"
 #include "common/util.h"
 
-// sylar::threadpool t_pool(MAX_NODE_NUM);
-
 Raft::Raft(sylar::IOManager::ptr _iom) : m_iom(_iom), m_pool(calculate_pool_size()) {}
-
 Raft::~Raft() { std::cout << "----------[Raft::~Raft()]---------- \n"; }
-
 
 /**
  * @brief 日志同步 + 心跳 rpc ，重点关注。远端的follow节点执行的操作
