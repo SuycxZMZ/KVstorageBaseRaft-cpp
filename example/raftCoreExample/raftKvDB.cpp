@@ -75,7 +75,6 @@ int main(int argc, char **argv) {
             // 如果是子进程
             // 子进程的代码
             auto kvServer = new KvServer(i, 500, configFileName, port);
-            std::cout << "-------------sb 出来了 \n";
             pause();  // 子进程进入等待状态
         } else if (pid > 0) {
             // 如果是父进程
