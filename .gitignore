@@ -9,3 +9,4 @@ build
 
 *.out
 *.a
+/cmake-build-debug-wsl/
