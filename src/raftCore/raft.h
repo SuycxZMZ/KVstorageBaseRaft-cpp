@@ -66,7 +66,7 @@ private:
     enum Status { Follower, Candidate, Leader }; // raft节点身份枚举
     Status m_status; // 节点身份
 
-    std::shared_ptr<LockQueue<ApplyMsg>> applyChan;  // client从这里取日志，client与raft通信的接口
+    std::shared_ptr<LockQueue<ApplyMsg>> m_applyChan;  // applyTicker会写，Installsnapshot也会写
 
     std::chrono::_V2::system_clock::time_point m_lastResetElectionTime; // 选举超时时间
     std::chrono::_V2::system_clock::time_point m_lastResetHearBeatTime; // 心跳超时，用于leader
@@ -234,12 +234,17 @@ public:
      */
     void pushMsgToKvServer(ApplyMsg msg);
     void readPersist(std::string data);
+
+    /**
+     * @brief 将当前raft节点的状态序列化为字符串
+     * 
+     * @return std::string 序列化的字符流状态
+     */
     std::string persistData();
 
     /**
-     * @brief 发布发一个新日志
+     * @brief 客户端发布发一个新日志
      */
-    // void Start(Op command, int *newLogIndex, int *newLogTerm, int *isLeader);
     bool Start(Op command, int *newLogIndex, int *newLogTerm);
 
     void Snapshot(int index, std::string snapshot);

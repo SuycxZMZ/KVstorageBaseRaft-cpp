@@ -107,7 +107,7 @@ void Raft::AppendEntries1(const raftRpcProctoc::AppendEntriesArgs* args, raftRpc
 }
 
 /**
- * @brief 定期向状态机写入日志，将已提交但未应用的日志应用，加入到 applyChan
+ * @brief 定期向状态机写入日志，将已提交但未应用的日志应用，加入到 m_applyChan
  */
 void Raft::applierTicker() {
     while (true) {
@@ -123,7 +123,7 @@ void Raft::applierTicker() {
                     applyMsgs.size());
         }
         for (auto& message : applyMsgs) {
-            applyChan->Push(message);
+            m_applyChan->Push(message);
         }
         sleepNMilliseconds(ApplyInterval);
     }
@@ -398,16 +398,9 @@ void Raft::InstallSnapshot(const raftRpcProctoc::InstallSnapshotRequest* args,
     msg.SnapshotTerm = args->lastsnapshotincludeterm();
     msg.SnapshotIndex = args->lastsnapshotincludeindex();
 
-    applyChan->Push(msg);
-    std::thread t(&Raft::pushMsgToKvServer, this, msg); 
-    t.detach();
-    // 看下这里能不能再优化
-    // 持久化
+    m_applyChan->Push(msg);
     m_persister->Save(persistData(), args->data());
 }
-
-void Raft::pushMsgToKvServer(ApplyMsg msg) { applyChan->Push(msg); }
-
 
 /**
  * @brief 1.检查是否需要发起心跳（leader）如果该发起就执行doHeartBeat。
@@ -876,7 +869,7 @@ void Raft::init(std::vector<std::shared_ptr<RaftRpcUtil>> peers, int me, std::sh
     // m_persister->SaveRaftState("fucker");
     m_me = me; // 标记自己，不能给自己发送rpc
     m_mtx.lock(); // 上锁
-    this->applyChan = applyCh; // 与kv-server沟通
+    this->m_applyChan = applyCh; // 与kv-server沟通
 
     m_currentTerm = 0; // 初始化当前任期为0
     m_status = Follower; // 初始化状态为follower
