@@ -135,19 +135,21 @@ bool Raft::CondInstallSnapshot(int lastIncludedTerm, int lastIncludedIndex, std:
  * @brief 实际发起选举，构造需要发送的rpc,调用sendRequestVote处理rpc及其相应。
 */
 void Raft::doElection() {
-    std::lock_guard<std::mutex> g(m_mtx); // 上锁
+    std::lock_guard<std::mutex> lock(m_mtx); // 上锁
     if (m_status == Leader) {
     }
 
     if (m_status != Leader) {
-        DPrintf("[       ticker-func-rf(%d)              ]  选举定时器到期且不是leader，开始选举 \n", m_me);
+        DPrintf("[ ticker-func-rf(%d) ]  选举定时器到期且不是leader，开始选举 \n", m_me);
         // 重竞选超时，term也会增加的
 
         m_status = Candidate; // 设置状态为candidate
         m_currentTerm += 1; // 开始新一轮的选举
         m_votedFor = m_me; // 即是自己给自己投，也避免candidate给同辈的candidate投
 
-        persist(); // 持久化一下 --> 选举之前为什么要持久化
+        /// Raft算法中的选举机制要求Candidate节点在发起选举请求时，附带其日志的最后一条日志条目的索引和任期号。
+        /// 这要求Candidate节点在发起选举前，必须确保其日志是最新的，并且已经被持久化。
+        persist();
         std::shared_ptr<int> votedNum = std::make_shared<int>(1);
         m_lastResetElectionTime = now(); //重新设置选举超时定时器
 
@@ -448,23 +450,25 @@ void Raft::leaderHearBeatTicker() {
 }
 
 void Raft::leaderSendSnapShot(int server) {
-    m_mtx.lock();
     raftRpcProctoc::InstallSnapshotRequest args;
-    args.set_leaderid(m_me);
-    args.set_term(m_currentTerm);
-    args.set_lastsnapshotincludeindex(m_lastSnapshotIncludeIndex);
-    args.set_lastsnapshotincludeterm(m_lastSnapshotIncludeTerm);
-    args.set_data(m_persister->ReadSnapshot());
-
+    {
+        std::lock_guard<std::mutex> lock(m_mtx);
+        args.set_leaderid(m_me);
+        args.set_term(m_currentTerm);
+        args.set_lastsnapshotincludeindex(m_lastSnapshotIncludeIndex);
+        args.set_lastsnapshotincludeterm(m_lastSnapshotIncludeTerm);
+        args.set_data(m_persister->ReadSnapshot());
+    }
     raftRpcProctoc::InstallSnapshotResponse reply;
-    m_mtx.unlock();
+
+    // 远程调用
     bool ok = m_peers[server]->InstallSnapshot(&args, &reply);
     std::lock_guard<std::mutex> lock(m_mtx);
     if (!ok) {
         return;
     }
     if (m_status != Leader || m_currentTerm != args.term()) {
-        return;  // 中间释放过锁，可能状态已经改变了
+        return;  // 可能状态已经改变了
     }
     //	无论什么时候都要判断term
     if (reply.term() > m_currentTerm) {
@@ -495,8 +499,6 @@ void Raft::leaderUpdateCommitIndex() {
         }
 
         // !!!只有当前term有新提交的，才会更新commitIndex！！！！
-        // log.Printf("lastSSP:%d, index: %d, commitIndex: %d, lastIndex: %d",rf.lastSSPointIndex, index,
-        // rf.commitIndex, rf.getLastIndex())
         if (sum >= m_peers.size() / 2 + 1 && getLogTermFromLogIndex(index) == m_currentTerm) {
             m_commitIndex = index;
             break;
@@ -516,7 +518,7 @@ bool Raft::matchLog(int logIndex, int logTerm) {
                     logIndex, m_lastSnapshotIncludeIndex, logIndex, getLastLogIndex()));
     return logTerm == getLogTermFromLogIndex(logIndex);
 }
-
+// so i'm your daddy,please rember this
 void Raft::persist() {
     auto data = persistData();
     m_persister->SaveRaftState(data);
@@ -524,13 +526,14 @@ void Raft::persist() {
 
 
 /**
- * @brief 服务提供方，也就是RPC请求的对端提供的方法
+ * @brief 服务提供方，也就是 RPC 请求的对端提供的方法
  * @param args 请求投票的参数
  * @param reply 请求投票的响应
  */
 void Raft::RequestVote(const raftRpcProctoc::RequestVoteArgs* args, raftRpcProctoc::RequestVoteReply* reply) {
-    std::lock_guard<std::mutex> lg(m_mtx);
-    DEFER { // 应该先持久化，再撤销lock
+    std::lock_guard<std::mutex> lock(m_mtx);
+
+    DEFER {
         persist();
     };
 
@@ -672,17 +675,17 @@ int Raft::getSlicesIndexFromLogIndex(int logIndex) {
 bool Raft::sendRequestVote(int server, std::shared_ptr<raftRpcProctoc::RequestVoteArgs> args,
                            std::shared_ptr<raftRpcProctoc::RequestVoteReply> reply, std::shared_ptr<int> votedNum) {
     auto start = now();
-    DPrintf("[func-sendRequestVote rf{%d}] 向server{%d} 發送 RequestVote 開始", m_me, server, getLastLogIndex());
+    DPrintf("[func-sendRequestVote rf{%d}] --> server{%d} send RequestVote start", m_me, server, getLastLogIndex());
     bool ok = m_peers[server]->RequestVote(args.get(), reply.get()); // 发送请求投票，远程调用raft节点的投票
-    DPrintf("[func-sendRequestVote rf{%d}] 向server{%d} 發送 RequestVote 完畢，耗時:{%d} ms", m_me, server,
+    DPrintf("[func-sendRequestVote rf{%d}] --> server{%d} send RequestVote finish，cost:{%d} ms", m_me, server,
             getLastLogIndex(), now() - start);
     // 没有 ok 为true的回复就是发送失败，也就不能处理回复，直接返回
     if (!ok) {
-        return ok;  // 不知道为什么不加这个的话如果服务器宕机会出现问题的
+        return ok;
     }
 
     // 对回应进行处理，要记得无论什么时候收到回复就要检查term
-    std::lock_guard<std::mutex> lg(m_mtx);
+    std::lock_guard<std::mutex> lock(m_mtx);
     if (reply->term() > m_currentTerm) { // 三变：身份，term，和投票
         m_status = Follower;  
         m_currentTerm = reply->term();
@@ -700,7 +703,7 @@ bool Raft::sendRequestVote(int server, std::shared_ptr<raftRpcProctoc::RequestVo
 
     // ---------------- 投票成功的逻辑 ---------------- //
     // follower如果投过来一票，它会把自己的任期改为目前candidate的任期
-    *votedNum = *votedNum + 1; // 如果投票成功，记录投票的结点数量，这里在lg锁的保护范围内，操作*votedNum是线程安全的
+    *votedNum = *votedNum + 1; // 如果投票成功，记录投票的结点数量，这里在lock锁的保护范围内，操作*votedNum是线程安全的
     if (*votedNum >= m_peers.size() / 2 + 1) {  
         *votedNum = 0;
         if (m_status == Leader) { // 如果已经是leader了，那么是就是了，不会进行下一步处理了
@@ -716,7 +719,8 @@ bool Raft::sendRequestVote(int server, std::shared_ptr<raftRpcProctoc::RequestVo
             m_nextIndex[i] = lastLogIndex + 1;  
             m_matchIndex[i] = 0;                // 每换一个领导都是从0开始 ？
         }
-        m_iom->schedule(std::bind(&Raft::doHeartBeat, this)); // 马上向其他节点宣告自己就是leader
+        // 马上向其他节点宣告自己就是leader
+        m_pool.commit_with_timeout(std::bind(&Raft::doHeartBeat, this), maxRandomizedElectionTime);
         persist();
     }
     return true;
@@ -775,7 +779,7 @@ bool Raft::sendAppendEntries(int server, std::shared_ptr<raftRpcProctoc::AppendE
             m_nextIndex[server] = reply->updatenextindex();  // 失败不更新mathIndex
         }
     } else {
-        ////到这里代表同意接收了本次心跳或者日志
+        //// 到这里代表同意接收了本次心跳或者日志
         *appendNums = *appendNums + 1; 
         //同意了日志，就更新对应的 m_matchIndex 和 m_nextIndex
         m_matchIndex[server] = std::max(m_matchIndex[server], args->prevlogindex() + args->entries_size());
@@ -915,7 +919,7 @@ std::string Raft::persistData() {
     }
 
     std::stringstream ss;
-    boost::archive::text_oarchive oa(ss);
+    boost::archive::text_oarchive oa(ss) ; // 关联 ss
     oa << boostPersistRaftNode;
     return ss.str();
 }
@@ -925,7 +929,7 @@ void Raft::readPersist(std::string data) {
         return;
     }
     std::stringstream iss(data);
-    boost::archive::text_iarchive ia(iss);
+    boost::archive::text_iarchive ia(iss);  // 关联 ss
     // read class state from archive
     BoostPersistRaftNode boostPersistRaftNode;
     ia >> boostPersistRaftNode;

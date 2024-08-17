@@ -72,8 +72,8 @@ private:
     std::chrono::_V2::system_clock::time_point m_lastResetHearBeatTime; // 心跳超时，用于leader
 
     // Snapshot是kvDb的快照，也可以看成是日志，因此:全部的日志 = m_logs + snapshot
-    int m_lastSnapshotIncludeIndex; // 最后一个日志的Index
-    int m_lastSnapshotIncludeTerm; // 最后一个日志的Term
+    int m_lastSnapshotIncludeIndex; // 最新的一个快照中包含的日志条目最大索引
+    int m_lastSnapshotIncludeTerm; // 最新的一个快照中日志条目的任期号
 
     // 协程调度器
     sylar::IOManager::ptr m_iom;
@@ -160,7 +160,7 @@ public:
     void leaderSendSnapShot(int server);
 
     /**
-     * @brief leader更新commitIndex
+     * @brief leader更新commitIndex，在项目中没调用
      */
     void leaderUpdateCommitIndex();
 
@@ -243,7 +243,7 @@ public:
     std::string persistData();
 
     /**
-     * @brief 客户端发布发一个新日志
+     * @brief kvServer收到客户端命令之后发起，客户端发布发一个新日志
      */
     bool Start(Op command, int *newLogIndex, int *newLogTerm);
 
@@ -290,7 +290,7 @@ public:
 private:
 
     /**
-     * @brief for persist
+     * @brief 对Raft节点的状态进行序列化和反序列化
      */
     class BoostPersistRaftNode {
     public:
