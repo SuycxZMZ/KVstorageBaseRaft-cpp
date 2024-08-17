@@ -4,10 +4,12 @@
 #include "raftServerRpcUtil.h"
 
 raftServerRpcUtil::raftServerRpcUtil(std::string ip, short port) {
-    stub = new raftKVRpcProctoc::kvServerRpc_Stub(new KVrpcChannel(ip, port, false));
+    stub = std::make_shared<raftKVRpcProctoc::kvServerRpc_Stub>(new KVrpcChannel(ip, port, false));
 }
 
-raftServerRpcUtil::~raftServerRpcUtil() { delete stub; }
+raftServerRpcUtil::~raftServerRpcUtil() { 
+    std::cout << "--------------- [raftServerRpcUtil::~raftServerRpcUtil] a clerk released -------------\n"; 
+}
 
 bool raftServerRpcUtil::Get(raftKVRpcProctoc::GetArgs *GetArgs, raftKVRpcProctoc::GetReply *reply) {
     sylar::rpc::MprpcController controller;

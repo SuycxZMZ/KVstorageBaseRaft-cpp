@@ -15,7 +15,7 @@
 // 对于一个节点来说，对于任意其他的节点都要维护一个rpc连接，
 class raftServerRpcUtil {
 private:
-    raftKVRpcProctoc::kvServerRpc_Stub* stub;
+    std::shared_ptr<raftKVRpcProctoc::kvServerRpc_Stub> stub;
 
 public:
     // 主动调用其他节点的三个方法,可以按照mit6824来调用，但是别的节点调用自己的好像就不行了，要继承protoc提供的service类才行
