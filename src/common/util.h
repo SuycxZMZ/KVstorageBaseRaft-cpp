@@ -76,6 +76,14 @@ public:
     }
 
     // 带超时的 Pop 操作，如果超时未获取数据返回 false（线程安全）
+    /**
+     * @brief 超时弹出
+     * 
+     * @param timeout 超时时间
+     * @param ResData 弹出值的指针，要提前申请好
+     * @return true 正常弹出
+     * @return false 没东西可弹或者一直没拿到锁，超时，ResData无效
+     */
     bool timeOutPop(int timeout, T* ResData) {
         std::unique_lock<std::mutex> lock(m_mutex);
         auto now = std::chrono::system_clock::now();
