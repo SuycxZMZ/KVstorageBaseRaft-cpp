@@ -14,10 +14,12 @@ private:
     raftRpcProctoc::raftRpc_Stub *stub_;
 
 public:
-    // 主动调用其他节点的三个方法,可以按照mit6824来调用，但是别的节点调用自己的好像就不行了，要继承protoc提供的service类才行
+    // 暴露给rpc调用方内部调用 stub->AppendEntries
     bool AppendEntries(raftRpcProctoc::AppendEntriesArgs *args, raftRpcProctoc::AppendEntriesReply *response);
+    // 暴露给rpc调用方内部调用 stub->InstallSnapshot
     bool InstallSnapshot(raftRpcProctoc::InstallSnapshotRequest *args,
                          raftRpcProctoc::InstallSnapshotResponse *response);
+    // 暴露给rpc调用方内部调用 stub->RequestVote
     bool RequestVote(raftRpcProctoc::RequestVoteArgs *args, raftRpcProctoc::RequestVoteReply *response);
 
     /// @brief RaftRpcUtil 构造函数
