@@ -75,13 +75,15 @@ void KvServer::Get(const raftKVRpcProctoc::GetArgs *args, raftKVRpcProctoc::GetR
         return;
     }
 
-    m_mtx.lock();
-    if (m_waitApplyCh.find(raftIndex) == m_waitApplyCh.end()) {
-        m_waitApplyCh.insert(std::make_pair(raftIndex, new LockQueue<Op>()));
+    LockQueue<Op>* chForRaftIndex = nullptr;
+    {
+        std::lock_guard<std::mutex> lock(m_mtx);
+        if (m_waitApplyCh.find(raftIndex) == m_waitApplyCh.end()) {
+            m_waitApplyCh.insert(std::make_pair(raftIndex, new LockQueue<Op>()));
+        }
+        // 拿命令
+        chForRaftIndex = m_waitApplyCh[raftIndex];
     }
-    // 拿命令
-    auto chForRaftIndex = m_waitApplyCh[raftIndex];
-    m_mtx.unlock();  // 直接解锁，等待任务执行完成，不能一直拿锁等待
 
     Op raftCommitOp; // timeout
     if (!chForRaftIndex->timeOutPop(CONSENSUS_TIMEOUT, &raftCommitOp)) { // 待执行命令 为空
@@ -122,14 +124,17 @@ void KvServer::Get(const raftKVRpcProctoc::GetArgs *args, raftKVRpcProctoc::GetR
             reply->set_err(ErrWrongLeader);
         }
     }
-    std::lock_guard<std::mutex> lock(m_mtx);
-    auto tmp = m_waitApplyCh[raftIndex];
-    m_waitApplyCh.erase(raftIndex);
-    delete tmp;
+
+    {
+        std::lock_guard<std::mutex> lock(m_mtx);
+        auto tmp = m_waitApplyCh[raftIndex];
+        m_waitApplyCh.erase(raftIndex);
+        delete tmp;
+    }
 }
 
 /**
- * @brief 从raft节点获取命令，操作kvDB
+ * @brief 从raft节点获取命令并解析，操作kvDB
  * @param message
  */
 void KvServer::GetCommandFromRaft(ApplyMsg message) {
@@ -202,13 +207,14 @@ void KvServer::PutAppend(const raftKVRpcProctoc::PutAppendArgs *args, raftKVRpcP
         "[func -KvServer::PutAppend -kvserver{%d}]From Client %s (Request %d) To Server %d, key %s, raftIndex %d , is "
         "leader ",
         m_me, &args->clientid(), args->requestid(), m_me, &op.Key, raftIndex);
-    m_mtx.lock();
-    if (m_waitApplyCh.find(raftIndex) == m_waitApplyCh.end()) {
-        m_waitApplyCh.insert(std::make_pair(raftIndex, new LockQueue<Op>()));
+    LockQueue<Op>* chForRaftIndex = nullptr;
+    {
+        std::lock_guard<std::mutex> lock(m_mtx);
+        if (m_waitApplyCh.find(raftIndex) == m_waitApplyCh.end()) {
+            m_waitApplyCh.insert(std::make_pair(raftIndex, new LockQueue<Op>()));
+        }
+        chForRaftIndex = m_waitApplyCh[raftIndex];
     }
-    auto chForRaftIndex = m_waitApplyCh[raftIndex];
-
-    m_mtx.unlock();  // 直接解锁，等待任务执行完成，不能一直拿锁等待
 
     // timeout
     Op raftCommitOp;
@@ -239,27 +245,23 @@ void KvServer::PutAppend(const raftKVRpcProctoc::PutAppendArgs *args, raftKVRpcP
         }
     }
 
-    m_mtx.lock();
-
-    auto tmp = m_waitApplyCh[raftIndex];
-    m_waitApplyCh.erase(raftIndex);
-    delete tmp;
-    m_mtx.unlock();
+    {
+        std::lock_guard<std::mutex> lock(m_mtx);
+        auto tmp = m_waitApplyCh[raftIndex];
+        m_waitApplyCh.erase(raftIndex);
+        delete tmp;
+    }
 }
 
 /**
- * @brief 一直等待raft传来的applyCh
+ * @brief 一直等待 raft 传来的ApplyMsg
 */
 void KvServer::ReadRaftApplyCommandLoop() {
     while (true) {
-        // 如果只操作applyChan不用拿锁，因为applyChan自己带锁
         auto message = m_applyChan->Pop();  // 阻塞弹出
-        // DPrintf(
-        //     "---------------tmp-------------[func-KvServer::ReadRaftApplyCommandLoop()-kvserver{%d}] "
-        //     "收到了下raft的消息",
-        //     m_me);
         // listen to every command applied by its raft ,delivery to relative RPC Handler
 
+        // 应用到 KVDB
         if (message.CommandValid) {
             GetCommandFromRaft(message);
         }
@@ -411,6 +413,8 @@ KvServer::KvServer(int me, int maxraftstate, std::string nodeInforFileName, shor
         ReadSnapShotToInstall(snapshot);
     }
 
-    std::thread t2(&KvServer::ReadRaftApplyCommandLoop, this);  // 马上向其他节点宣告自己就是leader
+    // 这个任务要单开一个独立线程，保证实时性，它是raft层消息的消费者，拿出raft层传过来的commit日志信息
+    // 然后真正把命令保存到KVDB，保存成功put操作才会返回(失败的话是超时返回)，get也差不多
+    std::thread t2(&KvServer::ReadRaftApplyCommandLoop, this);  
     t2.join();  // 由于ReadRaftApplyCommandLoop是死循环，进程一直卡到这里
 }
