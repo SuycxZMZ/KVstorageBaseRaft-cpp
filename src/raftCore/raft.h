@@ -96,7 +96,7 @@ public:
     void AppendEntries1(const raftRpcProctoc::AppendEntriesArgs *args, raftRpcProctoc::AppendEntriesReply *reply);
 
     /**
-     * @brief 定期向状态机写入日志
+     * @brief 定期将已提交但未 apply 的日志加入 m_applyChan , KVserver会取出这些命令应用到KVDB
      */
     void applierTicker();
 
@@ -126,7 +126,7 @@ public:
     void electionTimeOutTicker();
 
     /**
-     * @brief 返回待提交的日志信息
+     * @brief 返回待apply的日志信息
     */
     std::vector<ApplyMsg> getApplyLogs();
     int getNewCommandIndex();
