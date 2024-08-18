@@ -13,7 +13,7 @@
 
 1.库准备
 
-- 安装重构的muduo网络库，[tinymuduo网络库](https://github.com/SuycxZMZ/tiny-muduo)
+- 安装带rpc服务的sylar网络库，[sylar](https://github.com/SuycxZMZ/sylar-from-suycx)
 - boost
 - protoc
 
@@ -25,11 +25,8 @@
 3.编译
 
 ```shell
-# 安装tinymuduo
-git clone https://github.com/SuycxZMZ/tiny-muduo.git
-cd tiny-muduo
-# 自动编译安装脚本，安装完成后会打印安装完成信息
-sudo bash autobuild.sh
+# 安装 sylar
+https://github.com/SuycxZMZ/sylar-from-suycx
 
 # 注意，在编译KVRaft项目之前，最好执行一下根目录下的`configureproto.sh`脚本，这个脚本会自动生成proto文件对应的.pb.h和.pb.cc文件，覆盖原本的文件
 sudo bash configureproto.sh
