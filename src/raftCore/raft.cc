@@ -272,10 +272,9 @@ void Raft::electionTimeOutTicker() {
         std::chrono::duration<signed long int, std::ratio<1, 1000000000>> suitableSleepTime{};
         std::chrono::system_clock::time_point wakeTime{};
         {
-            m_mtx.lock();
+            std::lock_guard<std::mutex> lock(m_mtx);
             wakeTime = now();
             suitableSleepTime = getRandomizedElectionTimeout() + m_lastResetElectionTime - wakeTime;
-            m_mtx.unlock();
         }
 
         //若超时时间未到，进入睡眠状态 .count()返回毫秒数
@@ -523,7 +522,6 @@ void Raft::persist() {
     auto data = persistData();
     m_persister->SaveRaftState(data);
 }
-
 
 /**
  * @brief 服务提供方，也就是 RPC 请求的对端提供的方法
@@ -836,7 +834,7 @@ void Raft::RequestVote(google::protobuf::RpcController* controller, const ::raft
 }
 
 bool Raft::Start(Op command, int* newLogIndex, int* newLogTerm) {
-    std::lock_guard<std::mutex> lg1(m_mtx);
+    std::lock_guard<std::mutex> lock(m_mtx);
     if (m_status != Leader) {
         *newLogIndex = -1;
         *newLogTerm = -1;
@@ -847,13 +845,15 @@ bool Raft::Start(Op command, int* newLogIndex, int* newLogTerm) {
     newLogEntry.set_command(command.asString());
     newLogEntry.set_logterm(m_currentTerm);
     newLogEntry.set_logindex(getNewCommandIndex());
-    m_logs.emplace_back(newLogEntry);
+    m_logs.emplace_back(newLogEntry); // 加入日志队列，等待复制
 
     int lastLogIndex = getLastLogIndex();
 
-    // leader应该不停的向各个Follower发送AE来维护心跳和保持日志同步，目前的做法是新的命令来了不会直接执行，而是等待leader的心跳触发
     DPrintf("[func-Start-rf{%d}]  lastLogIndex:%d,command:%s\n", m_me, lastLogIndex, &command);
-    // rf.timer.Reset(10) //接收到命令后马上给follower发送,改成这样不知为何会出现问题，待修正 todo
+    /// 原项目:todo 接收到命令后马上给follower发送,改成这样不知为何会出现问题，待修正
+    /// leader应该不停的向各个Follower发送AE来维护心跳和保持日志同步，目前的做法是新的命令来了不会直接执行，而是等待leader的心跳触发
+    /// 关于这个问题，有可能上一次的心跳包还没发(就本项目的架构而言，基本上是必然触发)，
+    /// 再次发送给一个发送任务，两个线程同时写一个socket，未定义 ！！！！！
     persist();
     *newLogIndex = newLogEntry.logindex();
     *newLogTerm = newLogEntry.logterm();
