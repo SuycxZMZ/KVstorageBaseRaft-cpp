@@ -26,7 +26,7 @@ private:
         return std::to_string(rand()) + std::to_string(rand()) + std::to_string(rand()) + std::to_string(rand());
     }  // 用于返回随机的clientId
 
-    //    MakeClerk  todo
+    //    MakeClerk
     void PutAppend(std::string key, std::string value, std::string op);
 
 public:

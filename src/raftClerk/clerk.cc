@@ -9,7 +9,7 @@ std::string Clerk::Get(std::string key) {
     int requestId = m_requestId;
     int server = m_curLeaderId;
 
-    // 组请求
+    // 组装请求
     raftKVRpcProctoc::GetArgs args;
     args.set_key(key);
     args.set_clientid(m_clientId);
