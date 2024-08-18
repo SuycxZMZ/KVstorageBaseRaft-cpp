@@ -40,7 +40,7 @@ private:
 
     std::unordered_map<int, LockQueue<Op> *> m_waitApplyCh;// 字段含义 waitApplyCh是一个map，键 是int，值 是Op类型的阻塞队列
 
-    std::unordered_map<std::string, int> m_lastRequestClientAndId;  // <clientid -> requestID> 一个kV服务器可能连接多个client
+    std::unordered_map<std::string, int> m_lastRequestClientAndId;  // pair<客户id, 最近一次的请求id> 一个kV服务器可能连接多个client
 
     // last SnapShot point , raftIndex
     int m_lastSnapShotRaftLogIndex;
@@ -63,25 +63,26 @@ public:
 
     void DprintfKVDB();
 
-    void ExecuteAppendOpOnKVDB(Op op);
 
-    void ExecuteGetOpOnKVDB(Op op, std::string *value, bool *exist);
 
-    void ExecutePutOpOnKVDB(Op op);
+    void ExecuteGetOpOnKVDB(Op op, std::string *value, bool *exist);    // get操作，查跳表，返回结果
+    void ExecuteAppendOpOnKVDB(Op op);  // 操作KVDB，本项目中就是插入跳表，与put操作一样
+    void ExecutePutOpOnKVDB(Op op);     // 操作KVDB，本项目中就是插入跳表，与append操作一样
 
     /**
      * @brief rpc 实际调用内部实现
-     *        将 GetArgs 改为rpc调用的，因为是远程客户端，即服务器宕机对客户端来说是无感的
     */
     void Get(const raftKVRpcProctoc::GetArgs *args,
              raftKVRpcProctoc::GetReply *reply);  
 
     /**
      * @brief 从raft节点获取命令，操作kvDB
-     * @param message
+     * @param message 解析raft层传过来的命令
      */
     void GetCommandFromRaft(ApplyMsg message);
 
+    // 检查请求是否被持久化，如果客户id不存在，或者对应的请求id太大，就返flase
+    // 客户id存在且请求id小于等于当前最大值，返回true
     bool ifRequestDuplicate(std::string ClientId, int RequestId);
 
     /**
@@ -96,6 +97,11 @@ public:
 
     void ReadSnapShotToInstall(std::string snapshot);
 
+    /**
+     * @brief 将命令发送到kvserver层的 m_waitApplyChan
+     * @param op 从raft层解析出来的，要执行apply的命令
+     * @param raftIndex 节点序号
+     */
     bool SendMessageToWaitChan(const Op &op, int raftIndex);
 
     // 检查是否需要制作快照，需要的话就向raft之下制作快照

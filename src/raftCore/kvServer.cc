@@ -7,19 +7,8 @@ void KvServer::DprintfKVDB() {
     if (!Debug) {
         return;
     }
-    std::lock_guard<std::mutex> lg(m_mtx);
+    std::lock_guard<std::mutex> lock(m_mtx);
     m_skipList.display_list();
-}
-
-void KvServer::ExecuteAppendOpOnKVDB(Op op) {
-    {
-        std::lock_guard<std::mutex> lock(m_mtx);
-        m_skipList.insert_set_element(op.Key, op.Value);
-        m_lastRequestClientAndId[op.ClientId] = op.RequestId;
-    }
-    //    DPrintf("[KVServerExeAPPEND-----]ClientId :%d ,RequestID :%d ,Key : %v, value : %v", op.ClientId,
-    //    op.RequestId, op.Key, op.Value)
-    DprintfKVDB();
 }
 
 void KvServer::ExecuteGetOpOnKVDB(Op op, std::string *value, bool *exist) {
@@ -29,36 +18,32 @@ void KvServer::ExecuteGetOpOnKVDB(Op op, std::string *value, bool *exist) {
         *exist = false;
         if (m_skipList.search_element(op.Key, *value)) {
             *exist = true;
-            // *value = m_skipList.se //value已经完成赋值了
         }
         m_lastRequestClientAndId[op.ClientId] = op.RequestId;
     }
+    DprintfKVDB();
+}
 
-    if (*exist) {
-        //                DPrintf("[KVServerExeGET----]ClientId :%d ,RequestID :%d ,Key : %v, value :%v", op.ClientId,
-        //                op.RequestId, op.Key, value)
-    } else {
-        //        DPrintf("[KVServerExeGET----]ClientId :%d ,RequestID :%d ,Key : %v, But No KEY!!!!", op.ClientId,
-        //        op.RequestId, op.Key)
+void KvServer::ExecuteAppendOpOnKVDB(Op op) {
+    {
+        std::lock_guard<std::mutex> lock(m_mtx);
+        m_skipList.insert_set_element(op.Key, op.Value);
+        m_lastRequestClientAndId[op.ClientId] = op.RequestId;
     }
     DprintfKVDB();
 }
 
 void KvServer::ExecutePutOpOnKVDB(Op op) {
-    m_mtx.lock();
-    m_skipList.insert_set_element(op.Key, op.Value);
-    // m_kvDB[op.Key] = op.Value;
-    m_lastRequestClientAndId[op.ClientId] = op.RequestId;
-    m_mtx.unlock();
-
-    //    DPrintf("[KVServerExePUT----]ClientId :%d ,RequestID :%d ,Key : %v, value : %v", op.ClientId, op.RequestId,
-    //    op.Key, op.Value)
+    {
+        std::lock_guard<std::mutex> lock(m_mtx);
+        m_skipList.insert_set_element(op.Key, op.Value);
+        m_lastRequestClientAndId[op.ClientId] = op.RequestId;
+    }
     DprintfKVDB();
 }
 
 // 处理来自clerk的Get RPC
 void KvServer::Get(const raftKVRpcProctoc::GetArgs *args, raftKVRpcProctoc::GetReply *reply) {
-    // 根据请求参数生成Op，生成Op是因为raft和raftServer沟通用的是阻塞队列
     Op op;
     op.Operation = "Get";
     op.Key = args->key();
@@ -68,8 +53,9 @@ void KvServer::Get(const raftKVRpcProctoc::GetArgs *args, raftKVRpcProctoc::GetR
 
     int raftIndex = -1;
     int _ = -1;
-    int isLeader = m_raftNode->Start(op, &raftIndex, &_);  // raftIndex：raft预计的logIndex
-                                   // ，虽然是预计，但是正确情况下是准确的，op的具体内容对raft来说 是隔离的
+
+    // 发起一个日志
+    int isLeader = m_raftNode->Start(op, &raftIndex, &_);
     if (!isLeader) {
         reply->set_err(ErrWrongLeader);
         return;
@@ -79,24 +65,21 @@ void KvServer::Get(const raftKVRpcProctoc::GetArgs *args, raftKVRpcProctoc::GetR
     {
         std::lock_guard<std::mutex> lock(m_mtx);
         if (m_waitApplyCh.find(raftIndex) == m_waitApplyCh.end()) {
-            m_waitApplyCh.insert(std::make_pair(raftIndex, new LockQueue<Op>()));
+            m_waitApplyCh.emplace(raftIndex, new LockQueue<Op>());
         }
-        // 拿命令
         chForRaftIndex = m_waitApplyCh[raftIndex];
     }
 
-    Op raftCommitOp; // timeout
+    Op raftCommitOp;
     if (!chForRaftIndex->timeOutPop(CONSENSUS_TIMEOUT, &raftCommitOp)) { // 待执行命令 为空
         int _ = -1;
         int isLeader = m_raftNode->GetState(&_);
         if (ifRequestDuplicate(op.ClientId, op.RequestId) && isLeader) {
-            // 待执行命令为空，代表raft集群不保证已经commitIndex该日志。
-            // 但是如果是已经提交过的get请求，是可以再执行的,不会违反线性一致性
             std::string value;
             bool exist = false;
-            // 操作 kvDB
+            // 操作 Get请求 就是查找kvDB
             ExecuteGetOpOnKVDB(op, &value, &exist); 
-            if (exist) {
+            if (exist) {   // 如果是已经提交过的get请求，是可以再执行的,不会违反线性一致性
                 reply->set_err(OK);
                 reply->set_value(value);
             } else {
@@ -106,9 +89,8 @@ void KvServer::Get(const raftKVRpcProctoc::GetArgs *args, raftKVRpcProctoc::GetR
         } else {
             reply->set_err(ErrWrongLeader);  // 返回这个，其实就是让clerk换一个节点重试
         }
-    } else { // 待执行命令 非空
+    } else {
         // raft已经提交了该command（op），可以正式开始执行了
-        // 再次检验
         if (raftCommitOp.ClientId == op.ClientId && raftCommitOp.RequestId == op.RequestId) {
             std::string value;
             bool exist = false;
@@ -125,6 +107,7 @@ void KvServer::Get(const raftKVRpcProctoc::GetArgs *args, raftKVRpcProctoc::GetR
         }
     }
 
+    /// todo 这里要仔细考虑一下，每次阻塞弹出一个，用完就销毁，是不是不太合理
     {
         std::lock_guard<std::mutex> lock(m_mtx);
         auto tmp = m_waitApplyCh[raftIndex];
@@ -134,8 +117,8 @@ void KvServer::Get(const raftKVRpcProctoc::GetArgs *args, raftKVRpcProctoc::GetR
 }
 
 /**
- * @brief 从raft节点获取命令并解析，操作kvDB
- * @param message
+ * @brief 从raft节点获取命令，操作kvDB
+ * @param message 解析raft层传过来的命令
  */
 void KvServer::GetCommandFromRaft(ApplyMsg message) {
     Op op;
@@ -159,7 +142,6 @@ void KvServer::GetCommandFromRaft(ApplyMsg message) {
         if (op.Operation == "Append") {
             ExecuteAppendOpOnKVDB(op);
         }
-        //  kv.lastRequestId[op.ClientId] = op.RequestId  在Executexxx函数里面更新的
     }
     // 到这里kvDB已经制作了快照
     if (m_maxRaftState != -1) {
@@ -171,7 +153,7 @@ void KvServer::GetCommandFromRaft(ApplyMsg message) {
 }
 
 bool KvServer::ifRequestDuplicate(std::string ClientId, int RequestId) {
-    std::lock_guard<std::mutex> lg(m_mtx);
+    std::lock_guard<std::mutex> lock(m_mtx);
     if (m_lastRequestClientAndId.find(ClientId) == m_lastRequestClientAndId.end()) {
         return false;
         // todo :不存在这个client就创建
@@ -179,9 +161,7 @@ bool KvServer::ifRequestDuplicate(std::string ClientId, int RequestId) {
     return RequestId <= m_lastRequestClientAndId[ClientId];
 }
 
-// get和put//append執行的具體細節是不一樣的
-// PutAppend在收到raft消息之後執行，具體函數裏面只判斷冪等性（是否重複）
-// get函數收到raft消息之後在，因爲get無論是否重複都可以再執行
+// get和put//append执行的具体细节是不一样的
 void KvServer::PutAppend(const raftKVRpcProctoc::PutAppendArgs *args, raftKVRpcProctoc::PutAppendReply *reply) {
     Op op;
     op.Operation = args->op();
@@ -211,7 +191,7 @@ void KvServer::PutAppend(const raftKVRpcProctoc::PutAppendArgs *args, raftKVRpcP
     {
         std::lock_guard<std::mutex> lock(m_mtx);
         if (m_waitApplyCh.find(raftIndex) == m_waitApplyCh.end()) {
-            m_waitApplyCh.insert(std::make_pair(raftIndex, new LockQueue<Op>()));
+            m_waitApplyCh.emplace(raftIndex, new LockQueue<Op>());
         }
         chForRaftIndex = m_waitApplyCh[raftIndex];
     }
@@ -245,6 +225,7 @@ void KvServer::PutAppend(const raftKVRpcProctoc::PutAppendArgs *args, raftKVRpcP
         }
     }
 
+    /// todo 这里要仔细考虑一下，每次阻塞弹出一个，用完就销毁，是不是不太合理
     {
         std::lock_guard<std::mutex> lock(m_mtx);
         auto tmp = m_waitApplyCh[raftIndex];
@@ -259,8 +240,6 @@ void KvServer::PutAppend(const raftKVRpcProctoc::PutAppendArgs *args, raftKVRpcP
 void KvServer::ReadRaftApplyCommandLoop() {
     while (true) {
         auto message = m_applyChan->Pop();  // 阻塞弹出
-        // listen to every command applied by its raft ,delivery to relative RPC Handler
-
         // 应用到 KVDB
         if (message.CommandValid) {
             GetCommandFromRaft(message);
@@ -269,7 +248,6 @@ void KvServer::ReadRaftApplyCommandLoop() {
             GetSnapShotFromRaft(message);
         }
     }
-    std::cout << "Error !!! ReadRaftApplyCommandLoop() end" << std::endl;
 }
 
 // raft会与persister交互，kvserver层也会，因为kvserver层开始的时候需要恢复kvdb的状态
@@ -284,7 +262,7 @@ void KvServer::ReadSnapShotToInstall(std::string snapshot) {
 }
 
 bool KvServer::SendMessageToWaitChan(const Op &op, int raftIndex) {
-    std::lock_guard<std::mutex> lg(m_mtx);
+    std::lock_guard<std::mutex> lock(m_mtx);
     DPrintf(
         "[RaftApplyMessageSendToWaitChan--> raftserver{%d}] , Send Command --> Index:{%d} , ClientId {%d}, RequestId "
         "{%d}, Opreation {%v}, Key :{%v}, Value :{%v}",
