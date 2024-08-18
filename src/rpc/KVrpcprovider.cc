@@ -44,7 +44,7 @@ void KVRpcProvider::KVRpcProviderRunInit(int nodeIndex, short port) {
 
 void KVRpcProvider::InnerStart() {
     m_isrunning = true;
-    std::cout << " --------------- 绑定到子类函数 \n";
+    std::cout << " --------------- 绑定到子类 InnerStart() --------------- \n";
     auto addr = sylar::Address::LookupAny(m_ipPort);
     SYLAR_ASSERT(addr);
     std::vector<sylar::Address::ptr> addrs;
@@ -53,11 +53,10 @@ void KVRpcProvider::InnerStart() {
     while(!m_TcpServer->bind(addrs, fails)) {
         sleep(2);
     }
-    std::cout << " --------------- bind success, " << m_ipPort << " at:" << getpid() << std::endl;
+    std::cout << " --------------- bind success, " << m_ipPort << " at:" << getpid() << "---------------" << std::endl;
 
     // 开启 tcpserver
     m_TcpServer->start();
-    // sleep(1);
 }
 
 KVRpcProvider::~KVRpcProvider() {

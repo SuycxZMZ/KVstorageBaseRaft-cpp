@@ -7,12 +7,9 @@
 #include <string>
 #include "common/util.h"
 
-/*
-header_size + service_name method_name args_size + args
-*/
 // 所有通过stub代理对象调用的rpc方法，都会走到这里了，
 // 统一通过rpcChannel来调用方法
-// 统一做rpc方法调用的数据数据序列化和网络发送
+// 统一做rpc方法调用的  数据数据序列化  和  网络发送
 void KVrpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
                               google::protobuf::RpcController* controller, const google::protobuf::Message* request,
                               google::protobuf::Message* response, google::protobuf::Closure* done) {
@@ -83,6 +80,8 @@ void KVrpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
 
     // 发送rpc请求
     // 失败会重试连接再发送，重试连接失败会直接return
+    // TODO 这里要处理信号，如果对端被kill 9，杀掉，或者正常关闭
+    // 则这里再发送会收到SIGPIPE，需要忽略处理，send返回-1时关闭。返回值未-1，错误码为 ECONNRESET
     while (send(m_clientFd, rpc_send_str.c_str(), rpc_send_str.size(), 0) <= 0) {
         char errtxt[512] = {0};
         sprintf(errtxt, "send error! errno:%d", errno);
@@ -96,13 +95,13 @@ void KVrpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
             return;
         }
     }
-    /*
-    从时间节点来说，这里将请求发送过去之后rpc服务的提供者就会开始处理，返回的时候就代表着已经返回响应了
-    */
 
     // 接收rpc请求的响应值
     char recv_buf[1024] = {0};
     int recv_size = 0;
+
+    // TODO 这里要处理信号，如果对端被kill9杀掉 错误码是 ECONNRESET
+    // 如果对端close或者shutdown,那么返回0
     if (-1 == (recv_size = recv(m_clientFd, recv_buf, 1024, 0))) {
         close(m_clientFd);
         m_clientFd = -1;
@@ -112,14 +111,11 @@ void KVrpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
         return;
     }
     // 反序列化rpc调用的响应数据
-    // std::string response_str(recv_buf, 0, recv_size); //
     // bug：出现问题，recv_buf中遇到\0后面的数据就存不下来了，导致反序列化失败 if
-    // (!response->ParseFromString(response_str))
-    if (!response->ParseFromArray(recv_buf, recv_size)) {
+    if (!response->ParseFromArray((const void*)recv_buf, recv_size)) {
         char errtxt[1050] = {0};
         sprintf(errtxt, "parse error! response_str:%s", recv_buf);
         controller->SetFailed(errtxt);
-        // std::cout << "----------------- 响应失败 \n"; 
         return;
     }
 }
