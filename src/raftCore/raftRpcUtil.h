@@ -8,7 +8,7 @@
 #include "raftRpcPro/raftRPC.pb.h"
 
 /// @brief 维护当前节点对其他某一个结点的所有rpc发送通信的功能
-// 对于一个raft节点来说，对于任意其他的节点都要维护一个rpc连接，即MprpcChannel
+///        对于一个raft节点来说，要和任意其他的节点维护一个rpc连接，即MprpcChannel
 class RaftRpcUtil {
 private:
     raftRpcProctoc::raftRpc_Stub *stub_;
@@ -27,6 +27,9 @@ public:
     /// @param port 对端端口号
     RaftRpcUtil(std::string ip, short port);
     ~RaftRpcUtil();
+
+    RaftRpcUtil(const RaftRpcUtil& other) = delete; // 禁止浅拷贝
+    RaftRpcUtil& operator= (const RaftRpcUtil& other) = delete; // 禁止浅拷贝
 };
 
 #endif  // RAFTRPC_H
