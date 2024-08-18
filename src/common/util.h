@@ -75,9 +75,8 @@ public:
         return data;
     }
 
-    // 带超时的 Pop 操作，如果超时未获取数据返回 false（线程安全）
     /**
-     * @brief 超时弹出
+     * @brief 带超时的 Pop 操作，如果超时未获取数据返回 false（线程安全）
      * 
      * @param timeout 超时时间
      * @param ResData 弹出值的指针，要提前申请好
