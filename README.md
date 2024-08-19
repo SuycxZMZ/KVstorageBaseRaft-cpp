@@ -4,10 +4,17 @@
 
 ## [原KVstorageBaseRaft-cpp项目简介](docs/README.md)
 
+## [main分支](https://github.com/SuycxZMZ/KVstorageBaseRaft-cpp/tree/main)
+
 ## 改进
 
 - raft核心代码注释补全，[主干详细代码执行流说明](docs/项目解析.md)
 - 使用集成rpc服务的sylar网络框架重构
+- [main分支](https://github.com/SuycxZMZ/KVstorageBaseRaft-cpp/tree/main)重写muduo网络库，主要组件均已实现，支持更简单好用的异步日志系统。[日志系统可以单独剥离](https://github.com/SuycxZMZ/symlog)。
+- [rpc详细解析](https://github.com/SuycxZMZ/MpRPC-Cpp)
+- AE和投票信息的的发送使用线程池处理，避免频繁创建销毁大量线程。
+- 移除fiber文件夹，直接使用sylar协程调度器调度(使用时要仔细考虑好调度器的线程数，既要处理网络收发，又要处理两个定时任务)
+- 优化代码组织结构，移除多余的include文件夹，更清爽的cmake代码结构，减少重复编译和路径污染
 
 ## 使用
 
