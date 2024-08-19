@@ -6,6 +6,6 @@ cmake-build-debug
 lib
 build
 .vscode
-
+cmake-build-debug-wsl
 *.out
 *.a
