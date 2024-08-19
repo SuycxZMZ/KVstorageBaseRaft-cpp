@@ -946,39 +946,39 @@ void Raft::readPersist(std::string data) {
     }
 }
 
-void Raft::Snapshot(int index, std::string snapshot) {
+void Raft::Snapshot(int newLogIndex, std::string snapshot) {
     std::lock_guard<std::mutex> lock(m_mtx);
 
     // 没必要制作旧快照，也不能制作没提交的快照
-    if (m_lastSnapshotIncludeIndex >= index || index > m_commitIndex) {
+    if (m_lastSnapshotIncludeIndex >= newLogIndex || newLogIndex > m_commitIndex) {
         DPrintf(
             "[func-Snapshot-rf{%d}] rejects replacing log with snapshotIndex %d as current snapshotIndex %d is larger "
             "or "
             "smaller ",
-            m_me, index, m_lastSnapshotIncludeIndex);
+            m_me, newLogIndex, m_lastSnapshotIncludeIndex);
         return;
     }
     auto lastLogIndex = getLastLogIndex();  // 为了检查snapshot前后日志是否一样，防止多截取或者少截取日志
 
     // 制造完此快照后剩余的所有日志还保存在 m_logs 中
-    int newLastSnapshotIncludeIndex = index;
-    int newLastSnapshotIncludeTerm = m_logs[getSlicesIndexFromLogIndex(index)].logterm();
+    int newLastSnapshotIncludeIndex = newLogIndex;
+    int newLastSnapshotIncludeTerm = m_logs[getSlicesIndexFromLogIndex(newLogIndex)].logterm();
     std::vector<raftRpcProctoc::LogEntry> trunckedLogs;
     // todo :这种写法有点笨，待改进，而且有内存泄漏的风险
-    for (int i = index + 1; i <= getLastLogIndex(); i++) {
+    for (int i = newLogIndex + 1; i <= getLastLogIndex(); i++) {
         // 注意有=，因为要拿到最后一个日志
         trunckedLogs.push_back(m_logs[getSlicesIndexFromLogIndex(i)]);
     }
     m_lastSnapshotIncludeIndex = newLastSnapshotIncludeIndex;
     m_lastSnapshotIncludeTerm = newLastSnapshotIncludeTerm;
     m_logs = trunckedLogs;
-    m_commitIndex = std::max(m_commitIndex, index);
-    m_lastApplied = std::max(m_lastApplied, index);
+    m_commitIndex = std::max(m_commitIndex, newLogIndex);
+    m_lastApplied = std::max(m_lastApplied, newLogIndex);
 
     // rf.lastApplied = index //lastApplied 和 commit应不应该改变呢？？？ 为什么  不应该改变吧
     m_persister->Save(persistData(), snapshot);
 
-    DPrintf("[SnapShot]Server %d snapshot snapshot index {%d}, term {%d}, loglen {%d}", m_me, index,
+    DPrintf("[SnapShot]Server %d snapshot snapshot index {%d}, term {%d}, loglen {%d}", m_me, newLogIndex,
             m_lastSnapshotIncludeTerm, m_logs.size());
     myAssert(m_logs.size() + m_lastSnapshotIncludeIndex == lastLogIndex,
              format("len(rf.logs){%d} + rf.lastSnapshotIncludeIndex{%d} != lastLogjInde{%d}", m_logs.size(),
