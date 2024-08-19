@@ -13,6 +13,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <mutex>
 
 #include "sylar/rpc/rpcchannel.h"
 
@@ -33,6 +34,8 @@ private:
     int m_clientFd;
     const std::string m_ip;  // 保存ip和端口，如果断了可以尝试重连
     const uint16_t m_port;
+
+    std::mutex m_mtx;
 
     /// @brief 连接ip和端口,并设置m_clientFd
     /// @param ip ip地址，本机字节序

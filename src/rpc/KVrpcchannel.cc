@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <cerrno>
 #include <string>
+#include <memory>
 #include "common/util.h"
 
 // 所有通过stub代理对象调用的rpc方法，都会走到这里了，
@@ -13,6 +14,7 @@
 void KVrpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
                               google::protobuf::RpcController* controller, const google::protobuf::Message* request,
                               google::protobuf::Message* response, google::protobuf::Closure* done) {
+    std::unique_lock<std::mutex> lock(m_mtx);
     if (m_clientFd == -1) {
         std::string errMsg;
         bool rt = newConnect(m_ip.c_str(), m_port, &errMsg);
@@ -24,6 +26,7 @@ void KVrpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
             DPrintf("[func-MprpcChannel::CallMethod]连接ip：{%s} port{%d}成功", m_ip.c_str(), m_port);
         }
     }
+    lock.unlock();  // 判断完解个锁，下面的序列化根据接口参数来的，不涉及类内临界资源，不用拿锁
 
     // 获取服务名和方法名
     const google::protobuf::ServiceDescriptor* service_desc = method->service();
@@ -78,6 +81,13 @@ void KVrpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
     //          << "args_str : " << args_str << "\n"
     //          << "------------- send info ----------- \n";
 
+    // --------------------------- 加锁保护 --------------------------- //
+    lock.lock(); /// 发送接收当成一个原子过程，一个rpc调用要么一次成功，要么失败 
+                 /// TODO：这样的写法并发度一般，但是由于节点故障的情况并不常见
+                 /// 正常情况下不会有过多的超时选举，所以，
+                 /// 同一个socket上连着两次发送使用一把锁隔开还是比较合理的
+                 /// 一般不会出现非常严重的锁争用
+    
     // 发送rpc请求
     // 失败会重试连接再发送，重试连接失败会直接return
     // TODO 这里要处理信号，如果对端被kill 9，杀掉，或者正常关闭
