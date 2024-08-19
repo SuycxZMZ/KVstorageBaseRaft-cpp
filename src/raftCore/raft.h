@@ -244,6 +244,12 @@ public:
 
     /**
      * @brief kvServer收到客户端命令之后发起，客户端发布发一个新日志
+     * 
+     * @param command 操作信息 Op 包括请求的 k, v 请求id，客户端id等
+     * @param newLogIndex 输入输出值，正常情况下返回一个新的日志index
+     * @param newLogTerm 输入输出值，正常情况下返回一个新的日志 所在 raft主节点的任期
+     * @return true 发起成功
+     * @return false 发起失败，不是leader
      */
     bool Start(Op command, int *newLogIndex, int *newLogTerm);
 

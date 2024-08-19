@@ -947,8 +947,9 @@ void Raft::readPersist(std::string data) {
 }
 
 void Raft::Snapshot(int index, std::string snapshot) {
-    std::lock_guard<std::mutex> lg(m_mtx);
+    std::lock_guard<std::mutex> lock(m_mtx);
 
+    // 没必要制作旧快照，也不能制作没提交的快照
     if (m_lastSnapshotIncludeIndex >= index || index > m_commitIndex) {
         DPrintf(
             "[func-Snapshot-rf{%d}] rejects replacing log with snapshotIndex %d as current snapshotIndex %d is larger "
@@ -959,7 +960,7 @@ void Raft::Snapshot(int index, std::string snapshot) {
     }
     auto lastLogIndex = getLastLogIndex();  // 为了检查snapshot前后日志是否一样，防止多截取或者少截取日志
 
-    // 制造完此快照后剩余的所有日志
+    // 制造完此快照后剩余的所有日志还保存在 m_logs 中
     int newLastSnapshotIncludeIndex = index;
     int newLastSnapshotIncludeTerm = m_logs[getSlicesIndexFromLogIndex(index)].logterm();
     std::vector<raftRpcProctoc::LogEntry> trunckedLogs;

@@ -42,7 +42,7 @@ private:
 
     std::unordered_map<std::string, int> m_lastRequestClientAndId;  // pair<客户id, 最近一次的请求id> 一个kV服务器可能连接多个client
 
-    // last SnapShot point , raftIndex
+    // last SnapShot point , newLogIndex
     int m_lastSnapShotRaftLogIndex;
     sylar::IOManager::ptr m_iom; // 全局协程调度器指针
     std::shared_ptr<Raft> m_raftNode; // raft节点                
@@ -100,12 +100,12 @@ public:
     /**
      * @brief 将命令发送到kvserver层的 m_waitApplyChan
      * @param op 从raft层解析出来的，要执行apply的命令
-     * @param raftIndex 节点序号
+     * @param newLogIndex 节点序号
      */
-    bool SendMessageToWaitChan(const Op &op, int raftIndex);
+    bool SendMessageToWaitChan(const Op &op, int newLogIndex);
 
     // 检查是否需要制作快照，需要的话就向raft之下制作快照
-    void IfNeedToSendSnapShotCommand(int raftIndex, int proportion);
+    void IfNeedToSendSnapShotCommand(int newLogIndex, int proportion);
 
     // Handler the SnapShot from kv.rf.applyCh
     void GetSnapShotFromRaft(ApplyMsg message);
