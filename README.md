@@ -5,7 +5,8 @@
 ## 分支说明
 
 - 1.main分支是基于重写tinymuduo网络库为底层rpc实现的项目，把原本的项目稍微重构了一下，已经调试通过，后续慢慢优化。
-- 2.sylarbased分支是基于sylar服务器框架重构的项目，rpc服务已经集成到sylar服务器框架中，重构的项目只留核心代码，简洁清爽，bug待调试。[集成rpc服务的sylar服务器框架](https://github.com/SuycxZMZ/sylar-from-suycx)。
+- 2.[sylarbased分支](https://github.com/SuycxZMZ/KVstorageBaseRaft-cpp/tree/sylarbased)是基于sylar服务器框架重构的项目，rpc服务已经集成到sylar服务器框架中，重构的项目只留核心代码，简洁清爽，bug待调试。[集成rpc服务的sylar服务器框架](https://github.com/SuycxZMZ/sylar-from-suycx)。
+- 之后主要更新[sylarbased分支](https://github.com/SuycxZMZ/KVstorageBaseRaft-cpp/tree/sylarbased)
 
 ## 改进
 
