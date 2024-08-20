@@ -170,16 +170,17 @@ class Raft : public raftRpcProctoc::raftRpc {
     void persist();
 
     /**
-     * @brief 变成 candidate 之后需要让其他结点给自己投票，candidate通过该函数远程调用远端节点的投票函数
+     * @brief 变成 candidate 之后需要让其他结点给自己投票，
+     *        candidate通过该函数远程调用远端节点的投票函数，非常重要！！！！
      * @param args 请求投票的参数
      * @param reply 请求投票的响应
      */
     void RequestVote(const raftRpcProctoc::RequestVoteArgs *args, raftRpcProctoc::RequestVoteReply *reply);
 
     /**
-     * @brief 判断传入的日志参数是否比自身的新
+     * @brief 判断传入的日志参数是否比自身的新，判断是否要给对方投票的时候调用
      * @param index 传入要比较的日志index
-     * @param term 传入要比较的日志任期term
+     * @param term 传入要比较的日志的任期号
      * @return 传入的日志参数比自身的新返回true 否则返回false
      */
     bool UpToDate(int index, int term);

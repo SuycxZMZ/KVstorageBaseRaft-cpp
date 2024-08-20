@@ -607,7 +607,8 @@ void Raft::persist() {
 }
 
 /**
- * @brief 服务提供方，也就是 RPC 请求的对端提供的方法
+ * @brief 变成 candidate 之后需要让其他结点给自己投票，
+ *        candidate通过该函数远程调用远端节点的投票函数，非常重要！！！！
  * @param args 请求投票的参数
  * @param reply 请求投票的响应
  */
@@ -617,7 +618,7 @@ void Raft::RequestVote(const raftRpcProctoc::RequestVoteArgs* args, raftRpcProct
     DEFER { persist(); };
 
     // 对args的term的三种情况分别进行处理，大于小于等于自己的term都是不同的处理
-    // reason: 出现网络分区，竞选者已经过时，发送拒绝reply并不过多处理该请求
+    // *** 竞选者已经过时，发送拒绝reply并不过多处理该请求
     if (args->term() < m_currentTerm) {
         reply->set_term(m_currentTerm);
         reply->set_votestate(Expire);
@@ -625,7 +626,7 @@ void Raft::RequestVote(const raftRpcProctoc::RequestVoteArgs* args, raftRpcProct
         return;
     }
 
-    // 如果任何时候rpc请求或者响应的term大于自己的term，更新term，并变成follower
+    // *** 如果任何时候rpc请求或者响应的term大于自己的term，更新term，并变成follower
     if (args->term() > m_currentTerm) {
         m_status = Follower;
         m_currentTerm = args->term();
@@ -633,11 +634,15 @@ void Raft::RequestVote(const raftRpcProctoc::RequestVoteArgs* args, raftRpcProct
     }
     myAssert(args->term() == m_currentTerm,
              format("[func--rf{%d}] 前面校验过args.Term==rf.currentTerm，这里却不等", m_me));
-    // 现在节点任期都是相同的(任期小的也已经更新到新的args的term了)，还需要检查log的term和index是不是匹配的了
+
+    // 现在节点任期都是相同的(任期小的也已经更新到新的args的term了)，还需要检查log的term和index是不是匹配的
     int lastLogTerm = getLastLogTerm();
 
-    // 只有没投票，且candidate的日志的新的程度 ≥ 接受者的日志新的程度 才会给请求方投票
-    // 日志太旧了
+    // 只有 没投过票，且candidate的日志的新的程度 ≥ 接受者的日志新的程度 才会给请求方投票
+    //  这里，新的程度判断为，如果当前节点的最新的一条日志所在的任期号大于远端节点，就不给他投
+    //  如果这个关系是小于，就要考虑给对方投票，这个if进不来
+    //  如果这个关系是等于，就要比较看谁的日志比较长，如果对方比较长，就要考虑给他投票，这个if也进不来
+    //  其他情况就是对方的日志比较旧，直接进这个if，不给他投票
     if (!UpToDate(args->lastlogindex(), args->lastlogterm())) {
         if (args->lastlogterm() < lastLogTerm) {
         } else {
@@ -649,9 +654,8 @@ void Raft::RequestVote(const raftRpcProctoc::RequestVoteArgs* args, raftRpcProct
     }
 
     // ------------------------------ 对方的日志较新 ------------------------------ //
-    // 当因为网络质量不好导致的请求丢失重发就有可能！！！！
-    // 因此需要避免重复投票
-    if (m_votedFor != -1 && m_votedFor != args->candidateid()) {
+    // 当因为网络质量不好导致的请求丢失重发就有可能！！！！因此需要避免重复投票
+    if (m_votedFor != -1 && m_votedFor != args->candidateid()) {  // 已经投过票了
         reply->set_term(m_currentTerm);
         reply->set_votestate(Voted);
         reply->set_votegranted(false);
