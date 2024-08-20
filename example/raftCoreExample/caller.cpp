@@ -6,6 +6,7 @@
 const int test_count = 500;
 
 int main() {
+    signal(SIGPIPE, SIG_IGN);
     Clerk client;
     client.Init("test.conf");
     

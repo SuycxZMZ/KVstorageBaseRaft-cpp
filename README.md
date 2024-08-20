@@ -53,6 +53,31 @@ make -j4
 注意先运行provider，再运行consumer
 运行时在bin目录下提供了一个`test.config`配置文件，按照两个可执行文件打印的 help 信息进行加载，启动raft集群和测试客户端代码
 
+## 节点故障情况模拟
+
+```shell
+# raftCoreRun 跑起来之后可以查看几个节点的子进程
+ps -aux
+```
+
+![docs/images/raft-fail.png](docs/images/raft-fail.png)
+
+```shell
+# 1. 
+# 输出如上图所示，一般第一个进程是父进程，在后面几个中随机抽一个，杀掉
+kill -9 <pid>
+# 在运行 raftCoreRun 的终端还可以看到剩下的节点在继续运行，运行caller还可以正常工作，集群正常
+
+# 2. 
+# 也可以通过暂停进程来查看，
+# 不过这个caller端的现象现在没改，caller会连接所有节点，暂停的话会有一个阻塞，卡住动不了，但是选举过程还是可以观察的
+# 暂停进程
+kill -19 <pid>
+# 恢复进程
+kill -18 <pid>
+
+```
+
 ## Docs
 
 - [项目解析](docs/项目解析.md)

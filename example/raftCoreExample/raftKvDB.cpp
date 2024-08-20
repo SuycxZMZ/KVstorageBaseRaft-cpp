@@ -73,6 +73,7 @@ int main(int argc, char **argv) {
         pid_t pid = fork();  // 创建新进程
         if (pid == 0) {
             // 如果是子进程
+            signal(SIGPIPE, SIG_IGN);
             // 子进程的代码
             auto kvServer = new KvServer(i, 500, configFileName, port);
             pause();  // 子进程进入等待状态
