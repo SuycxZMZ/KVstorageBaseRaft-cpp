@@ -14,9 +14,9 @@
 #include <iostream>
 #include <mutex>
 #include <unordered_map>
+#include "raft.h"
 #include "raftRpcPro/kvServerRPC.pb.h"
 #include "rpc/KVrpcprovider.h"
-#include "raft.h"
 #include "skipList/skipList.h"
 
 /**
@@ -25,29 +25,32 @@
  *        1.接收外部请求。
  *        2.本机内部与raft和kvDB协商如何处理该请求。
  *        3.返回外部响应。
-*/
+ */
 class KvServer : raftKVRpcProctoc::kvServerRpc {
-private:
+   private:
     std::mutex m_mtx;
-    int m_me;                                         // 节点编号
-    std::shared_ptr<LockQueue<ApplyMsg> > m_applyChan;  // kvServer中拿到的消息，server用这些消息与raft打交道，由Raft::applierTicker线程填充
-    int m_maxRaftState;                               // snapshot if log grows this big
+    int m_me;  // 节点编号
+    std::shared_ptr<LockQueue<ApplyMsg> >
+        m_applyChan;  // kvServer中拿到的消息，server用这些消息与raft打交道，由Raft::applierTicker线程填充
+    int m_maxRaftState;  // snapshot if log grows this big
 
     // Your definitions here.
-    std::string m_serializedKVData;                      // TODO ： 序列化后的kv数据，理论上可以不用，但是目前没有找到特别好的替代方法
-    SkipList<std::string, std::string> m_skipList;       // skipList，用于存储kv数据
-    std::unordered_map<std::string, std::string> m_kvDB; // kvDB，用unordered_map来替代
+    std::string m_serializedKVData;  // TODO ： 序列化后的kv数据，理论上可以不用，但是目前没有找到特别好的替代方法
+    SkipList<std::string, std::string> m_skipList;        // skipList，用于存储kv数据
+    std::unordered_map<std::string, std::string> m_kvDB;  // kvDB，用unordered_map来替代
 
-    std::unordered_map<int, LockQueue<Op> *> m_waitApplyCh;// 字段含义 waitApplyCh是一个map，键 是int，值 是Op类型的阻塞队列
+    std::unordered_map<int, LockQueue<Op> *>
+        m_waitApplyCh;  // 字段含义 waitApplyCh是一个map，键 是int，值 是Op类型的阻塞队列
 
-    std::unordered_map<std::string, int> m_lastRequestClientAndId;  // pair<客户id, 最近一次的请求id> 一个kV服务器可能连接多个client
+    std::unordered_map<std::string, int>
+        m_lastRequestClientAndId;  // pair<客户id, 最近一次的请求id> 一个kV服务器可能连接多个client
 
     // last SnapShot point , newLogIndex
     int m_lastSnapShotRaftLogIndex;
-    sylar::IOManager::ptr m_iom; // 全局协程调度器指针
-    std::shared_ptr<Raft> m_raftNode; // raft节点                
-    std::shared_ptr<KVRpcProvider> m_KvRpcProvider; // one kvServer per rpcprovider
-public:
+    sylar::IOManager::ptr m_iom;                     // 全局协程调度器指针
+    std::shared_ptr<Raft> m_raftNode;                // raft节点
+    std::shared_ptr<KVRpcProvider> m_KvRpcProvider;  // one kvServer per rpcprovider
+   public:
     KvServer() = delete;
 
     /**
@@ -56,24 +59,21 @@ public:
      * @param maxraftstate 快照阈值，raft日志超过这个值时，会触发快照
      * @param nodeInforFileName 节点信息文件名
      * @param port 监听端口
-    */
+     */
     KvServer(int me, int maxraftstate, std::string nodeInforFileName, short port);
 
     void StartKVServer();
 
     void DprintfKVDB();
 
-
-
-    void ExecuteGetOpOnKVDB(Op op, std::string *value, bool *exist);    // get操作，查跳表，返回结果
+    void ExecuteGetOpOnKVDB(Op op, std::string *value, bool *exist);  // get操作，查跳表，返回结果
     void ExecuteAppendOpOnKVDB(Op op);  // 操作KVDB，本项目中就是插入跳表，与put操作一样
     void ExecutePutOpOnKVDB(Op op);     // 操作KVDB，本项目中就是插入跳表，与append操作一样
 
     /**
      * @brief rpc 实际调用内部实现
-    */
-    void Get(const raftKVRpcProctoc::GetArgs *args,
-             raftKVRpcProctoc::GetReply *reply);  
+     */
+    void Get(const raftKVRpcProctoc::GetArgs *args, raftKVRpcProctoc::GetReply *reply);
 
     /**
      * @brief 从raft节点获取命令，操作kvDB
@@ -87,14 +87,19 @@ public:
 
     /**
      * @brief rpc 实际调用内部实现
-    */
+     */
     void PutAppend(const raftKVRpcProctoc::PutAppendArgs *args, raftKVRpcProctoc::PutAppendReply *reply);
 
     /**
      * @brief 一直等待raft传来的applyCh
-    */
+     */
     void ReadRaftApplyCommandLoop();
 
+    /**
+     * @brief 安装快照，将raft传递过来的快照信息反序列化到kvserver层的跳表
+     *
+     * @param snapshot 传入的快照
+     */
     void ReadSnapShotToInstall(std::string snapshot);
 
     /**
@@ -104,33 +109,43 @@ public:
      */
     bool SendMessageToWaitChan(const Op &op, int newLogIndex);
 
-    // 检查是否需要制作快照，需要的话就向raft之下制作快照
+    /**
+     * @brief 检查是否需要制作快照，需要的话就制作KVDB快照，然后发送给raft层
+     *        raft层根据 newLogIndex 来确定 m_logs的压缩情况
+     * @param newLogIndex 新日志索引标号
+     * @param proportion 现在还没用上，写死为最大阈值的 1/10
+     */
     void IfNeedToSendSnapShotCommand(int newLogIndex, int proportion);
 
     // Handler the SnapShot from kv.rf.applyCh
     void GetSnapShotFromRaft(ApplyMsg message);
 
+    /**
+     * @brief 序列化KVDB内容为字符串
+     *
+     * @return std::string 返回序列化之后的KVDB中的内容
+     */
     std::string MakeSnapShot();
 
     /// @brief 初始化本节点的底层rpc,发布远程方法，并开启
     /// @param port 节点端口号
     void InitRpcAndRun(short port);
 
-public:  // for rpc
+   public:  // 调用rpc框架的notify时，会走过来，发布这些方法
     /**
-     * @brief 与客户打交道，Rpc框架调用
-    */
+     * @brief Rpc框架调用，函数内部掉用远程方法的真正实现
+     */
     void PutAppend(google::protobuf::RpcController *controller, const ::raftKVRpcProctoc::PutAppendArgs *request,
                    ::raftKVRpcProctoc::PutAppendReply *response, ::google::protobuf::Closure *done) override;
     /**
-     * @brief 与客户打交道，Rpc框架调用
-    */
+     * @brief Rpc框架调用，函数内部掉用远程方法的真正实现
+     */
     void Get(google::protobuf::RpcController *controller, const ::raftKVRpcProctoc::GetArgs *request,
              ::raftKVRpcProctoc::GetReply *response, ::google::protobuf::Closure *done) override;
 
-///////////////// serialiazation ///////////////////////////////
-// notice ： func serialize
-private:
+    ///////////////// serialiazation ///////////////////////////////
+    // notice ： func serialize
+   private:
     friend class boost::serialization::access;
 
     // When the class Archive corresponds to an output archive, the
