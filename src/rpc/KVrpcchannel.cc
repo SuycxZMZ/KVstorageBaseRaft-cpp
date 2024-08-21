@@ -96,13 +96,13 @@ void KVrpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
     while (send(m_clientFd, rpc_send_str.c_str(), rpc_send_str.size(), 0) < 0) {
         char errtxt[512] = {0};
         sprintf(errtxt, "recv error! errno:%d", errno);
-        std::cerr << "尝试重新连接，对方ip：" << m_ip << " 对方端口" << m_port << std::endl;
-        close(m_clientFd);
-        m_clientFd = -1;
-
-        // EAGAIN EWOULDBLOCK 代表超时，那么没超时的情况，现在统一按照断开来处理
+        
+        // EAGAIN EWOULDBLOCK 代表超时，没超时的情况，现在统一按照断开来处理
         if (!(errno == EAGAIN || errno == EWOULDBLOCK)) {
+            close(m_clientFd);
+            m_clientFd = -1;
             std::string errMsg;
+            std::cerr << "尝试重新连接，对方ip：" << m_ip << " 对方端口" << m_port << std::endl;
             bool rt = newConnect(m_ip.c_str(), m_port, &errMsg);
             if (!rt) {
                 controller->SetFailed(errMsg);
@@ -121,8 +121,11 @@ void KVrpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
     // TODO 这里要处理信号，如果对端被kill9杀掉 错误码是 ECONNRESET
     // 如果对端close或者shutdown,那么返回0
     if (-1 == (recv_size = recv(m_clientFd, recv_buf, 1024, 0))) {
-        close(m_clientFd);
-        m_clientFd = -1;
+        if (!(errno == EAGAIN || errno == EWOULDBLOCK)) {
+            close(m_clientFd);
+            m_clientFd = -1;
+        }
+
         char errtxt[512] = {0};
         sprintf(errtxt, "recv error! errno:%d", errno);
         controller->SetFailed(errtxt);
@@ -191,7 +194,6 @@ KVrpcChannel::KVrpcChannel(string ip, short port, bool connectNow, int sendTimeo
         m_sendTimeout(sendTimeout),
         m_recvTimeout(recvTimeout) 
 {
-    // 使用tcp编程，完成rpc方法的远程调用，使用的是短连接，因此每次都要重新连接上去，待改成长连接。
     // 没有连接或者连接已经断开，那么就要重新连接呢,会一直不断地重试
     if (!connectNow) {
         return;
