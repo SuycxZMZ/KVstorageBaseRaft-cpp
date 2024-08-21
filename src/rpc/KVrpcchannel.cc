@@ -87,23 +87,31 @@ void KVrpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
                  /// 正常情况下不会有过多的超时选举，所以，
                  /// 同一个socket上连着两次发送使用一把锁隔开还是比较合理的
                  /// 一般不会出现非常严重的锁争用
-    
+
     // 发送rpc请求
     // 失败会重试连接再发送，重试连接失败会直接return
     // TODO 这里要处理信号，如果对端被kill 9，杀掉，或者正常关闭
     // 则这里再发送会收到SIGPIPE，需要忽略处理，send返回-1时关闭。返回值未-1，错误码为 ECONNRESET
-    while (send(m_clientFd, rpc_send_str.c_str(), rpc_send_str.size(), 0) <= 0) {
+    //  在非调试版本可以给send 的最后一个参数加上 MSG_NOSIGNAL 忽略信号
+    while (send(m_clientFd, rpc_send_str.c_str(), rpc_send_str.size(), 0) < 0) {
         char errtxt[512] = {0};
-        sprintf(errtxt, "send error! errno:%d", errno);
-        std::cout << "尝试重新连接，对方ip：" << m_ip << " 对方端口" << m_port << std::endl;
+        sprintf(errtxt, "recv error! errno:%d", errno);
+        std::cerr << "尝试重新连接，对方ip：" << m_ip << " 对方端口" << m_port << std::endl;
         close(m_clientFd);
         m_clientFd = -1;
-        std::string errMsg;
-        bool rt = newConnect(m_ip.c_str(), m_port, &errMsg);
-        if (!rt) {
-            controller->SetFailed(errMsg);
-            return;
+
+        // EAGAIN EWOULDBLOCK 代表超时，那么没超时的情况，现在统一按照断开来处理
+        if (!(errno == EAGAIN || errno == EWOULDBLOCK)) {
+            std::string errMsg;
+            bool rt = newConnect(m_ip.c_str(), m_port, &errMsg);
+            if (!rt) {
+                controller->SetFailed(errMsg);
+                return;
+            }
         }
+        // 发送失败就不能等接收了，应该设置错误立马返回
+        controller->SetFailed(errtxt);
+        return;
     }
 
     // 接收rpc请求的响应值
@@ -140,6 +148,24 @@ bool KVrpcChannel::newConnect(const char* ip, uint16_t port, string* errMsg) {
         return false;
     }
 
+    struct timeval timeout;
+    timeout.tv_sec = 0;
+    timeout.tv_usec = m_sendTimeout * 1000;
+
+    // 设置发送超时时间
+    if (setsockopt(clientfd, SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof(timeout)) < 0) {
+        std::cerr << "Failed to set socket send timeout\n";
+        close(clientfd);
+        return false;
+    }
+    // 接收超时，没放在一起方便后期拓展，这两个超时可以设为不一样的值
+    timeout.tv_usec = m_recvTimeout * 1000;
+    if (setsockopt(clientfd, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout)) < 0) {
+        std::cerr << "Failed to set socket send timeout\n";
+        close(clientfd);
+        return false;
+    }
+
     struct sockaddr_in server_addr;
     server_addr.sin_family = AF_INET;
     server_addr.sin_port = htons(port);
@@ -153,11 +179,18 @@ bool KVrpcChannel::newConnect(const char* ip, uint16_t port, string* errMsg) {
         *errMsg = errtxt;
         return false;
     }
+
     m_clientFd = clientfd;
     return true;
 }
 
-KVrpcChannel::KVrpcChannel(string ip, short port, bool connectNow) : m_ip(ip), m_port(port), m_clientFd(-1) {
+KVrpcChannel::KVrpcChannel(string ip, short port, bool connectNow, int sendTimeout, int recvTimeout)
+        : m_ip(ip), 
+        m_port(port), 
+        m_clientFd(-1),
+        m_sendTimeout(sendTimeout),
+        m_recvTimeout(recvTimeout) 
+{
     // 使用tcp编程，完成rpc方法的远程调用，使用的是短连接，因此每次都要重新连接上去，待改成长连接。
     // 没有连接或者连接已经断开，那么就要重新连接呢,会一直不断地重试
     if (!connectNow) {

@@ -15,6 +15,7 @@
 #include <vector>
 #include <mutex>
 
+#include "common/util.h"
 #include "sylar/rpc/rpcchannel.h"
 
 using namespace std;
@@ -28,12 +29,16 @@ public:
     virtual void CallMethod(const google::protobuf::MethodDescriptor *method, google::protobuf::RpcController *controller,
                     const google::protobuf::Message *request, google::protobuf::Message *response,
                     google::protobuf::Closure *done) override;
-    KVrpcChannel(string ip, short port, bool connectNow);
+    KVrpcChannel(string ip, short port, bool connectNow = true, 
+                 int sendTimeout = HeartBeatTimeout, int recvTimeout = HeartBeatTimeout);
 
 private:
     int m_clientFd;
     const std::string m_ip;  // 保存ip和端口，如果断了可以尝试重连
     const uint16_t m_port;
+
+    int m_sendTimeout;
+    int m_recvTimeout;
 
     std::mutex m_mtx;
 
