@@ -2,9 +2,11 @@
 // Created by swx on 24-1-4.
 //
 #include "raftServerRpcUtil.h"
+#include "common/config.h"
 
 raftServerRpcUtil::raftServerRpcUtil(std::string ip, short port) {
-    stub = std::make_shared<raftKVRpcProctoc::kvServerRpc_Stub>(new KVrpcChannel(ip, port, false));
+    stub = std::make_shared<raftKVRpcProctoc::kvServerRpc_Stub>
+        (new KVrpcChannel(ip, port, false, CLERK_REQUEST_TIMEOUT / 2, CLERK_REQUEST_TIMEOUT / 2));
 }
 
 raftServerRpcUtil::~raftServerRpcUtil() { 

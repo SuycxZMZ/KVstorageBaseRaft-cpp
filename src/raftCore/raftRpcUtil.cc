@@ -30,7 +30,7 @@ bool RaftRpcUtil::RequestVote(raftRpcProctoc::RequestVoteArgs *args, raftRpcProc
 RaftRpcUtil::RaftRpcUtil(std::string ip, short port) {
     // 发送rpc设置
     // KVrpcChannel 里面完成连接
-    stub_ = new raftRpcProctoc::raftRpc_Stub(new KVrpcChannel(ip, port, true));
+    stub_ = new raftRpcProctoc::raftRpc_Stub(new KVrpcChannel(ip, port, true, HeartBeatTimeout / 2, HeartBeatTimeout / 2));
 }
 
 RaftRpcUtil::~RaftRpcUtil() { 
