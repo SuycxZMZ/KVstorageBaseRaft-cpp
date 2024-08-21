@@ -84,7 +84,7 @@ kill -18 <pid>
 - 目前我在笔记本装的虚拟机上测试，分 4核 4G 暂时还能正常运行，再低的没试。笔记本硬件是 8代i7, 24G
 - 租的云服务器在相同核心和内存的情况下比个人电脑要差很多 -->
 
-## Docs=7
+## Docs
 
 - [项目解析](docs/项目解析.md)
 - [tinymuduo](https://github.com/SuycxZMZ/tiny-muduo)
