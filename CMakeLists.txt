@@ -7,6 +7,12 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "Debug")
 endif()
 
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_definitions(-DDprintf_Debug=1)
+else()
+    add_definitions(-DDprintf_Debug=0)
+endif()
+
 # only build examples if this is the main project
 if(CMAKE_PROJECT_NAME STREQUAL "KVRaftCpp")
     option(KVRaftCpp_BUILD_EXAMPLES "Build KVRaftCpp examples" ON)

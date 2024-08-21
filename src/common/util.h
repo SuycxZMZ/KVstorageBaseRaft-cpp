@@ -17,6 +17,8 @@
 #include <thread>
 #include "config.h"
 
+#define Dprintf_Debug 0
+
 template <class F>
 class DeferClass {
    public:

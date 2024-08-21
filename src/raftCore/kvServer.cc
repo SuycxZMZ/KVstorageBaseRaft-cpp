@@ -4,7 +4,7 @@
 #include "sylar/rpc/rpcconfig.h"
 
 void KvServer::DprintfKVDB() {
-    if (!Debug) {
+    if (!Dprintf_Debug) {
         return;
     }
     std::lock_guard<std::mutex> lock(m_mtx);

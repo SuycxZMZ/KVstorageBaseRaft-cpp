@@ -53,7 +53,7 @@ bool isReleasePort(unsigned short usPort) {
 }
 
 void DPrintf(const char *format, ...) {
-    if (Debug) {
+    if (Dprintf_Debug) {
         // 获取当前的日期，然后取日志信息，写入相应的日志文件当中 a+
         time_t now = time(nullptr);
         tm *nowtm = localtime(&now);
