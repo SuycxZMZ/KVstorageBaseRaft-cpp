@@ -22,9 +22,10 @@
 
 1.库准备
 
-- 安装带rpc服务的sylar网络库，[sylar](https://github.com/SuycxZMZ/sylar-from-suycx)
-- boost
-- protoc
+- 安装带rpc服务的sylar网络库，[sylar-from-suycx](https://github.com/SuycxZMZ/sylar-from-suycx)
+- `boost`
+- `protoc`
+- 注意：我在[sylar-from-suycx](https://github.com/SuycxZMZ/sylar-from-suycx)项目的tools-packages文件夹下放了zookeeper3.4.1的安装包，如果是arm架构的cpu要装这个，官方原版的包有个函数里面直接用了x86的汇编，没加条件编译，会直接报错
 
 2.安装说明
 
