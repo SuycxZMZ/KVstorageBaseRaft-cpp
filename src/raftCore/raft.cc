@@ -902,7 +902,7 @@ void Raft::init(std::vector<std::shared_ptr<RaftRpcUtil>> peers, int me, std::sh
     m_iom->schedule(std::bind(&Raft::leaderHearBeatTicker, this));  // leader 心跳定时器
     m_iom->schedule(std::bind(&Raft::electionTimeOutTicker, this));  // 选举超时定时器，触发就开始发起选举
 
-    std::thread t3([this]() -> void { this->applierTicker(); });  // apply 定时器，单起一个线程
+    std::thread t3(std::bind(&Raft::applierTicker, this));  // apply 定时器，单起一个线程
     t3.detach();
 }
 

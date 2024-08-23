@@ -291,7 +291,7 @@ void KvServer::IfNeedToSendSnapShotCommand(int newLogIndex, int proportion) {
 }
 
 void KvServer::GetSnapShotFromRaft(ApplyMsg message) {
-    std::lock_guard<std::mutex> lg(m_mtx);
+    std::lock_guard<std::mutex> lock(m_mtx);
 
     if (m_raftNode->CondInstallSnapshot(message.SnapshotTerm, message.SnapshotIndex, message.Snapshot)) {
         ReadSnapShotToInstall(message.Snapshot);
@@ -300,7 +300,7 @@ void KvServer::GetSnapShotFromRaft(ApplyMsg message) {
 }
 
 std::string KvServer::MakeSnapShot() {
-    std::lock_guard<std::mutex> lg(m_mtx);
+    std::lock_guard<std::mutex> lock(m_mtx);
     std::string snapshotData = getSnapshotData();
     return snapshotData;
 }
@@ -381,7 +381,7 @@ KvServer::KvServer(int me, int maxraftstate, std::string nodeInforFileName, shor
     sleep(ipPortVt.size() - me);
 
     // 传递给 raft::init 用的 persister
-    std::shared_ptr<Persister> persister(new Persister(me));
+    auto persister = std::make_shared<Persister>(me);
 
     // 如果出现重大bug要调试，可以在这里睡眠时间长一点，然后gdb打断点，追踪每一个子进程
     sleep(2);
@@ -389,6 +389,7 @@ KvServer::KvServer(int me, int maxraftstate, std::string nodeInforFileName, shor
     // 初始化 raft 节点，也就是raft层
     m_raftNode->init(otherServers, m_me, persister, m_applyChan);
 
+    // 可能是异常重启，如果之前有快照，就恢复快照的内容
     auto snapshot = persister->ReadSnapshot();
     if (!snapshot.empty()) {
         ReadSnapShotToInstall(snapshot);
