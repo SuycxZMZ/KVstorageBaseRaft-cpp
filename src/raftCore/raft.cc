@@ -29,18 +29,17 @@ void Raft::AppendEntries(const raftRpcProctoc::AppendEntriesArgs* args, raftRpcP
     }
     DEFER { persist(); };
 
-    if (args->term() > m_currentTerm) {  // 当前落后
+    if (args->term() > m_currentTerm) {  // 当前落后 可以往下走 ---------------------------------------
         m_status = Follower;
         m_currentTerm = args->term();
-        m_votedFor = -1;  // 这里设置成-1有意义，如果突然宕机然后上线理论上是可以投票的
+        m_votedFor = -1;  
     }
     myAssert(args->term() == m_currentTerm, format("assert {args.Term == rf.currentTerm} fail"));
-    m_status = Follower;  // 这里是有必要的，因为如果candidate收到同一个term的leader的AE，需要变成follower
+    m_status = Follower;
     m_lastResetElectionTime = now();  // 重置定时器
 
-    // 不能无脑的从prevlogIndex开始阶段日志，因为rpc可能会延迟，导致发过来的log是很久之前的
-    // 那么就比较日志，日志有3种情况
-    if (args->prevlogindex() > getLastLogIndex()) {  // 本地日志落后
+    // 比较日志，日志有3种情况
+    if (args->prevlogindex() > getLastLogIndex()) {  // 本地日志落后，与发过来的不匹配，就要返回需要接收的idx
         reply->set_success(false);
         reply->set_term(m_currentTerm);
         reply->set_updatenextindex(getLastLogIndex() + 1);
@@ -51,25 +50,25 @@ void Raft::AppendEntries(const raftRpcProctoc::AppendEntriesArgs* args, raftRpcP
         reply->set_updatenextindex(m_lastSnapshotIncludeIndex + 1);
     }
 
-    if (matchLog(args->prevlogindex(), args->prevlogterm())) {  // 日志匹配，复制
+    // -------- args->prevlogindex() <= getLastLogIndex() 就是已经有了这个idx的日志项 --------
+    if (matchLog(args->prevlogindex(), args->prevlogterm())) {  // 任期匹配就可以直接进行复制
         for (int i = 0; i < args->entries_size(); i++) {
             auto log = args->entries(i);
             if (log.logindex() > getLastLogIndex()) {  // 超过就直接添加日志
                 m_logs.push_back(log);
-            } else {  // 没超过就比较是否匹配，不匹配再更新，而不是直接截断
+            } else {  // 覆盖
                 if (m_logs[getSlicesIndexFromLogIndex(log.logindex())].logterm() == log.logterm() &&
                     m_logs[getSlicesIndexFromLogIndex(log.logindex())].command() != log.command()) {
                     // 相同位置的log，其logTerm相等，但是命令却不相同，不符合raft的前向匹配，异常了！
                     myAssert(
                         false,
-                        format("[func-AppendEntries-rf{%d}] 两节点logIndex{%d}和term{%d}相同，但是其command{%d:%d}   "
+                        format("[func-AppendEntries-rf{%d}] 两节点logIndex{%d}和term{%d}相同，但是其command{%d:%d}"
                                " {%d:%d}却不同！！\n",
                                m_me, log.logindex(), log.logterm(), m_me,
                                m_logs[getSlicesIndexFromLogIndex(log.logindex())].command(), args->leaderid(),
                                log.command()));
                 }
-                if (m_logs[getSlicesIndexFromLogIndex(log.logindex())].logterm() !=
-                    log.logterm()) {  // 不匹配就覆盖更新
+                if (m_logs[getSlicesIndexFromLogIndex(log.logindex())].logterm() != log.logterm()) {  // 覆盖
                     m_logs[getSlicesIndexFromLogIndex(log.logindex())] = log;
                 }
             }
@@ -89,15 +88,14 @@ void Raft::AppendEntries(const raftRpcProctoc::AppendEntriesArgs* args, raftRpcP
         reply->set_success(true);
         reply->set_term(m_currentTerm);
         return;
-    } else {  // 不匹配
+    } else {  // --------------------- 日志项存在，但是任期不匹配 ---------------------
         // 优化，减少rpc
         reply->set_updatenextindex(args->prevlogindex());
-        for (int index = args->prevlogindex(); index >= m_lastSnapshotIncludeIndex; --index) {
-            if (getLogTermFromLogIndex(index) != getLogTermFromLogIndex(args->prevlogindex())) {
-                reply->set_updatenextindex(index + 1);
-                break;
-            }
+        int idx = args->prevlogindex();
+        while (idx >= m_commitIndex && getLogTermFromLogIndex(idx) == getLogTermFromLogIndex(args->prevlogindex())) {
+            --idx;
         }
+        reply->set_updatenextindex(idx + 1);
         reply->set_success(false);
         reply->set_term(m_currentTerm);
         return;
@@ -130,12 +128,13 @@ bool Raft::sendAppendEntries(int server, std::shared_ptr<raftRpcProctoc::AppendE
 
     std::lock_guard<std::mutex> lock(m_mtx);
     // 对reply进行处理
-    if (reply->term() > m_currentTerm) {  // 自己已经过时了
+    if (reply->term() > m_currentTerm) {  // 自己已经过时了 或者集群要进入下一个term周期，这里可以思考一下节点网络分区的情况
         m_status = Follower;
         m_currentTerm = reply->term();
         m_votedFor = -1;
         return ok;
-    } else if (reply->term() < m_currentTerm) {  // 对端任期比较老，接到心跳包之后会同步日志，直到追上当前leader
+    } else if (reply->term() < m_currentTerm) {  // 对端任期比较老，接到心跳包之后会--> 
+                                                 // 先同步term，再同步日志，其实这种情况在本项目中不好模拟，但是要考虑到
         DPrintf("[func -sendAppendEntries rf{%d}] node:{%d} term{%d}<rf{%d}term{%d}\n", m_me, server, reply->term(),
                 m_me, m_currentTerm);
         return ok;
@@ -145,17 +144,14 @@ bool Raft::sendAppendEntries(int server, std::shared_ptr<raftRpcProctoc::AppendE
         return ok;
     }
 
-    // term相等
+    // ----------------------- term相等 ----------------------- //
     myAssert(reply->term() == m_currentTerm,
              format("reply.Term{%d} != rf.currentTerm{%d}   ", reply->term(), m_currentTerm));
     if (!reply->success()) {  // 同一个任期，日志不匹配，说明对方的日志有错的，向前匹配
-                              // 正常来说就是index要往前-1
         if (reply->updatenextindex() != -100) {  //-100只是一个特殊标记而已，没有太具体的含义
             DPrintf("[func -sendAppendEntries rf{%d}] 返回的日志term相等，但是不匹配，回缩nextIndex[%d]:{%d}\n", m_me,
                     server, reply->updatenextindex());
-            // 优化日志匹配，让follower决定到底应该下一次从哪一个开始尝试发送
-            m_nextIndex[server] =
-                reply->updatenextindex();  // 失败不更新mathIndex ！！！！，但是要更新下次开始发送的索引！！！！
+            m_nextIndex[server] = reply->updatenextindex();  // 失败不更新mathIndex，但是要更新下次开始发送的索引
         }
     } else {
         /// 到这里代表 在同一个任期内 且 同意接收了本次心跳或者日志
@@ -167,7 +163,7 @@ bool Raft::sendAppendEntries(int server, std::shared_ptr<raftRpcProctoc::AppendE
         myAssert(m_nextIndex[server] <= lastLogIndex + 1,
                  format("error msg:rf.nextIndex[%d] > lastLogIndex+1, len(rf.logs) = %d lastLogIndex{%d} = %d", server,
                         m_logs.size(), server, lastLogIndex));
-        if (*appendNums >= 1 + m_peers.size() / 2) {  // 可以commit了
+        if (*appendNums >= 1 + m_peers.size() / 2) {  // 已经复制到大多数节点上了，可以commit了
             *appendNums = 0;
             if (args->entries_size() > 0) {
                 DPrintf("args->entries(args->entries_size()-1).logterm(){%d} m_currentTerm{%d}",
