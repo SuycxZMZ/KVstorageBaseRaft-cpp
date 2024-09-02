@@ -44,7 +44,13 @@ sudo bash configureproto.sh
 # KVRaft本项目编译运行
 mkdir cmake-build-debug
 cd cmake-build-debug
-cmake ..
+cmake -DCMAKE_BUILD_TYPE=Debug ..
+make -j4
+
+## 不想要调试信息的话
+mkdir cmake-build-release
+cd cmake-build-release
+cmake -DCMAKE_BUILD_TYPE=Release ..
 make -j4
 ```
 
