@@ -3,6 +3,9 @@ cmake_minimum_required(VERSION 3.10)
 
 project(KVRaftCpp)
 
+# 开启生成 cpmpile_commands.json 
+set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
+
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "Debug")
 endif()

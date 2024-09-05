@@ -2,11 +2,7 @@
 #define KVRPCPROVIDER_H
 
 #include <google/protobuf/descriptor.h>
-#include <functional>
 #include <string>
-#include <unordered_map>
-#include <memory>
-#include "google/protobuf/service.h"
 #include "sylar/rpc/rpcprovider.h"
 
 // 框架提供的专门发布rpc服务的网络对象类

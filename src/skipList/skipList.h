@@ -17,7 +17,14 @@
 #include <cstring>
 #include <fstream>
 #include <iostream>
+#include <iostream>
+#include <sstream>
 #include <mutex>
+#include <string>
+#include <vector>
+
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/archive/text_oarchive.hpp>
 
 #define STORE_FILE "store/dumpFile"
 

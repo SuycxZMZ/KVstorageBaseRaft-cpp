@@ -1,13 +1,13 @@
 #include "raftCore/raft.h"
 #include "raftCore/kvServer.h"
 
+#include <cstring>
 #include <iostream>
 #include <unistd.h>
 #include <fstream>
 #include <random>
 #include <signal.h>
 #include <sys/wait.h>
-#include <thread>
 
 // SIGCHLD signal handler
 void handle_sigchld(int sig) {

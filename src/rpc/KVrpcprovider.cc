@@ -5,10 +5,6 @@
 #include <cstring>
 #include <fstream>
 #include <string>
-#include <memory>
-
-#include "sylar/rpc/rpcheader.pb.h"
-// #include "common/util.h"
 #include "sylar/macro.h"
 
 KVRpcProvider::KVRpcProvider(sylar::IOManager::ptr _iom) : sylar::rpc::RpcProvider(_iom) {

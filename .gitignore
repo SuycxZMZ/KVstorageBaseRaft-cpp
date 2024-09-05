@@ -1,6 +1,7 @@
 
 !bin/test.conf
 .idea
+.cache/*
 bin
 cmake-build-debug
 lib
