@@ -1,7 +1,5 @@
-#include <iostream>
 #include <cstdio>
 #include "raftClerk/clerk.h"
-#include "common/util.h"
 
 const int test_count = 500;
 

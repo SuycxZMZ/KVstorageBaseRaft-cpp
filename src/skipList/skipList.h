@@ -372,7 +372,6 @@ void SkipList<K, V>::delete_element(K key) {
         _element_count--;
     }
     _mtx.unlock();
-    return;
 }
 
 /**

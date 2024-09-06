@@ -11,7 +11,7 @@ void KvServer::DprintfKVDB() {
     m_skipList.display_list();
 }
 
-void KvServer::ExecuteGetOpOnKVDB(Op op, std::string *value, bool *exist) {
+void KvServer::ExecuteGetOpOnKVDB(const Op& op, std::string *value, bool *exist) {
     {
         std::lock_guard<std::mutex> lock(m_mtx);
         *value = "";
@@ -153,7 +153,7 @@ void KvServer::GetCommandFromRaft(ApplyMsg message) {
     SendMessageToWaitChan(op, message.CommandIndex);
 }
 
-bool KvServer::ifRequestDuplicate(std::string ClientId, int RequestId) {
+bool KvServer::ifRequestDuplicate(const std::string& ClientId, int RequestId) {
     std::lock_guard<std::mutex> lock(m_mtx);
     if (m_lastRequestClientAndId.find(ClientId) == m_lastRequestClientAndId.end()) {
         return false;
@@ -256,7 +256,7 @@ void KvServer::ReadRaftApplyCommandLoop() {
     }
 }
 
-void KvServer::ReadSnapShotToInstall(std::string snapshot) {
+void KvServer::ReadSnapShotToInstall(const std::string& snapshot) {
     if (snapshot.empty()) {
         return;
     }
@@ -283,14 +283,14 @@ bool KvServer::SendMessageToWaitChan(const Op &op, int newLogIndex) {
 
 void KvServer::IfNeedToSendSnapShotCommand(int newLogIndex, int proportion) {
     // 触发快照才发给raft层
-    if (m_raftNode->GetRaftStateSize() > m_maxRaftState / 10.0) {
+    if (m_raftNode->GetRaftStateSize() > m_maxRaftState / 10) {
         // Send SnapShot Command
         auto snapshot = MakeSnapShot();
         m_raftNode->Snapshot(newLogIndex, snapshot);
     }
 }
 
-void KvServer::GetSnapShotFromRaft(ApplyMsg message) {
+void KvServer::GetSnapShotFromRaft(const ApplyMsg& message) {
     std::lock_guard<std::mutex> lock(m_mtx);
 
     if (m_raftNode->CondInstallSnapshot(message.SnapshotTerm, message.SnapshotIndex, message.Snapshot)) {
@@ -324,7 +324,7 @@ void KvServer::Get(google::protobuf::RpcController *controller, const ::raftKVRp
  * @param nodeInforFileName 节点信息文件名
  * @param port 监听端口
  */
-KvServer::KvServer(int me, int maxraftstate, std::string nodeInforFileName, short port)
+KvServer::KvServer(int me, int maxraftstate, const  std::string& nodeInforFileName, short port)
     : m_me(me),
       m_applyChan(std::make_shared<LockQueue<ApplyMsg> >()),
       m_maxRaftState(maxraftstate),

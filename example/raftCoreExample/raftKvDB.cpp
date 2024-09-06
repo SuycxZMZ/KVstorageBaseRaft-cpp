@@ -1,12 +1,9 @@
-#include "raftCore/raft.h"
 #include "raftCore/kvServer.h"
-
 #include <cstring>
 #include <iostream>
 #include <unistd.h>
 #include <fstream>
 #include <random>
-#include <signal.h>
 #include <sys/wait.h>
 
 // SIGCHLD signal handler
@@ -21,7 +18,7 @@ void ShowArgsHelp() {
 
 int main(int argc, char **argv) {
     // Set up the SIGCHLD handler to reap zombie processes
-    struct sigaction sa;
+    struct sigaction sa = {};
     sa.sa_handler = &handle_sigchld;
     sigemptyset(&sa.sa_mask);
     sa.sa_flags = SA_RESTART | SA_NOCLDSTOP;
@@ -45,7 +42,7 @@ int main(int argc, char **argv) {
     while ((c = getopt(argc, argv, "n:f:")) != -1) {
         switch (c) {
             case 'n':
-                nodeNum = atoi(optarg);
+                nodeNum = std::stoi(optarg);
                 break;
             case 'f':
                 configFileName = optarg;
@@ -69,7 +66,7 @@ int main(int argc, char **argv) {
     // ---------------------- 进程创建，测试 ----------------------
     for (int i = 0; i < nodeNum; i++) {
         short port = startPort + static_cast<short>(i);
-        std::cout << "start to create raftkv node:" << i << "    port:" << port << " pid:" << getpid() << std::endl;
+        std::cout << "start to create raftkv node:" << i << " port:" << port << " pid:" << getpid() << std::endl;
         pid_t pid = fork();  // 创建新进程
         if (pid == 0) {
             // 如果是子进程

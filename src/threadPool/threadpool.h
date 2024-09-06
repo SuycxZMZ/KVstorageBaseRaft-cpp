@@ -43,7 +43,7 @@ class threadpool {
     std::atomic<int> _idlThrNum{0};    // 空闲线程数量
 
    public:
-    inline threadpool(unsigned short size = 4) {
+    inline explicit threadpool(unsigned short size = 4) {
         _initSize = size;
         addThread(size);
         // std::cout << "------------- thread pool create --- size=" << size << "-------------\n";
@@ -98,7 +98,7 @@ class threadpool {
     // 空闲线程数量
     int idlCount() { return _idlThrNum; }
     // 线程数量
-    int thrCount() { return _pool.size(); }
+    int thrCount() { return (int)_pool.size(); }
 
 #ifndef THREADPOOL_AUTO_GROW
    private:
@@ -124,7 +124,7 @@ class threadpool {
                         });
                         if (!_run && _tasks.empty()) return;
                         _idlThrNum--;
-                        task = move(_tasks.front());  // 按先进先出从队列取一个 task
+                        task = _tasks.front();  // 按先进先出从队列取一个 task
                         _tasks.pop();
                     }
                     task();  // 执行任务

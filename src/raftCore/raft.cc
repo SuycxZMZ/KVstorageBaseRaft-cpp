@@ -6,7 +6,19 @@
 #include "common/config.h"
 #include "common/util.h"
 
-Raft::Raft(sylar::IOManager::ptr _iom) : m_iom(_iom), m_pool(calculate_pool_size()) {}
+Raft::Raft(sylar::IOManager::ptr _iom)
+    : m_iom(std::move(_iom)),
+      m_pool(calculate_pool_size()),
+      m_lastSnapshotIncludeIndex(),
+      m_me(),
+      m_commitIndex(),
+      m_lastApplied(),
+      m_lastSnapshotIncludeTerm(),
+      m_currentTerm(),
+      m_votedFor(),
+      m_status()
+{
+}
 Raft::~Raft() { std::cout << "----------[Raft::~Raft()]---------- \n"; }
 
 /**
@@ -53,7 +65,7 @@ void Raft::AppendEntries(const raftRpcProctoc::AppendEntriesArgs* args, raftRpcP
     // -------- args->prevlogindex() <= getLastLogIndex() 就是已经有了这个idx的日志项 --------
     if (matchLog(args->prevlogindex(), args->prevlogterm())) {  // 任期匹配就可以直接进行复制
         for (int i = 0; i < args->entries_size(); i++) {
-            auto log = args->entries(i);
+            const ::raftRpcProctoc::LogEntry& log = args->entries(i);
             if (log.logindex() > getLastLogIndex()) {  // 超过就直接添加日志
                 m_logs.push_back(log);
             } else {  // 覆盖
@@ -110,9 +122,9 @@ void Raft::AppendEntries(const raftRpcProctoc::AppendEntriesArgs* args, raftRpcP
  * @param appendNums 记录回复的结点数量
  * @param return 返回是否成功
  */
-bool Raft::sendAppendEntries(int server, std::shared_ptr<raftRpcProctoc::AppendEntriesArgs> args,
-                             std::shared_ptr<raftRpcProctoc::AppendEntriesReply> reply,
-                             std::shared_ptr<std::atomic_int32_t> appendNums) {
+bool Raft::sendAppendEntries(int server, const std::shared_ptr<raftRpcProctoc::AppendEntriesArgs>& args,
+                             const std::shared_ptr<raftRpcProctoc::AppendEntriesReply>& reply,
+                             const std::shared_ptr<std::atomic_int32_t>& appendNums) {
     DPrintf("[func-Raft::sendAppendEntries-raft{%d}] leader --> {%d} AE rpc start，args->entries_size():{%d}", m_me,
             server, args->entries_size());
     bool ok =
@@ -212,7 +224,9 @@ void Raft::applierTicker() {
     }
 }
 
-bool Raft::CondInstallSnapshot(int lastIncludedTerm, int lastIncludedIndex, std::string snapshot) { return true; }
+bool Raft::CondInstallSnapshot(int lastIncludedTerm, int lastIncludedIndex, const std::string& snapshot) {
+    return true;
+}
 
 /**
  * @brief 实际发起选举，构造需要发送的rpc,调用sendRequestVote处理rpc及其相应。
@@ -640,9 +654,6 @@ void Raft::RequestVote(const raftRpcProctoc::RequestVoteArgs* args, raftRpcProct
     //  如果这个关系是等于，就要比较看谁的日志比较长，如果对方比较长，就要考虑给他投票，这个if也进不来
     //  其他情况就是对方的日志比较旧，直接进这个if，不给他投票
     if (!UpToDate(args->lastlogindex(), args->lastlogterm())) {
-        if (args->lastlogterm() < lastLogTerm) {
-        } else {
-        }
         reply->set_term(m_currentTerm);
         reply->set_votestate(Voted);
         reply->set_votegranted(false);
@@ -726,7 +737,7 @@ int Raft::getLogTermFromLogIndex(int logIndex) {
     }
 }
 
-int Raft::GetRaftStateSize() { return m_persister->RaftStateSize(); }
+long long Raft::GetRaftStateSize() { return m_persister->RaftStateSize(); }
 
 // 找到index对应的真实下标位置！！！
 // 限制，输入的logIndex必须保存在当前的logs里面（不包含snapshot）
@@ -750,8 +761,8 @@ int Raft::getSlicesIndexFromLogIndex(int logIndex) {
  * @param votedNum 记录投票的结点数量
  * @param return 返回是否成功
  */
-bool Raft::sendRequestVote(int server, std::shared_ptr<raftRpcProctoc::RequestVoteArgs> args,
-                           std::shared_ptr<raftRpcProctoc::RequestVoteReply> reply, std::shared_ptr<int> votedNum) {
+bool Raft::sendRequestVote(int server, const std::shared_ptr<raftRpcProctoc::RequestVoteArgs>& args,
+                          const  std::shared_ptr<raftRpcProctoc::RequestVoteReply>& reply, const std::shared_ptr<int>& votedNum) {
     auto start = now();
     DPrintf("[func-sendRequestVote rf{%d}] --> server{%d} send RequestVote start", m_me, server, getLastLogIndex());
     bool ok = m_peers[server]->RequestVote(args.get(), reply.get());  // 发送请求投票，远程调用raft节点的投票
@@ -863,12 +874,12 @@ bool Raft::Start(Op command, int* newLogIndex, int* newLogTerm) {
  */
 void Raft::init(std::vector<std::shared_ptr<RaftRpcUtil>> peers, int me, std::shared_ptr<Persister> persister,
                 std::shared_ptr<LockQueue<ApplyMsg>> applyCh) {
-    m_peers = peers;          // 需要与其他raft节点通信类
-    m_persister = persister;  // 持久化类
+    m_peers = std::move(peers);          // 需要与其他raft节点通信类
+    m_persister = std::move(persister);  // 持久化类
     m_me = me;                // 标记自己，不能给自己发送rpc
     {
         std::lock_guard<std::mutex> lock(m_mtx);
-        this->m_applyChan = applyCh;  // 与kv-server沟通
+        this->m_applyChan = std::move(applyCh);  // 与kv-server沟通
 
         m_currentTerm = 0;    // 初始化当前任期为0
         m_status = Follower;  // 初始化状态为follower
@@ -918,7 +929,7 @@ std::string Raft::persistData() {
     return ss.str();
 }
 
-void Raft::readPersist(std::string data) {
+void Raft::readPersist(const std::string& data) {
     if (data.empty()) {
         return;
     }
@@ -940,7 +951,7 @@ void Raft::readPersist(std::string data) {
     }
 }
 
-void Raft::Snapshot(int newLogIndex, std::string snapshot) {
+void Raft::Snapshot(int newLogIndex, const std::string& snapshot) {
     std::lock_guard<std::mutex> lock(m_mtx);
 
     // 没必要制作旧快照，也不能制作没提交的快照

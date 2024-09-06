@@ -1,10 +1,11 @@
 #include "clerk.h"
 #include "raftServerRpcUtil.h"
 #include "common/util.h"
+#include "sylar/rpc/rpcconfig.h"
 
 #include <string>
 #include <vector>
-std::string Clerk::Get(std::string key) {
+std::string Clerk::Get(const std::string& key) {
     m_requestId++;
     int requestId = m_requestId;
     int server = m_curLeaderId;
@@ -24,7 +25,7 @@ std::string Clerk::Get(std::string key) {
         if (!ok || 
             reply.err() == ErrWrongLeader) 
         {  // 会一直重试，因为requestId没有改变，因此可能会因为RPC的丢失或者其他情况导致重试，kvserver层来保证不重复执行（线性一致性）
-            server = (server + 1) % m_servers.size();
+            server = (server + 1) % (int)m_servers.size();
             continue;
         }
         if (reply.err() == ErrNoKey) {
@@ -38,7 +39,7 @@ std::string Clerk::Get(std::string key) {
     return "";
 }
 
-void Clerk::PutAppend(std::string key, std::string value, std::string op) {
+void Clerk::PutAppend(const std::string& key, const std::string& value, const std::string& op) {
     m_requestId++;
     int requestId = m_requestId;
     int server = m_curLeaderId;
@@ -57,12 +58,12 @@ void Clerk::PutAppend(std::string key, std::string value, std::string op) {
             DPrintf("[Clerk::PutAppend]原以为的leader：{%d}请求失败，向新leader{%d}重试  ，操作：{%s}", server,
                     server + 1, op.c_str());
             if (!ok) {
-                DPrintf("重试原因 ，rpc失敗 ，");
+                DPrintf("重试原因，rpc失败，");
             }
             if (reply.err() == ErrWrongLeader) {
                 DPrintf("重试原因：非leader");
             }
-            server = (server + 1) % m_servers.size();  // try the next server
+            server = (server + 1) % (int)m_servers.size();  // try the next server
             continue;
         }
         if (reply.err() == OK || ok) {
@@ -72,11 +73,11 @@ void Clerk::PutAppend(std::string key, std::string value, std::string op) {
     }
 }
 
-void Clerk::Put(std::string key, std::string value) { PutAppend(key, value, "Put"); }
-void Clerk::Append(std::string key, std::string value) { PutAppend(key, value, "Append"); }
+void Clerk::Put(const std::string& key, const std::string& value) { PutAppend(key, value, "Put"); }
+void Clerk::Append(const std::string& key, const std::string& value) { PutAppend(key, value, "Append"); }
 
 // 初始化客户端
-void Clerk::Init(std::string configFileName) {
+void Clerk::Init(const std::string& configFileName) {
     // 获取所有raft节点ip、port ，并进行连接
     sylar::rpc::MprpcConfig config; 
     config.LoadConfigFile(configFileName.c_str());

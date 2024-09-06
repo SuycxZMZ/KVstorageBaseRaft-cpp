@@ -2,11 +2,12 @@
 // Created by swx on 24-1-4.
 //
 #include "raftServerRpcUtil.h"
-#include "common/config.h"
+#include "sylar/rpc/rpccontroller.h"
+#include "rpc/KVrpcchannel.h"
 
-raftServerRpcUtil::raftServerRpcUtil(std::string ip, short port) {
-    stub = std::make_shared<raftKVRpcProctoc::kvServerRpc_Stub>
-        (new KVrpcChannel(ip, port, false, CLERK_REQUEST_TIMEOUT / 2, CLERK_REQUEST_TIMEOUT / 2));
+raftServerRpcUtil::raftServerRpcUtil(const std::string& ip, short port) {
+    stub = std::make_shared<raftKVRpcProctoc::kvServerRpc_Stub>(
+        new KVrpcChannel(ip, port, false, CLERK_REQUEST_TIMEOUT / 2, CLERK_REQUEST_TIMEOUT / 2));
 }
 
 raftServerRpcUtil::~raftServerRpcUtil() { 
@@ -23,7 +24,7 @@ bool raftServerRpcUtil::PutAppend(raftKVRpcProctoc::PutAppendArgs *args, raftKVR
     sylar::rpc::MprpcController controller;
     stub->PutAppend(&controller, args, reply, nullptr);
     if (controller.Failed()) {
-        std::cout << controller.ErrorText() << endl;
+        std::cout << controller.ErrorText() << std::endl;
     }
     return !controller.Failed();
 }

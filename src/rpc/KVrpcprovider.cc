@@ -5,10 +5,10 @@
 #include <cstring>
 #include <fstream>
 #include <string>
+#include <utility>
 #include "sylar/macro.h"
 
-KVRpcProvider::KVRpcProvider(sylar::IOManager::ptr _iom) : sylar::rpc::RpcProvider(_iom) {
-}
+KVRpcProvider::KVRpcProvider(sylar::IOManager::ptr _iom) : sylar::rpc::RpcProvider(std::move(_iom)), m_nodeIndex() {}
 
 void KVRpcProvider::KVRpcProviderRunInit(int nodeIndex, short port) {
     // 获取可用ip

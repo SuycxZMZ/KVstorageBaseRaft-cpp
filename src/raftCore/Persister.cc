@@ -4,7 +4,7 @@
 #include "Persister.h"
 #include "common/util.h"
 
-void Persister::Save(const std::string raftstate, const std::string snapshot) {
+void Persister::Save(const std::string& raftstate, const std::string& snapshot) {
     std::lock_guard<std::mutex> lg(m_mtx);
     clearRaftStateAndSnapshot();
     // 将raftstate和snapshot写入本地文件
@@ -36,7 +36,7 @@ void Persister::SaveRaftState(const std::string &data) {
     // 将raftstate和snapshot写入本地文件
     clearRaftState();
     m_raftStateOutStream << data;
-    m_raftStateSize += data.size();
+    m_raftStateSize += (long long)data.size();
 }
 
 long long Persister::RaftStateSize() {

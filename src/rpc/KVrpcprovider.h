@@ -10,7 +10,7 @@
 // todo：为了配合这个，那么rpc客户端那边每次发送之前也需要真正的
 class KVRpcProvider : public sylar::rpc::RpcProvider {
 public:
-    KVRpcProvider(sylar::IOManager::ptr iom);
+    explicit KVRpcProvider(sylar::IOManager::ptr iom);
 
     /// @brief 开启 tcpserver
     virtual void InnerStart() override;

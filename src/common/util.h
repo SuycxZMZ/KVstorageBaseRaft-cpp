@@ -8,14 +8,10 @@
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/serialization/access.hpp>
 #include <condition_variable>  // pthread_condition_t
-// #include <functional>
 #include <iostream>
 #include <mutex>  // pthread_mutex_t
 #include <queue>
-// #include <random>
 #include <sstream>
-// #include <thread>
-// #include "config.h"
 
 
 template <class F>

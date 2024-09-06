@@ -6,20 +6,16 @@
 #include <boost/serialization/vector.hpp>
 #include <chrono>
 #include <cmath>
-#include <iostream>
 #include <memory>
 #include <mutex>
 #include <string>
-#include <thread>
 #include <vector>
 #include "ApplyMsg.h"
 #include "Persister.h"
-#include "boost/any.hpp"
-#include "boost/serialization/serialization.hpp"
 #include "common/config.h"
 #include "common/util.h"
 #include "raftRpcUtil.h"
-#include "sylar/sylar.h"
+#include "sylar/iomanager.h"
 #include "threadPool/threadpool.h"
 
 /// @brief //////////// 网络状态表示  todo：可以在rpc中删除该字段，实际生产中是用不到的.
@@ -83,7 +79,7 @@ class Raft : public raftRpcProctoc::raftRpc {
 
     /// @brief raft节点构造函数
     /// @param iom 指向全局调度器的智能指针
-    Raft(sylar::IOManager::ptr iom);
+    explicit Raft(sylar::IOManager::ptr iom);
 
     ~Raft();
 
@@ -102,7 +98,7 @@ class Raft : public raftRpcProctoc::raftRpc {
     /**
      * @brief 安装快照 TODO，还没实现好，现在直接返回true
      */
-    bool CondInstallSnapshot(int lastIncludedTerm, int lastIncludedIndex, std::string snapshot);
+    static bool CondInstallSnapshot(int lastIncludedTerm, int lastIncludedIndex, const std::string& snapshot);
 
     /**
      * @brief 实际发起选举，构造需要发送的rpc，并多线程调用sendRequestVote处理rpc及其相应。
@@ -194,7 +190,7 @@ class Raft : public raftRpcProctoc::raftRpc {
      * @return int 节点的 logIndex 对应的任期
      */
     int getLogTermFromLogIndex(int logIndex);
-    int GetRaftStateSize();
+    long long GetRaftStateSize();
 
     /**
      * @brief 设计快照之后logIndex不能与再日志中的数组下标相等了，根据logIndex找到其在日志数组中的位置
@@ -209,8 +205,8 @@ class Raft : public raftRpcProctoc::raftRpc {
      * @param votedNum 记录投票的结点数量
      * @param return 返回是否成功
      */
-    bool sendRequestVote(int server, std::shared_ptr<raftRpcProctoc::RequestVoteArgs> args,
-                         std::shared_ptr<raftRpcProctoc::RequestVoteReply> reply, std::shared_ptr<int> votedNum);
+    bool sendRequestVote(int server, const std::shared_ptr<raftRpcProctoc::RequestVoteArgs>& args,
+                        const std::shared_ptr<raftRpcProctoc::RequestVoteReply>& reply, const std::shared_ptr<int>& votedNum);
 
     /**
      * @brief Leader真正发送心跳的函数，执行RPC
@@ -220,15 +216,15 @@ class Raft : public raftRpcProctoc::raftRpc {
      * @param appendNums 记录回复的结点数量
      * @param return 返回是否成功
      */
-    bool sendAppendEntries(int server, std::shared_ptr<raftRpcProctoc::AppendEntriesArgs> args,
-                           std::shared_ptr<raftRpcProctoc::AppendEntriesReply> reply,
-                           std::shared_ptr<std::atomic_int32_t> appendNums);
+    bool sendAppendEntries(int server, const std::shared_ptr<raftRpcProctoc::AppendEntriesArgs>& args,
+                           const std::shared_ptr<raftRpcProctoc::AppendEntriesReply>& reply,
+                           const std::shared_ptr<std::atomic_int32_t>& appendNums);
 
     /**
      * @brief 给上层的kvserver层发送消息
      */
     void pushMsgToKvServer(ApplyMsg msg);
-    void readPersist(std::string data);
+    void readPersist(const std::string& data);
 
     /**
      * @brief 将当前raft节点的状态序列化为字符串
@@ -254,13 +250,13 @@ class Raft : public raftRpcProctoc::raftRpc {
      * @param newLogIndex kvServer层传过来的新的日志索引
      * @param snapshot kvServer层传过来的KVDB数据快照
      */
-    void Snapshot(int newLogIndex, std::string snapshot);
+    void Snapshot(int newLogIndex, const std::string& snapshot);
 
    public:
     /**
      * @brief 重写基类方法, 远程 follower 节点远程被调用。动态多态，框架会自己调用
      */
-    virtual void AppendEntries(google::protobuf::RpcController *controller,
+    void AppendEntries(google::protobuf::RpcController *controller,
                                const ::raftRpcProctoc::AppendEntriesArgs *request,
                                ::raftRpcProctoc::AppendEntriesReply *response,
                                ::google::protobuf::Closure *done) override;
@@ -269,7 +265,7 @@ class Raft : public raftRpcProctoc::raftRpc {
      * @brief 重写基类方法,因为rpc远程调用真正调用的是这个方法
      *        序列化，反序列化等操作rpc框架都已经做完了，因此这里只需要获取值然后真正调用本地方法即可。
      */
-    virtual void InstallSnapshot(google::protobuf::RpcController *controller,
+    void InstallSnapshot(google::protobuf::RpcController *controller,
                                  const ::raftRpcProctoc::InstallSnapshotRequest *request,
                                  ::raftRpcProctoc::InstallSnapshotResponse *response,
                                  ::google::protobuf::Closure *done) override;
@@ -278,7 +274,7 @@ class Raft : public raftRpcProctoc::raftRpc {
      * @brief 重写基类方法,因为rpc远程调用真正调用的是这个方法
      *        序列化，反序列化等操作rpc框架都已经做完了，因此这里只需要获取值然后真正调用本地方法即可。
      */
-    virtual void RequestVote(google::protobuf::RpcController *controller,
+    void RequestVote(google::protobuf::RpcController *controller,
                              const ::raftRpcProctoc::RequestVoteArgs *request,
                              ::raftRpcProctoc::RequestVoteReply *response, ::google::protobuf::Closure *done) override;
 

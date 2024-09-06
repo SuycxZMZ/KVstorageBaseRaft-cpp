@@ -5,8 +5,9 @@
 #include <unistd.h>
 #include <cerrno>
 #include <string>
-#include <memory>
 #include "common/util.h"
+#include "sylar/rpc/rpcchannel.h"
+#include "sylar/rpc/rpcheader.pb.h"
 
 // 所有通过stub代理对象调用的rpc方法，都会走到这里了，
 // 统一通过rpcChannel来调用方法
@@ -31,7 +32,7 @@ void KVrpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
     // 获取服务名和方法名
     const google::protobuf::ServiceDescriptor* service_desc = method->service();
     std::string service_name = service_desc->name();
-    std::string method_name = method->name();
+    const std::string &method_name = method->name();
 
     // 序列化 request 请求参数
     uint32_t args_size = 0;
@@ -116,7 +117,7 @@ void KVrpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
 
     // 接收rpc请求的响应值
     char recv_buf[1024] = {0};
-    int recv_size = 0;
+    ssize_t recv_size = 0;
 
     // TODO 这里要处理信号，如果对端被kill9杀掉 错误码是 ECONNRESET
     // 如果对端close或者shutdown,那么返回0
@@ -133,7 +134,7 @@ void KVrpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
     }
     // 反序列化rpc调用的响应数据
     // bug：出现问题，recv_buf中遇到\0后面的数据就存不下来了，导致反序列化失败 if
-    if (!response->ParseFromArray((const void*)recv_buf, recv_size)) {
+    if (!response->ParseFromArray((const void*)recv_buf, static_cast<int> (recv_size))) {
         char errtxt[1050] = {0};
         sprintf(errtxt, "parse error! response_str:%s", recv_buf);
         controller->SetFailed(errtxt);
@@ -151,7 +152,7 @@ bool KVrpcChannel::newConnect(const char* ip, uint16_t port, string* errMsg) {
         return false;
     }
 
-    struct timeval timeout;
+    struct timeval timeout = {};
     timeout.tv_sec = 0;
     timeout.tv_usec = m_sendTimeout * 1000;
 
@@ -169,7 +170,7 @@ bool KVrpcChannel::newConnect(const char* ip, uint16_t port, string* errMsg) {
         return false;
     }
 
-    struct sockaddr_in server_addr;
+    struct sockaddr_in server_addr = {};
     server_addr.sin_family = AF_INET;
     server_addr.sin_port = htons(port);
     server_addr.sin_addr.s_addr = inet_addr(ip);
@@ -187,7 +188,7 @@ bool KVrpcChannel::newConnect(const char* ip, uint16_t port, string* errMsg) {
     return true;
 }
 
-KVrpcChannel::KVrpcChannel(string ip, short port, bool connectNow, int sendTimeout, int recvTimeout)
+KVrpcChannel::KVrpcChannel(const std::string& ip, short port, bool connectNow, int sendTimeout, int recvTimeout)
         : m_ip(ip), 
         m_port(port), 
         m_clientFd(-1),

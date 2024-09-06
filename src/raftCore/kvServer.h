@@ -11,7 +11,6 @@
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/unordered_map.hpp>
 #include <boost/serialization/vector.hpp>
-#include <iostream>
 #include <mutex>
 #include <unordered_map>
 #include "raft.h"
@@ -60,13 +59,13 @@ class KvServer : raftKVRpcProctoc::kvServerRpc {
      * @param nodeInforFileName 节点信息文件名
      * @param port 监听端口
      */
-    KvServer(int me, int maxraftstate, std::string nodeInforFileName, short port);
+    KvServer(int me, int maxraftstate, const std::string& nodeInforFileName, short port);
 
     void StartKVServer();
 
     void DprintfKVDB();
 
-    void ExecuteGetOpOnKVDB(Op op, std::string *value, bool *exist);  // get操作，查跳表，返回结果
+    void ExecuteGetOpOnKVDB(const Op& op, std::string *value, bool *exist);  // get操作，查跳表，返回结果
     void ExecuteAppendOpOnKVDB(Op op);  // 操作KVDB，本项目中就是插入跳表，与put操作一样
     void ExecutePutOpOnKVDB(Op op);     // 操作KVDB，本项目中就是插入跳表，与append操作一样
 
@@ -83,7 +82,7 @@ class KvServer : raftKVRpcProctoc::kvServerRpc {
 
     // 检查请求是否被持久化，如果客户id不存在，或者对应的请求id太大，就返flase
     // 客户id存在且请求id小于等于当前最大值，返回true
-    bool ifRequestDuplicate(std::string ClientId, int RequestId);
+    bool ifRequestDuplicate(const std::string& ClientId, int RequestId);
 
     /**
      * @brief rpc 实际调用内部实现
@@ -100,7 +99,7 @@ class KvServer : raftKVRpcProctoc::kvServerRpc {
      *
      * @param snapshot 传入的快照
      */
-    void ReadSnapShotToInstall(std::string snapshot);
+    void ReadSnapShotToInstall(const std::string& snapshot);
 
     /**
      * @brief 将命令发送到kvserver层的 m_waitApplyChan
@@ -118,7 +117,7 @@ class KvServer : raftKVRpcProctoc::kvServerRpc {
     void IfNeedToSendSnapShotCommand(int newLogIndex, int proportion);
 
     // Handler the SnapShot from kv.rf.applyCh
-    void GetSnapShotFromRaft(ApplyMsg message);
+    void GetSnapShotFromRaft(const ApplyMsg& message);
 
     /**
      * @brief 序列化KVDB内容为字符串

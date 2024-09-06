@@ -25,7 +25,7 @@ public:
     /// @brief RaftRpcUtil 构造函数
     /// @param ip 对端ip
     /// @param port 对端端口号
-    RaftRpcUtil(std::string ip, short port);
+    RaftRpcUtil(const std::string& ip, short port);
     ~RaftRpcUtil();
 
     RaftRpcUtil(const RaftRpcUtil& other) = delete; // 禁止浅拷贝
