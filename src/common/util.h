@@ -8,16 +8,15 @@
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/serialization/access.hpp>
 #include <condition_variable>  // pthread_condition_t
-#include <functional>
+// #include <functional>
 #include <iostream>
 #include <mutex>  // pthread_mutex_t
 #include <queue>
-#include <random>
+// #include <random>
 #include <sstream>
-#include <thread>
-#include "config.h"
+// #include <thread>
+// #include "config.h"
 
-#define Dprintf_Debug 0
 
 template <class F>
 class DeferClass {
@@ -33,11 +32,11 @@ class DeferClass {
     F m_func;
 };
 
-#define _CONCAT(a, b) a##b
-#define _MAKE_DEFER_(line) DeferClass _CONCAT(defer_placeholder, line) = [&]()
+#define CONCAT(a, b) a##b
+#define MAKE_DEFER(line) DeferClass CONCAT(defer_placeholder, line) = [&]()
 
 #undef DEFER
-#define DEFER _MAKE_DEFER_(__LINE__)
+#define DEFER MAKE_DEFER(__LINE__)
 
 void DPrintf(const char* format, ...);
 
@@ -158,7 +157,7 @@ public:
         return ss.str();
     }
 
-    bool parseFromString(std::string str) {
+    bool parseFromString(std::string& str) {
         std::stringstream iss(str);
         boost::archive::text_iarchive ia(iss);
         // read class state from archive

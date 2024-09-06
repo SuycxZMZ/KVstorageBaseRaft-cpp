@@ -16,7 +16,8 @@
 #include <mutex>
 
 #include "common/util.h"
-#include "sylar/rpc/rpcchannel.h"
+#    include "sylar/rpc/rpcchannel.h"
+#include "common/config.h"
 
 using namespace std;
 

@@ -3,7 +3,8 @@
 #include <cstdarg>
 #include <cstdio>
 #include <ctime>
-#include <iomanip>
+#include <random>
+#include "config.h"
 
 void myAssert(bool condition, std::string message) {
     if (!condition) {
@@ -39,7 +40,7 @@ bool getReleasePort(short &port) {
 
 bool isReleasePort(unsigned short usPort) {
     int s = socket(AF_INET, SOCK_STREAM, IPPROTO_IP);
-    sockaddr_in addr;
+    sockaddr_in addr = {};
     addr.sin_family = AF_INET;
     addr.sin_port = htons(usPort);
     addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
@@ -53,16 +54,16 @@ bool isReleasePort(unsigned short usPort) {
 }
 
 void DPrintf(const char *format, ...) {
-    if (Dprintf_Debug) {
-        // 获取当前的日期，然后取日志信息，写入相应的日志文件当中 a+
-        time_t now = time(nullptr);
-        tm *nowtm = localtime(&now);
-        va_list args;
-        va_start(args, format);
-        std::printf("[%d-%d-%d-%d-%d-%d] ", nowtm->tm_year + 1900, nowtm->tm_mon + 1, nowtm->tm_mday, nowtm->tm_hour,
-                    nowtm->tm_min, nowtm->tm_sec);
-        std::vprintf(format, args);
-        std::printf("\n");
-        va_end(args);
-    }
+#ifdef Dprintf_Debug
+    // 获取当前的日期，然后取日志信息，写入相应的日志文件当中 a+
+    time_t now = time(nullptr);
+    tm *nowtm = localtime(&now);
+    va_list args;
+    va_start(args, format);
+    std::printf("[%d-%d-%d-%d-%d-%d] ", nowtm->tm_year + 1900, nowtm->tm_mon + 1, nowtm->tm_mday, nowtm->tm_hour,
+                nowtm->tm_min, nowtm->tm_sec);
+    std::vprintf(format, args);
+    std::printf("\n");
+    va_end(args);
+#endif
 }
