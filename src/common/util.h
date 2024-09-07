@@ -13,7 +13,6 @@
 #include <queue>
 #include <sstream>
 
-
 template <class F>
 class DeferClass {
    public:
@@ -36,7 +35,7 @@ class DeferClass {
 
 void DPrintf(const char* format, ...);
 
-void myAssert(bool condition, std::string message = "Assertion failed!");
+void myAssert(bool condition, const std::string& message);
 
 template <typename... Args>
 std::string format(const char* format_str, Args... args) {

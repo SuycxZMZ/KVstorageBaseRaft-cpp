@@ -6,7 +6,7 @@
 #include <random>
 #include "config.h"
 
-void myAssert(bool condition, std::string message) {
+void myAssert(bool condition, const std::string& message) {
     if (!condition) {
         std::cerr << "Error: " << message << std::endl;
         std::exit(EXIT_FAILURE);

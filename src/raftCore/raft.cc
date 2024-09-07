@@ -39,7 +39,7 @@ void Raft::AppendEntries(const raftRpcProctoc::AppendEntriesArgs* args, raftRpcP
                 args->leaderid(), args->term(), m_me, m_currentTerm);
         return;  // 注意从过期的领导人收到消息不要重设定时器
     }
-    DEFER { persist(); };
+    DEFER{ persist(); };
 
     if (args->term() > m_currentTerm) {  // 当前落后 可以往下走 ---------------------------------------
         m_status = Follower;
