@@ -7,36 +7,27 @@
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/serialization/access.hpp>
+#include <chrono>
+#include <cstdarg>
 #include <iostream>
 #include <sstream>
-#include <chrono>
-
-// ---------------------- DEFER ---------------------- //
-/// TODO：可以有更优雅的实现，这个目前只是可以用
-template <class F>
-class DeferClass {
-   public:
-    DeferClass(F&& f) : m_func(std::forward<F>(f)) {}
-    DeferClass(const F& f) : m_func(f) {}
-    ~DeferClass() { m_func(); }
-
-    DeferClass(const DeferClass& e) = delete;
-    DeferClass& operator=(const DeferClass& e) = delete;
-
-   private:
-    F m_func;
-};
-
-#define CONCAT(a, b) a##b
-#define MAKE_DEFER(line) DeferClass CONCAT(defer_placeholder, line) = [&]()
-
-#undef DEFER
-#define DEFER MAKE_DEFER(__LINE__)
-
-// ---------------------- DEFER ---------------------- //
 
 // ---------------------- DEBUG ---------------------- //
+
+/**
+ * @brief raft调试日志输出
+ * 
+ * @param format 格式化字符串
+ * @param ... 
+ */
 void DPrintf(const char* format, ...);
+
+/**
+ * @brief raft调试断言
+ * 
+ * @param condition 断言条件，不满足就断，满足不断
+ * @param message 断言打印
+ */
 void myAssert(bool condition, const std::string& message);
 
 template <typename... Args>
@@ -49,7 +40,7 @@ std::string format(const char* format_str, Args... args) {
 
 std::chrono::_V2::system_clock::time_point now();
 std::chrono::milliseconds getRandomizedElectionTimeout();
-void sleepNMilliseconds(int N);
+
 // ---------------------- DEBUG ---------------------- //
 
 /**
@@ -117,9 +108,5 @@ private:
 const std::string OK = "OK";
 const std::string ErrNoKey = "ErrNoKey";
 const std::string ErrWrongLeader = "ErrWrongLeader";
-
-//获取可用端口
-bool isReleasePort(unsigned short usPort);
-bool getReleasePort(short& port);
 
 #endif  //  UTIL_H

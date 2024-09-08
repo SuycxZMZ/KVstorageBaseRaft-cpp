@@ -3,6 +3,7 @@
 //
 #include "Persister.h"
 #include "common/util.h"
+#include "thirdParty/scopeGuard/scope_guard.hpp"
 
 void Persister::Save(const std::string& raftstate, const std::string& snapshot) {
     std::lock_guard<std::mutex> lg(m_mtx);

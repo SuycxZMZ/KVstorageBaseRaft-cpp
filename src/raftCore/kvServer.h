@@ -18,8 +18,8 @@
 #include "raftCore/ApplyMsg.h"
 #include "raftRpcPro/kvServerRPC.pb.h"
 #include "rpc/KVrpcprovider.h"
-#    include "skipList/skipList.h"
-#include "msd/channel.hpp"
+#include "thirdParty/msd/channel.hpp"
+#include "thirdParty/skipList/skipList.h"
 
 /**
  * @brief kvServer负责与外部客户端和其他raft节点通信
@@ -43,7 +43,7 @@ class KvServer : raftKVRpcProctoc::kvServerRpc {
     // Your definitions here.
     std::string m_serializedKVData;  // TODO ： 序列化后的kv数据，理论上可以不用，但是目前没有找到特别好的替代方法
     SkipList<std::string, std::string> m_skipList;        // skipList，用于存储kv数据
-    std::unordered_map<std::string, std::string> m_kvDB;  // kvDB，用unordered_map来替代
+    std::unordered_map<std::string, std::string> m_kvDB;  // 没用上
 
     std::unordered_map<int, std::shared_ptr<waitCh>>
         m_waitApplyCh;  // 字段含义 waitApplyCh是一个map，键 是int，值 是Op类型的阻塞队列

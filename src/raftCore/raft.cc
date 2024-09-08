@@ -2,9 +2,11 @@
 #include <atomic>
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/archive/text_oarchive.hpp>
+#include <chrono>
 #include <memory>
 #include "common/config.h"
 #include "common/util.h"
+#include "thirdParty/scopeGuard/scope_guard.hpp"
 
 Raft::Raft(sylar::IOManager::ptr _iom)
     : m_iom(std::move(_iom)),
@@ -221,7 +223,7 @@ void Raft::applierTicker() {
             *m_applyChan << message;
         }
         // 检查间隔 ApplyInterval 毫秒
-        sleepNMilliseconds(ApplyInterval);
+        std::this_thread::sleep_for(std::chrono::milliseconds(ApplyInterval));
     }
 }
 

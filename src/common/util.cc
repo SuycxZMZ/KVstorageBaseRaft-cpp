@@ -4,7 +4,6 @@
 #include <cstdio>
 #include <ctime>
 #include <random>
-#include <thread>
 #include "config.h"
 
 std::chrono::_V2::system_clock::time_point now() { return std::chrono::high_resolution_clock::now(); }
@@ -15,36 +14,6 @@ std::chrono::milliseconds getRandomizedElectionTimeout() {
     std::uniform_int_distribution<int> dist(minRandomizedElectionTime, maxRandomizedElectionTime);
 
     return std::chrono::milliseconds(dist(rng));
-}
-
-void sleepNMilliseconds(int N) { std::this_thread::sleep_for(std::chrono::milliseconds(N)); };
-
-bool getReleasePort(short &port) {
-    short num = 0;
-    while (!isReleasePort(port) && num < 30) {
-        ++port;
-        ++num;
-    }
-    if (num >= 30) {
-        port = -1;
-        return false;
-    }
-    return true;
-}
-
-bool isReleasePort(unsigned short usPort) {
-    int s = socket(AF_INET, SOCK_STREAM, IPPROTO_IP);
-    sockaddr_in addr = {};
-    addr.sin_family = AF_INET;
-    addr.sin_port = htons(usPort);
-    addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
-    int ret = ::bind(s, (sockaddr *)&addr, sizeof(addr));
-    if (ret != 0) {
-        close(s);
-        return false;
-    }
-    close(s);
-    return true;
 }
 
 void DPrintf(const char *format, ...) {

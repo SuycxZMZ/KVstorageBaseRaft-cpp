@@ -11,13 +11,14 @@
 - raft核心代码注释补全，[主干详细代码执行流说明](docs/项目解析.md)
 - 使用集成rpc服务的sylar网络框架重构
 - [main分支](https://github.com/SuycxZMZ/KVstorageBaseRaft-cpp/tree/main)重写muduo网络库，主要组件均已实现，支持更简单好用的异步日志系统。[日志系统可以单独剥离](https://github.com/SuycxZMZ/symlog)。
-- [rpc详细解析](https://github.com/SuycxZMZ/MpRPC-Cpp)
+- [rpc详细解析](https://github.com/SuycxZMZ/MpRPC-Cpp)，这个我画的是muduo作为底层的结构，其实sylar也差不多，最主要的是重写handleClient，在muduo中是onMessage
 - AE和投票信息的的发送使用线程池处理，避免频繁创建销毁大量线程。
 - 移除fiber文件夹，直接使用sylar协程调度器调度(使用时要仔细考虑好调度器的线程数，既要处理网络收发，又要处理两个定时任务)
 - 对raft层的rpc调用方进行加锁保护，使每次调用的发送和接收为一个原子过程，避免出现答非所问和多线程写同一个socket
 - 对raft层的每个rpc调用设置超时时间，避免长时间阻塞造成后续调用不能及时执行，确保每个调用的时效性
 - 优化代码组织结构，移除多余的include文件夹，更清爽的cmake代码结构，减少重复编译和路径污染
-- 引入开源库cpp-channel代替原本的手搓阻塞队列，golang风格，更优雅(只在原版代码中添加了超时弹出的接口)
+- 引入开源库[cpp-channel](https://github.com/andreiavrammsd/cpp-channel)代替原本的手搓阻塞队列，golang风格，更优雅(只在原版代码中添加了超时弹出的接口)
+- 引入开源库[Defer-C++](https://github.com/Neargye/scope_guard)代替原本手搓的DEFER，该库主要使用RAII手法封了一套宏，使用简单，写的也比较规范
 
 ## 使用
 
@@ -141,3 +142,4 @@ https://zhuanlan.zhihu.com/p/636581210
 https://github.com/Shangyizhou/A-Tiny-Network-Library
 https://www.cnblogs.com/tuilk/p/16793625.html
 https://github.com/andreiavrammsd/cpp-channel
+https://github.com/Neargye/scope_guard
