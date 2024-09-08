@@ -24,14 +24,13 @@
 1.库准备
 
 - 安装带rpc服务的sylar网络库，[sylar-from-suycx](https://github.com/SuycxZMZ/sylar-from-suycx)
-- `boost`
-- `protoc`
+- `boost`、`protoc`
 - 注意：我在[sylar-from-suycx](https://github.com/SuycxZMZ/sylar-from-suycx)项目的tools-packages文件夹下放了zookeeper3.4.1的安装包，如果是arm架构的cpu要装这个，官方原版的包有个函数里面直接用了x86的汇编，没加条件编译，会直接报错
 
 2.安装说明
 
 - protoc，本地版本为3.12.4，ubuntu22使用`sudo apt-get install protobuf-compiler libprotobuf-dev`默认安装的版本在这个附近，大概率能用，项目的tools-package中也放了3.12.4的源码，编译安装就行，如果报错直接百度，很好解决。ubuntu24.04默认安装的是3.21.1，编译会报错，目前没有解决。
-- boost，`sudo apt-get install libboost-dev libboost-test-dev libboost-all-dev`，raft核心代码中使用boost进行日志序列化生成快照。
+- boost，`sudo apt-get install libboost-dev libboost-test-dev libboost-all-dev`
 
 3.编译
 
@@ -42,13 +41,13 @@ https://github.com/SuycxZMZ/sylar-from-suycx
 # 注意，在编译KVRaft项目之前，最好执行一下根目录下的`configureproto.sh`脚本，这个脚本会自动生成proto文件对应的.pb.h和.pb.cc文件，覆盖原本的文件
 sudo bash configureproto.sh
 
-# KVRaft本项目编译运行
+# 带调试打印信息的编译
 mkdir cmake-build-debug
 cd cmake-build-debug
 cmake -DCMAKE_BUILD_TYPE=Debug ..
 make -j4
 
-## 不想要调试信息的话
+# 不想要调试信息的话
 mkdir cmake-build-release
 cd cmake-build-release
 cmake -DCMAKE_BUILD_TYPE=Release ..
@@ -61,7 +60,7 @@ make -j4
 - `raftCoreRun`(provider)
   
 注意先运行provider，再运行consumer
-运行时在bin目录下提供了一个`test.config`配置文件，按照两个可执行文件打印的 help 信息进行加载，启动raft集群和测试客户端代码
+运行时在bin目录下`./raftCoreRun -n 5 -f test.conf`，再开一个终端`./callerMain`，启动raft集群和测试客户端代码
 
 ## 节点故障情况模拟
 
@@ -87,12 +86,6 @@ kill -19 <pid>
 kill -18 <pid>
 
 ```
-
-<!-- ## 注意
-
-- 目前这个项目的测试程序适合在性能 不太差 的机器上跑，如果是租的云服务器，可能几个节点刚起来就挂了，原因留一个彩蛋自己分析一下
-- 目前我在笔记本装的虚拟机上测试，分 4核 4G 暂时还能正常运行，再低的没试。笔记本硬件是 8代i7, 24G
-- 租的云服务器在相同核心和内存的情况下比个人电脑要差很多 -->
 
 ## Docs
 
