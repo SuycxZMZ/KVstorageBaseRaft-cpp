@@ -8,5 +8,4 @@ file(GLOB KVRAFT_SRC_LIST
 
 add_library(skip_list_on_raft SHARED  ${KVRAFT_SRC_LIST})
 target_link_libraries(skip_list_on_raft sylar pthread dl)
-target_compile_definitions(skip_list_on_raft PRIVATE Dprintf_Debug=${DPRINTF_DEBUG})
 

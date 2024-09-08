@@ -17,6 +17,7 @@
 - 对raft层的rpc调用方进行加锁保护，使每次调用的发送和接收为一个原子过程，避免出现答非所问和多线程写同一个socket
 - 对raft层的每个rpc调用设置超时时间，避免长时间阻塞造成后续调用不能及时执行，确保每个调用的时效性
 - 优化代码组织结构，移除多余的include文件夹，更清爽的cmake代码结构，减少重复编译和路径污染
+- 引入开源库cpp-channel代替原本的手搓阻塞队列，golang风格，更优雅(只在原版代码中添加了超时弹出的接口)
 
 ## 使用
 
@@ -146,3 +147,4 @@ https://blog.csdn.net/T_Solotov/article/details/124044175
 https://zhuanlan.zhihu.com/p/636581210
 https://github.com/Shangyizhou/A-Tiny-Network-Library
 https://www.cnblogs.com/tuilk/p/16793625.html
+https://github.com/andreiavrammsd/cpp-channel

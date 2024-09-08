@@ -17,6 +17,7 @@
 #include "raftRpcUtil.h"
 #include "sylar/iomanager.h"
 #include "threadPool/threadpool.h"
+#include "msd/channel.hpp"
 
 /// @brief //////////// 网络状态表示  todo：可以在rpc中删除该字段，实际生产中是用不到的.
 /// 方便网络分区的时候debug，网络异常的时候为disconnected，只要网络正常就为AppNormal，防止matchIndex[]数组异常减小
@@ -40,6 +41,8 @@ constexpr int calculate_pool_size() { return static_cast<int>(MAX_NODE_NUM * 1.5
  * @brief Raft 核心类
  */
 class Raft : public raftRpcProctoc::raftRpc {
+   public:
+    using applyCh = msd::channel<ApplyMsg>;
    private:
     std::mutex m_mtx;                                   // 互斥锁，用于保护raft状态的修改
     std::vector<std::shared_ptr<RaftRpcUtil>> m_peers;  // 保存与其他raft结点通信的rpc入口
@@ -60,7 +63,7 @@ class Raft : public raftRpcProctoc::raftRpc {
     enum Status { Follower, Candidate, Leader };  // raft节点身份枚举
     Status m_status;                              // 节点身份
 
-    std::shared_ptr<LockQueue<ApplyMsg>> m_applyChan;  // applyTicker会写，Installsnapshot也会写
+    std::shared_ptr<applyCh> m_applyChan;  // applyTicker会写，Installsnapshot也会写
 
     std::chrono::_V2::system_clock::time_point m_lastResetElectionTime;  // 选举超时时间
     std::chrono::_V2::system_clock::time_point m_lastResetHearBeatTime;  // 心跳超时，用于leader
@@ -287,7 +290,7 @@ class Raft : public raftRpcProctoc::raftRpc {
      * @param applyCh 与kv-server沟通的channel，Raft层负责装填
      */
     void init(std::vector<std::shared_ptr<RaftRpcUtil>> peers, int me, std::shared_ptr<Persister> persister,
-              std::shared_ptr<LockQueue<ApplyMsg>> applyCh);
+              std::shared_ptr<applyCh> applych);
 
    private:
     /**

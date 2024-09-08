@@ -4,14 +4,8 @@
 #include <cstdio>
 #include <ctime>
 #include <random>
+#include <thread>
 #include "config.h"
-
-void myAssert(bool condition, const std::string& message) {
-    if (!condition) {
-        std::cerr << "Error: " << message << std::endl;
-        std::exit(EXIT_FAILURE);
-    }
-}
 
 std::chrono::_V2::system_clock::time_point now() { return std::chrono::high_resolution_clock::now(); }
 
@@ -60,10 +54,20 @@ void DPrintf(const char *format, ...) {
     tm *nowtm = localtime(&now);
     va_list args;
     va_start(args, format);
+    // 这个效率极其低下，可以改成线程局部变量存储 [年月日 时分秒] 每次只刷新毫秒
     std::printf("[%d-%d-%d-%d-%d-%d] ", nowtm->tm_year + 1900, nowtm->tm_mon + 1, nowtm->tm_mday, nowtm->tm_hour,
                 nowtm->tm_min, nowtm->tm_sec);
     std::vprintf(format, args);
     std::printf("\n");
     va_end(args);
+#endif
+}
+
+void myAssert(bool condition, const std::string &message) {
+#ifdef Dprintf_Debug
+    if (!condition) {
+        std::cerr << "Error: " << message << std::endl;
+        std::exit(EXIT_FAILURE);
+    }
 #endif
 }

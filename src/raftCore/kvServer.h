@@ -11,12 +11,15 @@
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/unordered_map.hpp>
 #include <boost/serialization/vector.hpp>
+#include <memory>
 #include <mutex>
 #include <unordered_map>
 #include "raft.h"
+#include "raftCore/ApplyMsg.h"
 #include "raftRpcPro/kvServerRPC.pb.h"
 #include "rpc/KVrpcprovider.h"
-#include "skipList/skipList.h"
+#    include "skipList/skipList.h"
+#include "msd/channel.hpp"
 
 /**
  * @brief kvServer负责与外部客户端和其他raft节点通信
@@ -26,10 +29,14 @@
  *        3.返回外部响应。
  */
 class KvServer : raftKVRpcProctoc::kvServerRpc {
+   public:
+    using waitCh = msd::channel<Op>;
+    using applyCh = msd::channel<ApplyMsg>;
+
    private:
     std::mutex m_mtx;
     int m_me;  // 节点编号
-    std::shared_ptr<LockQueue<ApplyMsg> >
+    std::shared_ptr<applyCh>
         m_applyChan;  // kvServer中拿到的消息，server用这些消息与raft打交道，由Raft::applierTicker线程填充
     int m_maxRaftState;  // snapshot if log grows this big
 
@@ -38,7 +45,7 @@ class KvServer : raftKVRpcProctoc::kvServerRpc {
     SkipList<std::string, std::string> m_skipList;        // skipList，用于存储kv数据
     std::unordered_map<std::string, std::string> m_kvDB;  // kvDB，用unordered_map来替代
 
-    std::unordered_map<int, LockQueue<Op> *>
+    std::unordered_map<int, std::shared_ptr<waitCh>>
         m_waitApplyCh;  // 字段含义 waitApplyCh是一个map，键 是int，值 是Op类型的阻塞队列
 
     std::unordered_map<std::string, int>

@@ -7,12 +7,12 @@
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/serialization/access.hpp>
-#include <condition_variable>  // pthread_condition_t
 #include <iostream>
-#include <mutex>  // pthread_mutex_t
-#include <queue>
 #include <sstream>
+#include <chrono>
 
+// ---------------------- DEFER ---------------------- //
+/// TODO：可以有更优雅的实现，这个目前只是可以用
 template <class F>
 class DeferClass {
    public:
@@ -33,8 +33,10 @@ class DeferClass {
 #undef DEFER
 #define DEFER MAKE_DEFER(__LINE__)
 
-void DPrintf(const char* format, ...);
+// ---------------------- DEFER ---------------------- //
 
+// ---------------------- DEBUG ---------------------- //
+void DPrintf(const char* format, ...);
 void myAssert(bool condition, const std::string& message);
 
 template <typename... Args>
@@ -46,77 +48,9 @@ std::string format(const char* format_str, Args... args) {
 }
 
 std::chrono::_V2::system_clock::time_point now();
-
 std::chrono::milliseconds getRandomizedElectionTimeout();
 void sleepNMilliseconds(int N);
-
-template <typename T>
-class LockQueue {
-public:
-    // 向队列中推送数据（线程安全）
-    void Push(const T& data) {
-        {
-            std::lock_guard<std::mutex> lock(m_mutex);  
-            m_queue.push(data);
-        }
-        m_condvariable.notify_one();  // 释放锁后通知等待的线程
-    }
-
-    // 弹出队列中的数据，如果队列为空则阻塞等待（线程安全）
-    T Pop() {
-        std::unique_lock<std::mutex> lock(m_mutex);
-        m_condvariable.wait(lock, [this]{ return !m_queue.empty(); });  // 阻塞直到队列非空
-        T data = std::move(m_queue.front());  // 使用 move 构造，避免不必要的拷贝
-        m_queue.pop();
-        return data;
-    }
-
-    /**
-     * @brief 带超时的 Pop 操作，如果超时未获取数据返回 false（线程安全）
-     * 
-     * @param timeout 超时时间
-     * @param ResData 弹出值的指针，要提前申请好
-     * @return true 正常弹出
-     * @return false 没东西可弹或者一直没拿到锁，超时，ResData无效
-     */
-    bool timeOutPop(int timeout, T* ResData) {
-        std::unique_lock<std::mutex> lock(m_mutex);
-        auto now = std::chrono::system_clock::now();
-        
-        // 超时等待队列不为空
-        if (!m_condvariable.wait_until(lock, now + std::chrono::milliseconds(timeout), [this]{ return !m_queue.empty(); })) {
-            return false;  // 超时未获取数据
-        }
-
-        *ResData = std::move(m_queue.front());
-        m_queue.pop();
-        return true;  // 成功获取数据
-    }
-
-    // 获取队列中的第一个元素，但不弹出（线程安全）
-    T front() {
-        std::unique_lock<std::mutex> lock(m_mutex);
-        m_condvariable.wait(lock, [this]{ return !m_queue.empty(); });  // 阻塞直到队列非空
-        return m_queue.front();  // 返回队列头部的元素
-    }
-
-    // 获取队列的大小（线程安全）
-    size_t size() {
-        std::lock_guard<std::mutex> lock(m_mutex);
-        return m_queue.size();
-    }
-
-    // 检查队列是否为空（线程安全）
-    bool empty() {
-        std::lock_guard<std::mutex> lock(m_mutex);
-        return m_queue.empty();
-    }
-
-private:
-    std::queue<T> m_queue;  // 底层使用 std::queue 存储数据
-    std::mutex m_mutex;  // 保护队列操作的互斥锁
-    std::condition_variable m_condvariable;  // 用于管理阻塞等待的条件变量
-};
+// ---------------------- DEBUG ---------------------- //
 
 /**
  * @brief 这个Op是kvServer传递给raft的command
@@ -179,16 +113,13 @@ private:
     }
 };
 
-///////////////////////////////////////////////kvserver reply err to clerk
-
+//kvserver reply err to clerk
 const std::string OK = "OK";
 const std::string ErrNoKey = "ErrNoKey";
 const std::string ErrWrongLeader = "ErrWrongLeader";
 
-////////////////////////////////////获取可用端口
-
+//获取可用端口
 bool isReleasePort(unsigned short usPort);
-
 bool getReleasePort(short& port);
 
 #endif  //  UTIL_H

@@ -11,9 +11,7 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    set(DPRINTF_DEBUG 1)
-else()
-    set(DPRINTF_DEBUG 0)
+    add_definitions(Dprintf_Debug)
 endif()
 
 # only build examples if this is the main project

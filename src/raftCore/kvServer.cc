@@ -1,14 +1,14 @@
 #include "kvServer.h"
+#include <memory>
 #include "common/config.h"
 #include "rpc/KVrpcprovider.h"
 #include "sylar/rpc/rpcconfig.h"
 
 void KvServer::DprintfKVDB() {
-    if (!Dprintf_Debug) {
-        return;
-    }
+#ifdef Dprintf_Debug
     std::lock_guard<std::mutex> lock(m_mtx);
     m_skipList.display_list();
+#endif
 }
 
 void KvServer::ExecuteGetOpOnKVDB(const Op& op, std::string *value, bool *exist) {
@@ -61,17 +61,17 @@ void KvServer::Get(const raftKVRpcProctoc::GetArgs *args, raftKVRpcProctoc::GetR
         return;
     }
 
-    LockQueue<Op> *chFornewLogIndex = nullptr;
+    std::shared_ptr<waitCh> chFornewLogIndex;
     {
         std::lock_guard<std::mutex> lock(m_mtx);
         if (m_waitApplyCh.find(newLogIndex) == m_waitApplyCh.end()) {
-            m_waitApplyCh.emplace(newLogIndex, new LockQueue<Op>());
+            m_waitApplyCh.emplace(newLogIndex, std::make_shared<waitCh>(2));
         }
         chFornewLogIndex = m_waitApplyCh[newLogIndex];
     }
 
     Op raftCommitOp;
-    if (!chFornewLogIndex->timeOutPop(CONSENSUS_TIMEOUT, &raftCommitOp)) {  // 待执行命令 为空
+    if (!chFornewLogIndex->try_pop_with_timeout(raftCommitOp, CONSENSUS_TIMEOUT)) {  // 待执行命令 为空
         int _ = -1;
         int isLeader = m_raftNode->GetState(&_);
         if (ifRequestDuplicate(op.ClientId, op.RequestId) && isLeader) {
@@ -106,14 +106,8 @@ void KvServer::Get(const raftKVRpcProctoc::GetArgs *args, raftKVRpcProctoc::GetR
             reply->set_err(ErrWrongLeader);
         }
     }
-
-    /// todo 这里要仔细考虑一下，每次阻塞弹出一个，用完就销毁，是不是不太合理
-    {
-        std::lock_guard<std::mutex> lock(m_mtx);
-        auto tmp = m_waitApplyCh[newLogIndex];
-        m_waitApplyCh.erase(newLogIndex);
-        delete tmp;
-    }
+    std::lock_guard<std::mutex> lock(m_mtx);
+    m_waitApplyCh.erase(newLogIndex);
 }
 
 /**
@@ -190,19 +184,18 @@ void KvServer::PutAppend(const raftKVRpcProctoc::PutAppendArgs *args, raftKVRpcP
         "is "
         "leader ",
         m_me, &args->clientid(), args->requestid(), m_me, &op.Key, newLogIndex);
-    LockQueue<Op> *chFornewLogIndex = nullptr;
+    std::shared_ptr<waitCh> chFornewLogIndex;
     {
         std::lock_guard<std::mutex> lock(m_mtx);
         if (m_waitApplyCh.find(newLogIndex) == m_waitApplyCh.end()) {
-            m_waitApplyCh.emplace(newLogIndex, new LockQueue<Op>());
+            m_waitApplyCh.emplace(newLogIndex, std::make_shared<waitCh>(2));
         }
         chFornewLogIndex = m_waitApplyCh[newLogIndex];
     }
 
     // timeout
     Op raftCommitOp;
-
-    if (!chFornewLogIndex->timeOutPop(CONSENSUS_TIMEOUT, &raftCommitOp)) {
+    if (!chFornewLogIndex->try_pop_with_timeout(raftCommitOp, CONSENSUS_TIMEOUT)) {
         DPrintf(
             "[func -KvServer::PutAppend -kvserver{%d}]TIMEOUT PUTAPPEND !!!! Server %d , get Command <-- Index:%d , "
             "ClientId %s, RequestId %d, Opreation %s Key :%s, Value :%s",
@@ -228,14 +221,8 @@ void KvServer::PutAppend(const raftKVRpcProctoc::PutAppendArgs *args, raftKVRpcP
             reply->set_err(ErrWrongLeader);
         }
     }
-
-    /// todo 这里要仔细考虑一下，每次阻塞弹出一个，用完就销毁，是不是不太合理
-    {
-        std::lock_guard<std::mutex> lock(m_mtx);
-        auto tmp = m_waitApplyCh[newLogIndex];
-        m_waitApplyCh.erase(newLogIndex);
-        delete tmp;
-    }
+    std::lock_guard<std::mutex> lock(m_mtx);
+    m_waitApplyCh.erase(newLogIndex);
 }
 
 /**
@@ -243,7 +230,9 @@ void KvServer::PutAppend(const raftKVRpcProctoc::PutAppendArgs *args, raftKVRpcP
  */
 void KvServer::ReadRaftApplyCommandLoop() {
     while (true) {
-        auto message = m_applyChan->Pop();  // 阻塞弹出
+        ApplyMsg message;
+        *m_applyChan >> message;
+        // auto message = m_applyChan->Pop();  // 阻塞弹出
         // 应用到 KVDB
         if (message.CommandValid) {
             GetCommandFromRaft(message);
@@ -273,7 +262,8 @@ bool KvServer::SendMessageToWaitChan(const Op &op, int newLogIndex) {
     if (m_waitApplyCh.find(newLogIndex) == m_waitApplyCh.end()) {
         return false;
     }
-    m_waitApplyCh[newLogIndex]->Push(op);
+    // m_waitApplyCh[newLogIndex]->Push(op);
+    *m_waitApplyCh[newLogIndex] << op;
     DPrintf(
         "[RaftApplyMessageSendToWaitChan--> raftserver{%d}] , Send Command --> Index:{%d} , ClientId {%d}, RequestId "
         "{%d}, Opreation {%v}, Key :{%v}, Value :{%v}",
@@ -324,9 +314,9 @@ void KvServer::Get(google::protobuf::RpcController *controller, const ::raftKVRp
  * @param nodeInforFileName 节点信息文件名
  * @param port 监听端口
  */
-KvServer::KvServer(int me, int maxraftstate, const  std::string& nodeInforFileName, short port)
+KvServer::KvServer(int me, int maxraftstate, const std::string &nodeInforFileName, short port)
     : m_me(me),
-      m_applyChan(std::make_shared<LockQueue<ApplyMsg> >()),
+      m_applyChan(std::make_shared<applyCh>(2)),
       m_maxRaftState(maxraftstate),
       m_skipList(6),
       m_lastSnapShotRaftLogIndex(0),

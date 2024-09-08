@@ -16,7 +16,8 @@ Raft::Raft(sylar::IOManager::ptr _iom)
       m_lastSnapshotIncludeTerm(),
       m_currentTerm(),
       m_votedFor(),
-      m_status()
+      m_status(),
+      m_applyChan(nullptr)
 {
 }
 Raft::~Raft() { std::cout << "----------[Raft::~Raft()]---------- \n"; }
@@ -217,7 +218,7 @@ void Raft::applierTicker() {
                     applyMsgs.size());
         }
         for (auto& message : applyMsgs) {
-            m_applyChan->Push(message);
+            *m_applyChan << message;
         }
         // 检查间隔 ApplyInterval 毫秒
         sleepNMilliseconds(ApplyInterval);
@@ -491,7 +492,7 @@ void Raft::InstallSnapshot(const raftRpcProctoc::InstallSnapshotRequest* args,
     msg.SnapshotTerm = args->lastsnapshotincludeterm();
     msg.SnapshotIndex = args->lastsnapshotincludeindex();
 
-    m_applyChan->Push(msg);
+    *m_applyChan << msg;
     m_persister->Save(persistData(), args->data());  // 持久化一下状态，并保存
 }
 
@@ -873,13 +874,13 @@ bool Raft::Start(Op command, int* newLogIndex, int* newLogTerm) {
  * @param applyCh 与kv-server沟通的channel，Raft层负责装填
  */
 void Raft::init(std::vector<std::shared_ptr<RaftRpcUtil>> peers, int me, std::shared_ptr<Persister> persister,
-                std::shared_ptr<LockQueue<ApplyMsg>> applyCh) {
+                std::shared_ptr<applyCh> applych) {
     m_peers = std::move(peers);          // 需要与其他raft节点通信类
     m_persister = std::move(persister);  // 持久化类
     m_me = me;                // 标记自己，不能给自己发送rpc
     {
         std::lock_guard<std::mutex> lock(m_mtx);
-        this->m_applyChan = std::move(applyCh);  // 与kv-server沟通
+        this->m_applyChan = std::move(applych);  // 与kv-server沟通
 
         m_currentTerm = 0;    // 初始化当前任期为0
         m_status = Follower;  // 初始化状态为follower
