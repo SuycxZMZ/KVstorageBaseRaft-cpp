@@ -131,6 +131,7 @@ kill -18 <pid>
 - 支持超时和重试
 - 支持异步，代码更加高效和简洁
 - 支持负载均衡和服务发现，配置起来更加优雅
+- gitbub这个东西也是个纯**，手机验证不支持中国大陆，最新的代码在[gitee](https://gitee.com/suycx/KVstorageBaseRaft-cpp)
 
 ## 参考&&致谢
 
