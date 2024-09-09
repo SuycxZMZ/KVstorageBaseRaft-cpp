@@ -2,7 +2,7 @@
 !bin/test.conf
 .idea
 .cache/*
-bin
+# bin
 cmake-build-debug
 lib
 build
