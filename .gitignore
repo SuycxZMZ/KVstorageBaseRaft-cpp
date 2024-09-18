@@ -4,6 +4,7 @@
 .cache/*
 bin
 cmake-build-debug
+cmake-build-release
 lib
 build
 .vscode
