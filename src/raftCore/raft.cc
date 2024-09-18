@@ -204,7 +204,7 @@ bool Raft::sendAppendEntries(int server, const std::shared_ptr<raftRpcProctoc::A
     return ok;
 }
 
-void Raft::applierTicker() {
+[[noreturn]] void Raft::applierTicker() {
     while (true) {
         std::vector<ApplyMsg> applyMsgs;
         {
@@ -227,7 +227,7 @@ void Raft::applierTicker() {
     }
 }
 
-bool Raft::CondInstallSnapshot(int lastIncludedTerm, int lastIncludedIndex, const std::string& snapshot) {
+bool Raft::CondInstallSnapshot([[maybe_unused]] const std::string& snapshot) {
     return true;
 }
 
@@ -272,7 +272,7 @@ void Raft::doElection() {
 
             // 在for循环中 --> 候选者可能会起 (n - 1) 个线程发送投票RPC
             m_pool.commit_with_timeout(
-                [task = std::bind(&Raft::sendRequestVote, this, i, requestVoteArgs, requestVoteReply, votedNum)]() {
+                [task = [this, i, requestVoteArgs, requestVoteReply, votedNum] { return sendRequestVote(i, requestVoteArgs, requestVoteReply, votedNum); }]() {
                     task();  // 忽略返回值
                 },
                 maxRandomizedElectionTime);
@@ -300,7 +300,7 @@ void Raft::doHeartBeat() {
 
             // ----------------------------- 发快照心跳 ----------------------------- //
             if (m_nextIndex[i] <= m_lastSnapshotIncludeIndex) {
-                m_pool.commit_with_timeout(std::bind(&Raft::leaderSendSnapShot, this, i), HeartBeatTimeout);
+                m_pool.commit_with_timeout([this, i] { leaderSendSnapShot(i); }, HeartBeatTimeout);
                 continue;
             }
 
@@ -344,8 +344,10 @@ void Raft::doHeartBeat() {
             appendEntriesReply->set_appstate(Disconnected);
 
             // 提交发送任务到线程池
-            m_pool.commit_with_timeout([task = std::bind(&Raft::sendAppendEntries, this, i, appendEntriesArgs,
-                                                         appendEntriesReply, appendNums)]() { task(); },
+            m_pool.commit_with_timeout([
+                                           task = [this, i, appendEntriesArgs, appendEntriesReply, appendNums]
+                    { return sendAppendEntries(i, appendEntriesArgs, appendEntriesReply, appendNums); }
+                                            ] () { task(); },
                                        HeartBeatTimeout);
         }
 
@@ -358,7 +360,7 @@ void Raft::doHeartBeat() {
  * @brief 负责查看是否该发起选举，如果该发起选举就执行doElection发起选举。
  *        注意，只有follower状态的节点才会执行这个函数。而leader只负责sleep什么也不做
  */
-void Raft::electionTimeOutTicker() {
+[[noreturn]] void Raft::electionTimeOutTicker() {
     while (true) {
         while (m_status == Leader) {
             usleep(HeartBeatTimeout * 1000);
@@ -502,7 +504,7 @@ void Raft::InstallSnapshot(const raftRpcProctoc::InstallSnapshotRequest* args,
  * @brief 检查是否需要发起心跳（leader）如果该发起就执行doHeartBeat。
  *        注意:只有leader才可以发起心跳。follower在这个函数中什么也不做。
  */
-void Raft::leaderHearBeatTicker() {
+[[noreturn]] void Raft::leaderHearBeatTicker() {
     while (true) {
         // follower和candidate在这里循环睡觉
         while (m_status != Leader) {
@@ -579,7 +581,7 @@ void Raft::leaderSendSnapShot(int server) {
     m_nextIndex[server] = m_matchIndex[server] + 1;
 }
 
-void Raft::leaderUpdateCommitIndex() {
+[[maybe_unused]] void Raft::leaderUpdateCommitIndex() {
     m_commitIndex = m_lastSnapshotIncludeIndex;
     for (int index = getLastLogIndex(); index >= m_lastSnapshotIncludeIndex + 1; index--) {
         int sum = 0;
@@ -649,7 +651,7 @@ void Raft::RequestVote(const raftRpcProctoc::RequestVoteArgs* args, raftRpcProct
              format("[func--rf{%d}] 前面校验过args.Term==rf.currentTerm，这里却不等", m_me));
 
     // 现在节点任期都是相同的(任期小的也已经更新到新的args的term了)，还需要检查log的term和index是不是匹配的
-    int lastLogTerm = getLastLogTerm();
+//    int lastLogTerm = getLastLogTerm();
 
     // 只有 没投过票，且candidate的日志的新的程度 ≥ 接受者的日志新的程度 才会给请求方投票
     //  这里，新的程度判断为，如果当前节点的最新的一条日志所在的任期号大于远端节点，就不给他投
@@ -710,7 +712,7 @@ int Raft::getLastLogIndex() {
     return lastLogIndex;
 }
 
-int Raft::getLastLogTerm() {
+[[maybe_unused]] int Raft::getLastLogTerm() {
     int _ = -1;
     int lastLogTerm = -1;
     getLastLogIndexAndTerm(&_, &lastLogTerm);
@@ -812,7 +814,7 @@ bool Raft::sendRequestVote(int server, const std::shared_ptr<raftRpcProctoc::Req
             m_matchIndex[i] = 0;  // 每换一个领导都是从0开始 ？
         }
         // 马上向其他节点宣告自己就是leader
-        m_pool.commit_with_timeout(std::bind(&Raft::doHeartBeat, this), maxRandomizedElectionTime);
+        m_pool.commit_with_timeout([this] { doHeartBeat(); }, maxRandomizedElectionTime);
         persist();
     }
     return true;
@@ -909,10 +911,10 @@ void Raft::init(std::vector<std::shared_ptr<RaftRpcUtil>> peers, int me, std::sh
         DPrintf("[Init&ReInit] Sever %d, term %d, lastSnapshotIncludeIndex {%d} , lastSnapshotIncludeTerm {%d}", m_me,
                 m_currentTerm, m_lastSnapshotIncludeIndex, m_lastSnapshotIncludeTerm);
     }
-    m_iom->schedule(std::bind(&Raft::leaderHearBeatTicker, this));  // leader 心跳定时器
-    m_iom->schedule(std::bind(&Raft::electionTimeOutTicker, this));  // 选举超时定时器，触发就开始发起选举
+    m_iom->schedule([this] { leaderHearBeatTicker(); });  // leader 心跳定时器
+    m_iom->schedule([this] { electionTimeOutTicker(); });  // 选举超时定时器，触发就开始发起选举
 
-    std::thread t3(std::bind(&Raft::applierTicker, this));  // apply 定时器，单起一个线程
+    std::thread t3([this] { applierTicker(); });  // apply 定时器，单起一个线程
     t3.detach();
 }
 

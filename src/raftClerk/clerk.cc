@@ -31,12 +31,11 @@ std::string Clerk::Get(const std::string& key) {
         if (reply.err() == ErrNoKey) {
             return "";
         }
-        if (reply.err() == OK || ok) {
+        if (reply.err() == OK) {
             m_curLeaderId = server;
             return reply.value();
         }
     }
-    return "";
 }
 
 void Clerk::PutAppend(const std::string& key, const std::string& value, const std::string& op) {
@@ -66,14 +65,14 @@ void Clerk::PutAppend(const std::string& key, const std::string& value, const st
             server = (server + 1) % (int)m_servers.size();  // try the next server
             continue;
         }
-        if (reply.err() == OK || ok) {
+        if (reply.err() == OK) {
             m_curLeaderId = server;
             return;
         }
     }
 }
 
-void Clerk::Put(const std::string& key, const std::string& value) { PutAppend(key, value, "Put"); }
+[[maybe_unused]] void Clerk::Put(const std::string& key, const std::string& value) { PutAppend(key, value, "Put"); }
 void Clerk::Append(const std::string& key, const std::string& value) { PutAppend(key, value, "Append"); }
 
 // 初始化客户端

@@ -55,7 +55,7 @@ void KvServer::Get(const raftKVRpcProctoc::GetArgs *args, raftKVRpcProctoc::GetR
     int _ = -1;
 
     // 发起一个日志
-    int isLeader = m_raftNode->Start(op, &newLogIndex, &_);
+    bool isLeader = m_raftNode->Start(op, &newLogIndex, &_);
     if (!isLeader) {
         reply->set_err(ErrWrongLeader);
         return;
@@ -73,7 +73,7 @@ void KvServer::Get(const raftKVRpcProctoc::GetArgs *args, raftKVRpcProctoc::GetR
     Op raftCommitOp;
     if (!chFornewLogIndex->try_pop_with_timeout(raftCommitOp, CONSENSUS_TIMEOUT)) {  // 待执行命令 为空
         int _ = -1;
-        int isLeader = m_raftNode->GetState(&_);
+        isLeader = m_raftNode->GetState(&_);
         if (ifRequestDuplicate(op.ClientId, op.RequestId) && isLeader) {
             std::string value;
             bool exist = false;
@@ -166,9 +166,9 @@ void KvServer::PutAppend(const raftKVRpcProctoc::PutAppendArgs *args, raftKVRpcP
     op.RequestId = args->requestid();
     int newLogIndex = -1;
     int _ = -1;
-    int isleader = m_raftNode->Start(op, &newLogIndex, &_);
+    bool isleader = m_raftNode->Start(op, &newLogIndex, &_);
 
-    if (0 == isleader) {
+    if (!isleader) {
         DPrintf(
             "[func -KvServer::PutAppend -kvserver{%d}]From Client %s (Request %d) To Server %d, key %s, newLogIndex %d "
             ", "
@@ -228,7 +228,7 @@ void KvServer::PutAppend(const raftKVRpcProctoc::PutAppendArgs *args, raftKVRpcP
 /**
  * @brief 一直等待 raft 传来的m_applyChan待应用日志消息
  */
-void KvServer::ReadRaftApplyCommandLoop() {
+[[noreturn]] void KvServer::ReadRaftApplyCommandLoop() {
     while (true) {
         ApplyMsg message;
         *m_applyChan >> message;
@@ -271,7 +271,7 @@ bool KvServer::SendMessageToWaitChan(const Op &op, int newLogIndex) {
     return true;
 }
 
-void KvServer::IfNeedToSendSnapShotCommand(int newLogIndex, int proportion) {
+void KvServer::IfNeedToSendSnapShotCommand(int newLogIndex, [[maybe_unused]] int proportion) {
     // 触发快照才发给raft层
     if (m_raftNode->GetRaftStateSize() > m_maxRaftState / 10) {
         // Send SnapShot Command
@@ -283,7 +283,7 @@ void KvServer::IfNeedToSendSnapShotCommand(int newLogIndex, int proportion) {
 void KvServer::GetSnapShotFromRaft(const ApplyMsg& message) {
     std::lock_guard<std::mutex> lock(m_mtx);
 
-    if (m_raftNode->CondInstallSnapshot(message.SnapshotTerm, message.SnapshotIndex, message.Snapshot)) {
+    if (Raft::CondInstallSnapshot(message.Snapshot)) {
         ReadSnapShotToInstall(message.Snapshot);
         m_lastSnapShotRaftLogIndex = message.SnapshotIndex;
     }

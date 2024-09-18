@@ -41,9 +41,9 @@ class KvServer : raftKVRpcProctoc::kvServerRpc {
     int m_maxRaftState;  // snapshot if log grows this big
 
     // Your definitions here.
-    std::string m_serializedKVData;  // TODO ： 序列化后的kv数据，理论上可以不用，但是目前没有找到特别好的替代方法
+    std::string m_serializedKVData;  // 序列化后的kv数据
     SkipList<std::string, std::string> m_skipList;        // skipList，用于存储kv数据
-    std::unordered_map<std::string, std::string> m_kvDB;  // 没用上
+    std::unordered_map<std::string, std::string> m_kvDB;  // 没用上，不过暂时先不删
 
     std::unordered_map<int, std::shared_ptr<waitCh>>
         m_waitApplyCh;  // 字段含义 waitApplyCh是一个map，键 是int，值 是Op类型的阻塞队列
@@ -68,7 +68,7 @@ class KvServer : raftKVRpcProctoc::kvServerRpc {
      */
     KvServer(int me, int maxraftstate, const std::string& nodeInforFileName, short port);
 
-    void StartKVServer();
+    // void StartKVServer();
 
     void DprintfKVDB();
 
@@ -99,7 +99,7 @@ class KvServer : raftKVRpcProctoc::kvServerRpc {
     /**
      * @brief 一直等待raft传来的applyCh
      */
-    void ReadRaftApplyCommandLoop();
+    [[noreturn]] void ReadRaftApplyCommandLoop();
 
     /**
      * @brief 安装快照，将raft传递过来的快照信息反序列化到kvserver层的跳表
@@ -121,7 +121,7 @@ class KvServer : raftKVRpcProctoc::kvServerRpc {
      * @param newLogIndex 新日志索引标号
      * @param proportion 现在还没用上，写死为最大阈值的 1/10
      */
-    void IfNeedToSendSnapShotCommand(int newLogIndex, int proportion);
+    void IfNeedToSendSnapShotCommand(int newLogIndex, [[maybe_unused]] int proportion);
 
     // Handler the SnapShot from kv.rf.applyCh
     void GetSnapShotFromRaft(const ApplyMsg& message);
@@ -135,7 +135,7 @@ class KvServer : raftKVRpcProctoc::kvServerRpc {
 
     /// @brief 初始化本节点的底层rpc,发布远程方法，并开启
     /// @param port 节点端口号
-    void InitRpcAndRun(short port);
+    // void InitRpcAndRun(short port);
 
    public:  // 调用rpc框架的notify时，会走过来，发布这些方法
     /**
@@ -149,7 +149,7 @@ class KvServer : raftKVRpcProctoc::kvServerRpc {
     void Get(google::protobuf::RpcController *controller, const ::raftKVRpcProctoc::GetArgs *request,
              ::raftKVRpcProctoc::GetReply *response, ::google::protobuf::Closure *done) override;
 
-    ///////////////// serialiazation ///////////////////////////////
+    // -------------------------- serialiazation -------------------------- //
     // notice ： func serialize
    private:
     friend class boost::serialization::access;
@@ -158,7 +158,7 @@ class KvServer : raftKVRpcProctoc::kvServerRpc {
     // & operator is defined similar to <<.  Likewise, when the class Archive
     // is a type of input archive the & operator is defined similar to >>.
     template <class Archive>
-    void serialize(Archive &ar, const unsigned int version)  // 这里面写需要序列话和反序列化的字段
+    void serialize(Archive &ar, [[maybe_unused]] const unsigned int version)  // 这里面写需要序列话和反序列化的字段
     {
         ar & m_serializedKVData;
 
@@ -183,7 +183,7 @@ class KvServer : raftKVRpcProctoc::kvServerRpc {
         m_serializedKVData.clear();
     }
 
-    ///////////////// serialiazation ///////////////////////////////
+    // -------------------------- serialiazation -------------------------- //
 };
 
 #endif  // SKIP_LIST_ON_RAFT_KVSERVER_H

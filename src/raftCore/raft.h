@@ -25,7 +25,7 @@ constexpr int Disconnected = 0;
 constexpr int AppNormal = 1;
 
 ///////////////投票状态
-constexpr int Killed = 0;
+[[maybe_unused]] constexpr int Killed = 0;
 constexpr int Voted = 1;   // 本轮已经投过票了
 constexpr int Expire = 2;  // 投票（消息、竞选者）过期
 constexpr int Normal = 3;
@@ -84,7 +84,7 @@ class Raft : public raftRpcProctoc::raftRpc {
     /// @param iom 指向全局调度器的智能指针
     explicit Raft(sylar::IOManager::ptr iom);
 
-    ~Raft();
+    ~Raft() override;
 
     /**
      * @brief 日志同步 + 心跳 rpc ，重点关注。follow 节点执行的操作
@@ -96,12 +96,12 @@ class Raft : public raftRpcProctoc::raftRpc {
     /**
      * @brief 单起一个线程，定期将已提交但未 apply 的日志加入 m_applyChan , KVserver会取出这些命令应用到KVDB
      */
-    void applierTicker();
+    [[noreturn]] void applierTicker();
 
     /**
      * @brief 安装快照 TODO，还没实现好，现在直接返回true
      */
-    static bool CondInstallSnapshot(int lastIncludedTerm, int lastIncludedIndex, const std::string& snapshot);
+    static bool CondInstallSnapshot([[maybe_unused]] const std::string &snapshot);
 
     /**
      * @brief 实际发起选举，构造需要发送的rpc，并多线程调用sendRequestVote处理rpc及其相应。
@@ -121,7 +121,7 @@ class Raft : public raftRpcProctoc::raftRpc {
      *        3.sendRequestVote：负责发送选举中的RPC，在发送完rpc后还需要负责接收并处理对端发送回来的响应。
      *        4.RequestVote：远端执行，接收别人发来的选举请求，主要检验是否要给对方投票。
      */
-    void electionTimeOutTicker();
+    [[noreturn]] void electionTimeOutTicker();
 
     /**
      * @brief 返回待apply的日志信息
@@ -148,13 +148,13 @@ class Raft : public raftRpcProctoc::raftRpc {
     /**
      * @brief 检查是否需要发起心跳（leader）如果该发起就执行doHeartBeat。
      */
-    void leaderHearBeatTicker();
+    [[noreturn]] void leaderHearBeatTicker();
     void leaderSendSnapShot(int server);
 
     /**
      * @brief leader更新commitIndex，在项目中没调用
      */
-    void leaderUpdateCommitIndex();
+    [[maybe_unused]] void leaderUpdateCommitIndex();
 
     /**
      * @brief leader传过来的对应Index的日志是否匹配，只需要Index和Term就可以知道是否匹配
@@ -184,7 +184,7 @@ class Raft : public raftRpcProctoc::raftRpc {
      */
     bool UpToDate(int index, int term);
     int getLastLogIndex();
-    int getLastLogTerm();
+    [[maybe_unused]] int getLastLogTerm();
     void getLastLogIndexAndTerm(int *lastLogIndex, int *lastLogTerm);
 
     /**
@@ -223,10 +223,10 @@ class Raft : public raftRpcProctoc::raftRpc {
                            const std::shared_ptr<raftRpcProctoc::AppendEntriesReply>& reply,
                            const std::shared_ptr<std::atomic_int32_t>& appendNums);
 
-    /**
-     * @brief 给上层的kvserver层发送消息
-     */
-    void pushMsgToKvServer(ApplyMsg msg);
+//    /**
+//     * @brief 给上层的kvserver层发送消息
+//     */
+//    void pushMsgToKvServer(ApplyMsg msg);
     void readPersist(const std::string& data);
 
     /**

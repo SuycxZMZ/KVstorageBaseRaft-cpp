@@ -41,7 +41,7 @@ public:
     void Init(const std::string& configFileName);
     std::string Get(const std::string& key);
 
-    void Put(const std::string& key, const std::string& value);
+    [[maybe_unused]] [[maybe_unused]] void Put(const std::string& key, const std::string& value);
     void Append(const std::string& key, const std::string& value);
 
 public:
