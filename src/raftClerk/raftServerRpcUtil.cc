@@ -1,6 +1,3 @@
-//
-// Created by swx on 24-1-4.
-//
 #include "raftServerRpcUtil.h"
 #include "sylar/rpc/rpccontroller.h"
 #include "rpc/KVrpcchannel.h"

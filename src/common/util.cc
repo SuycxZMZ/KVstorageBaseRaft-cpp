@@ -1,8 +1,5 @@
 #include "util.h"
 #include <chrono>
-#include <cstdarg>
-#include <cstdio>
-#include <ctime>
 #include <random>
 #include "config.h"
 
@@ -16,7 +13,7 @@ std::chrono::milliseconds getRandomizedElectionTimeout() {
     return std::chrono::milliseconds(dist(rng));
 }
 
-void DPrintf(const char *format, ...) {
+void DPrintf([[maybe_unused]] const char *format, ...) {
 #ifdef Dprintf_Debug
     // 获取当前的日期，然后取日志信息，写入相应的日志文件当中 a+
     time_t now = time(nullptr);
@@ -32,7 +29,7 @@ void DPrintf(const char *format, ...) {
 #endif
 }
 
-void myAssert(bool condition, const std::string &message) {
+void myAssert([[maybe_unused]] bool condition, [[maybe_unused]] const std::string &message) {
 #ifdef Dprintf_Debug
     if (!condition) {
         std::cerr << "Error: " << message << std::endl;

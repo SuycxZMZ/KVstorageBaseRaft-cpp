@@ -18,7 +18,7 @@ const int CLERK_REQUEST_TIMEOUT = 500;  // 客户端请求超时时间
 // 协程相关设置
 
 const int FIBER_THREAD_NUM = 5;              // raft节点中的协程调度器中线程池的大小
-const bool FIBER_USE_CALLER_THREAD = false;  // 是否使用caller_thread执行调度任务
+[[maybe_unused]] const bool FIBER_USE_CALLER_THREAD = false;  // 是否使用caller_thread执行调度任务
 
 // 推荐节点数量
 const int MAX_NODE_NUM = 5;

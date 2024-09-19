@@ -206,7 +206,7 @@ void KvServer::PutAppend(const raftKVRpcProctoc::PutAppendArgs *args, raftKVRpcP
             reply->set_err(
                 OK);  // 超时了,但因为是重复的请求，返回ok，实际上就算没有超时，在真正执行的时候也要判断是否重复
         } else {
-            reply->set_err(ErrWrongLeader);  /// 这里返回这个的目的让clerk重新尝试
+            reply->set_err(ErrWrongLeader);  // 让clerk重新尝试
         }
     } else {
         DPrintf(
@@ -323,7 +323,7 @@ KvServer::KvServer(int me, int maxraftstate, const std::string &nodeInforFileNam
       m_iom(std::make_shared<sylar::IOManager>(FIBER_THREAD_NUM, false)),
       m_raftNode(std::make_shared<Raft>(m_iom)),
       m_KvRpcProvider(std::make_shared<KVRpcProvider>(m_iom)) {
-    sleep(3);
+    sleep(1);
 
     // rpc层起来，初始化阶段，调度器也没事情干，可以放调度器执行
     m_iom->schedule([this, port]() -> void {
@@ -336,7 +336,7 @@ KvServer::KvServer(int me, int maxraftstate, const std::string &nodeInforFileNam
     });
 
     // 等其他节点初始化完成
-    std::cout << "raftServer node:" << m_me << " start to sleep to wait all ohter raftnode start!!!!" << std::endl;
+    std::cout << "raftServer node:" << m_me << " start to sleep to wait all ohter raftnode start!!!" << std::endl;
     sleep(5);
     std::cout << "raftServer node:" << m_me << " wake up!!!! start to connect other raftnode" << std::endl;
 

@@ -10,20 +10,20 @@
 // todo：为了配合这个，那么rpc客户端那边每次发送之前也需要真正的
 class KVRpcProvider : public sylar::rpc::RpcProvider {
 public:
-    explicit KVRpcProvider(sylar::IOManager::ptr iom);
+    explicit KVRpcProvider([[maybe_unused]] sylar::IOManager::ptr iom);
 
     /// @brief 开启 tcpserver
-    virtual void InnerStart() override;
+    void InnerStart() override;
 
     /// @brief 初始化rpc节点信息
     /// @param nodeIndex 节点索引
     /// @param port 端口号
     void KVRpcProviderRunInit(int nodeIndex, short port);
 public:
-    ~KVRpcProvider();
+    ~KVRpcProvider() override;
 private:
     // 节点索引
-    int m_nodeIndex;
+    [[maybe_unused]] int m_nodeIndex;
     // 节点ip
     std::string m_ipPort;
 };

@@ -2,23 +2,24 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <unistd.h>
-#include <cstring>
 #include <fstream>
 #include <string>
 #include <utility>
 #include "sylar/macro.h"
 
-KVRpcProvider::KVRpcProvider(sylar::IOManager::ptr _iom) : sylar::rpc::RpcProvider(std::move(_iom)), m_nodeIndex() {}
+KVRpcProvider::KVRpcProvider([[maybe_unused]] sylar::IOManager::ptr _iom) :
+    sylar::rpc::RpcProvider(std::move(_iom)),
+    m_nodeIndex() {}
 
 void KVRpcProvider::KVRpcProviderRunInit(int nodeIndex, short port) {
     // 获取可用ip
-    char *ipC;
+    [[maybe_unused]] char *ipC;
     char hname[128];
     struct hostent *hent;
     gethostname(hname, sizeof(hname));
     hent = gethostbyname(hname);
     for (int i = 0; hent->h_addr_list[i]; i++) {
-        ipC = inet_ntoa(*(struct in_addr *)(hent->h_addr_list[i]));  // IP地址
+        inet_ntoa(*(struct in_addr *)(hent->h_addr_list[i]));  // IP地址
     }
     // 测试[FIXME]
     // std::string ip = std::string(ipC);
@@ -42,7 +43,6 @@ void KVRpcProvider::InnerStart() {
     m_isrunning = true;
     std::cout << " --------------- 绑定到子类 InnerStart() --------------- \n";
     auto addr = sylar::Address::LookupAny(m_ipPort);
-    SYLAR_ASSERT(addr);
     std::vector<sylar::Address::ptr> addrs;
     addrs.push_back(addr);
     std::vector<sylar::Address::ptr> fails;

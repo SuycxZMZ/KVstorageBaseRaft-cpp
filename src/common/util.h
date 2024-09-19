@@ -20,7 +20,7 @@
  * @param format 格式化字符串
  * @param ... 
  */
-void DPrintf(const char* format, ...);
+void DPrintf([[maybe_unused]] const char* format, ...);
 
 /**
  * @brief raft调试断言
@@ -28,7 +28,7 @@ void DPrintf(const char* format, ...);
  * @param condition 断言条件，不满足就断，满足不断
  * @param message 断言打印
  */
-void myAssert(bool condition, const std::string& message);
+void myAssert([[maybe_unused]] bool condition, [[maybe_unused]] const std::string& message);
 
 template <typename... Args>
 std::string format(const char* format_str, Args... args) {

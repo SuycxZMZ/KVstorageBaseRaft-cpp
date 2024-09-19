@@ -1,7 +1,3 @@
-//
-// Created by swx on 23-6-4.
-//
-
 #ifndef SKIP_LIST_ON_RAFT_CLERK_H
 #define SKIP_LIST_ON_RAFT_CLERK_H
 #include <arpa/inet.h>

@@ -98,7 +98,7 @@ class threadpool {
     // 空闲线程数量
     int idlCount() { return _idlThrNum; }
     // 线程数量
-    int thrCount() { return (int)_pool.size(); }
+    [[maybe_unused]] int thrCount() { return (int)_pool.size(); }
 
 #ifndef THREADPOOL_AUTO_GROW
    private:
@@ -147,7 +147,7 @@ class threadpool {
 
     // 带超时时间的提交
     template <class F, class... Args>
-    auto commit_with_timeout(F&& f, Args&&... args, int timeout_ms) -> std::future<decltype(f(args...))> {
+    [[maybe_unused]] auto commit_with_timeout(F&& f, Args&&... args, int timeout_ms) -> std::future<decltype(f(args...))> {
         if (!_run) throw std::runtime_error("commit on ThreadPool is stopped.");
 
         using RetType = decltype(f(args...));
