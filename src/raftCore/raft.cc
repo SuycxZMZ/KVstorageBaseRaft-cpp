@@ -155,13 +155,13 @@ bool Raft::sendAppendEntries(int server, const std::shared_ptr<raftRpcProctoc::A
         return ok;
     }
 
-    if (m_status != Leader) {  // 如果不是leader，那么就不要对返回的情况进行处理了
+    if (m_status != Leader) {  // 不是leader
         return ok;
     }
 
     // ----------------------- term相等 ----------------------- //
     myAssert(reply->term() == m_currentTerm,
-             format("reply.Term{%d} != rf.currentTerm{%d}   ", reply->term(), m_currentTerm));
+             format("reply.Term{%d} != rf.currentTerm{%d}", reply->term(), m_currentTerm));
     if (!reply->success()) {  // 同一个任期，日志不匹配，说明对方的日志有错的，向前匹配
         if (reply->updatenextindex() != -100) {  //-100只是一个特殊标记而已，没有太具体的含义
             DPrintf("[func -sendAppendEntries rf{%d}] 返回的日志term相等，但是不匹配，回缩nextIndex[%d]:{%d}\n", m_me,
@@ -245,7 +245,7 @@ void Raft::doElection() {
 
         m_status = Candidate;  // 设置状态为candidate
         m_currentTerm += 1;    // 开始新一轮的选举
-        m_votedFor = m_me;     // 即是自己给自己投，也避免candidate给同辈的candidate投
+        m_votedFor = m_me;     // 自己给自己投
 
         /// Raft算法中的选举机制要求Candidate节点在发起选举请求时，附带其日志的最后一条日志条目的索引和任期号。
         /// 这要求Candidate节点在发起选举前，必须确保其日志是最新的，并且已经被持久化。
@@ -272,10 +272,11 @@ void Raft::doElection() {
 
             // 在for循环中 --> 候选者可能会起 (n - 1) 个线程发送投票RPC
             m_pool.commit_with_timeout(
-                [task = [this, i, requestVoteArgs, requestVoteReply, votedNum] { return sendRequestVote(i, requestVoteArgs, requestVoteReply, votedNum); }]() {
-                    task();  // 忽略返回值
+                [this, i, requestVoteArgs, requestVoteReply, votedNum]() {
+                    sendRequestVote(i, requestVoteArgs, requestVoteReply, votedNum);  // 直接调用任务
                 },
-                maxRandomizedElectionTime);
+                maxRandomizedElectionTime
+            );
         }
     }
 }
@@ -344,11 +345,12 @@ void Raft::doHeartBeat() {
             appendEntriesReply->set_appstate(Disconnected);
 
             // 提交发送任务到线程池
-            m_pool.commit_with_timeout([
-                                           task = [this, i, appendEntriesArgs, appendEntriesReply, appendNums]
-                    { return sendAppendEntries(i, appendEntriesArgs, appendEntriesReply, appendNums); }
-                                            ] () { task(); },
-                                       HeartBeatTimeout);
+            m_pool.commit_with_timeout(
+                [this, i, appendEntriesArgs, appendEntriesReply, appendNums]() {
+                    sendAppendEntries(i, appendEntriesArgs, appendEntriesReply, appendNums);  // 直接调用任务
+                },
+                HeartBeatTimeout
+            );
         }
 
         // leader发送心跳，重置心跳时间，与选举不同
@@ -615,7 +617,7 @@ bool Raft::matchLog(int logIndex, int logTerm) {
                     logIndex, m_lastSnapshotIncludeIndex, logIndex, getLastLogIndex()));
     return logTerm == getLogTermFromLogIndex(logIndex);
 }
-// so i'm your daddy,please rember this
+
 void Raft::persist() {
     auto data = persistData();
     m_persister->SaveRaftState(data);
@@ -860,7 +862,6 @@ bool Raft::Start(Op command, int* newLogIndex, int* newLogTerm) {
     int lastLogIndex = getLastLogIndex();
 
     DPrintf("[func-Start-rf{%d}]  lastLogIndex:%d,command:%s\n", m_me, lastLogIndex, &command);
-    /// 原项目:todo 接收到命令后马上给follower发送,改成这样不知为何会出现问题，待修正
     /// leader应该不停的向各个Follower发送AE来维护心跳和保持日志同步，目前的做法是新的命令来了不会直接执行，而是等待leader的心跳触发
     /// 关于这个问题，有可能上一次的心跳包还没发(就本项目的架构而言，基本上是必然触发)，
     /// 再次发送给一个发送任务，两个线程同时写一个socket，未定义 ！！！！！
@@ -970,11 +971,10 @@ void Raft::Snapshot(int newLogIndex, const std::string& snapshot) {
     }
     auto lastLogIndex = getLastLogIndex();  // 为了检查snapshot前后日志是否一样，防止多截取或者少截取日志
 
-    // 制造完此快照后剩余的所有日志还保存在 m_logs 中
+    // 制作完此快照后剩余的所有日志还保存在 m_logs 中
     int newLastSnapshotIncludeIndex = newLogIndex;
     int newLastSnapshotIncludeTerm = m_logs[getSlicesIndexFromLogIndex(newLogIndex)].logterm();
     std::vector<raftRpcProctoc::LogEntry> trunckedLogs;
-    // todo :这种写法有点笨，待改进，而且有内存泄漏的风险
     for (int i = newLogIndex + 1; i <= getLastLogIndex(); i++) {
         // 注意有=，因为要拿到最后一个日志
         trunckedLogs.push_back(m_logs[getSlicesIndexFromLogIndex(i)]);

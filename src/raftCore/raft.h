@@ -19,12 +19,13 @@
 #include "thirdParty/threadPool/threadpool.h"
 #include "thirdParty/msd/channel.hpp"
 
-/// @brief //////////// 网络状态表示  todo：可以在rpc中删除该字段，实际生产中是用不到的.
-/// 方便网络分区的时候debug，网络异常的时候为disconnected，只要网络正常就为AppNormal，防止matchIndex[]数组异常减小
+/// 网络状态表示  todo：可以在rpc中删除该字段，实际生产中是用不到的.
+/// 方便网络分区的时候debug，网络异常的时候为disconnected，
+/// 只要网络正常就为AppNormal，防止matchIndex[]数组异常减小
 constexpr int Disconnected = 0;
-constexpr int AppNormal = 1;
+[[maybe_unused]] constexpr int AppNormal = 1;
 
-///////////////投票状态
+/// 投票状态
 [[maybe_unused]] constexpr int Killed = 0;
 constexpr int Voted = 1;   // 本轮已经投过票了
 constexpr int Expire = 2;  // 投票（消息、竞选者）过期
@@ -44,18 +45,17 @@ class Raft : public raftRpcProctoc::raftRpc {
    public:
     using applyCh = msd::channel<ApplyMsg>;
    private:
-    std::mutex m_mtx;                                   // 互斥锁，用于保护raft状态的修改
-    std::vector<std::shared_ptr<RaftRpcUtil>> m_peers;  // 保存与其他raft结点通信的rpc入口
-    std::shared_ptr<Persister> m_persister;             // 持久化层，负责raft数据的持久化
+    std::mutex m_mtx;                                   // 互斥锁
+    std::vector<std::shared_ptr<RaftRpcUtil>> m_peers;  // 保存与其他raft结点通信的stub
+    std::shared_ptr<Persister> m_persister;             // 持久化层，负责raft节点本身数据的持久化，并不是kvDB持久化
 
     int m_me;           // raft是以集群启动，这个用来标识自己的的编号
     int m_currentTerm;  // 记录任期
     int m_votedFor;     // 记录当前term给谁投票过
 
     std::vector<raftRpcProctoc::LogEntry> m_logs;  // raft节点保存的全部的日志信息。
-    int m_commitIndex;                             // 已提交到状态机的日志的index
-    int m_lastApplied;                             // 已经汇报给状态机（上层应用）的log 的index
-    // 这两个状态的下标1开始，因为通常commitIndex和lastApplied从0开始，应该是一个无效的index，因此下标从1开始
+    int m_commitIndex;                             // 已经commit的日志，主节点得到大多数回应之后可以commit
+    int m_lastApplied;                             // 上次汇报给KVserver层的日志index
 
     std::vector<int> m_nextIndex;   // m_nextIndex 保存leader下一次应该从哪一个日志开始发送给follower
     std::vector<int> m_matchIndex;  // m_matchIndex表示follower在哪一个日志是已经匹配了的
@@ -63,25 +63,25 @@ class Raft : public raftRpcProctoc::raftRpc {
     enum Status { Follower, Candidate, Leader };  // raft节点身份枚举
     Status m_status;                              // 节点身份
 
-    std::shared_ptr<applyCh> m_applyChan;  // applyTicker会写，Installsnapshot也会写
+    std::shared_ptr<applyCh> m_applyChan;  // applyTicker作为主要生产者，KVserver作为消费者
 
     std::chrono::_V2::system_clock::time_point m_lastResetElectionTime;  // 选举超时时间
     std::chrono::_V2::system_clock::time_point m_lastResetHearBeatTime;  // 心跳超时，用于leader
 
-    // Snapshot是kvDb的快照，也可以看成是日志，因此:全部的日志 = m_logs + snapshot
+    // Snapshot是kvDB的快照，也可以看成是日志，因此:全部的日志 = m_logs + snapshot
     int m_lastSnapshotIncludeIndex;  // 最新的一个快照中包含的日志条目最大索引
     int m_lastSnapshotIncludeTerm;   // 最新的一个快照中日志条目的任期号
 
-    // 协程调度器
-    sylar::IOManager::ptr m_iom;
-    // 工作线程池，主要用来发送AE和投票请求
-    sylar::threadpool m_pool;
+    sylar::IOManager::ptr m_iom;     // 协程调度器
+    sylar::threadpool m_pool;        // 工作线程池，主要用来执行发送AE和投票请求任务
 
    public:
     Raft() = delete;
 
-    /// @brief raft节点构造函数
-    /// @param iom 指向全局调度器的智能指针
+    /**
+     * @brief raft节点构造函数
+     * @param iom 指向全局调度器的智能指针
+     */
     explicit Raft(sylar::IOManager::ptr iom);
 
     ~Raft() override;
@@ -130,10 +130,10 @@ class Raft : public raftRpcProctoc::raftRpc {
     int getNewCommandIndex();
     void getPrevLogInfo(int server, int *preIndex, int *preTerm);
 
-    /**
-     * @brief 看当前节点是否是leader
-     */
-    // void GetState(int *term, int *isLeader);
+//    /**
+//     * @brief 看当前节点是否是leader
+//     */
+//    void GetState(int *term, int *isLeader);
     bool GetState(int *term);
 
     /**
@@ -306,7 +306,7 @@ class Raft : public raftRpcProctoc::raftRpc {
          *        is a type of input archive the & operator is defined similar to >>.
          */
         template <class Archive>
-        void serialize(Archive &ar, const unsigned int version) {
+        [[maybe_unused]] void serialize(Archive &ar, [[maybe_unused]] const unsigned int version) {
             ar & m_currentTerm;
             ar & m_votedFor;
             ar & m_lastSnapshotIncludeIndex;
