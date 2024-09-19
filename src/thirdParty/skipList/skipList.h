@@ -1,7 +1,3 @@
-//
-// Created by swx on 24-1-5.
-//
-
 #ifndef SKIPLIST_H
 #define SKIPLIST_H
 /* ************************************************************************
@@ -44,7 +40,7 @@ class Node {
 
     V get_value() const;
 
-    void set_value(V);
+    [[maybe_unused]] void set_value(V);
 
     // Linear array to hold pointers to next node of different level
     Node<K, V> **forward;
@@ -84,7 +80,7 @@ V Node<K, V>::get_value() const {
     return value;
 };
 template <typename K, typename V>
-void Node<K, V>::set_value(V value) {
+[[maybe_unused]] void Node<K, V>::set_value(V value) {
     this->value = value;
 };
 // Class template to implement node
@@ -94,7 +90,7 @@ class SkipListDump {
     friend class boost::serialization::access;
 
     template <class Archive>
-    void serialize(Archive &ar, const unsigned int version) {
+    [[maybe_unused]] void serialize(Archive &ar, [[maybe_unused]] const unsigned int version) {
         ar & keyDumpVt_;
         ar & valDumpVt_;
     }
@@ -108,7 +104,7 @@ class SkipListDump {
 template <typename K, typename V>
 class SkipList {
    public:
-    SkipList(int);
+    [[maybe_unused]] SkipList(int);
     ~SkipList();
     int get_random_level();
     Node<K, V> *create_node(K, V, int);
@@ -442,7 +438,7 @@ void SkipListDump<K, V>::insert(const Node<K, V> &node) {
 
 // construct skip list
 template <typename K, typename V>
-SkipList<K, V>::SkipList(int max_level) {
+[[maybe_unused]] SkipList<K, V>::SkipList(int max_level) {
     this->_max_level = max_level;
     this->_skip_list_level = 0;
     this->_element_count = 0;

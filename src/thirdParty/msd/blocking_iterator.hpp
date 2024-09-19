@@ -62,9 +62,9 @@ class blocking_iterator {
  */
 template <typename T>
 struct std::iterator_traits<msd::blocking_iterator<T>> {
-    using value_type = typename msd::blocking_iterator<T>::value_type;
-    using reference = typename msd::blocking_iterator<T>::reference;
-    using iterator_category = std::input_iterator_tag;
+    using value_type [[maybe_unused]] = typename msd::blocking_iterator<T>::value_type;
+    using reference [[maybe_unused]] = typename msd::blocking_iterator<T>::reference;
+    using iterator_category [[maybe_unused]] = std::input_iterator_tag;
 };
 
 #endif  // MSD_CHANNEL_BLOCKING_ITERATOR_HPP_

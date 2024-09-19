@@ -32,10 +32,6 @@
 #ifndef NEARGYE_SCOPE_GUARD_HPP
 #define NEARGYE_SCOPE_GUARD_HPP
 
-#define SCOPE_GUARD_VERSION_MAJOR 0
-#define SCOPE_GUARD_VERSION_MINOR 9
-#define SCOPE_GUARD_VERSION_PATCH 1
-
 #include <type_traits>
 #if (defined(_MSC_VER) && _MSC_VER >= 1900) || ((defined(__clang__) || defined(__GNUC__)) && __cplusplus >= 201700L)
 #include <exception>
@@ -134,7 +130,7 @@ class on_exit_policy {
 
     void dismiss() noexcept { execute_ = false; }
 
-    bool should_execute() const noexcept { return execute_; }
+    [[nodiscard]] bool should_execute() const noexcept { return execute_; }
 };
 
 class on_fail_policy {
@@ -145,7 +141,7 @@ class on_fail_policy {
 
     void dismiss() noexcept { ec_ = -1; }
 
-    bool should_execute() const noexcept { return ec_ != -1 && ec_ < uncaught_exceptions(); }
+    [[nodiscard]] bool should_execute() const noexcept { return ec_ != -1 && ec_ < uncaught_exceptions(); }
 };
 
 class on_success_policy {
@@ -156,7 +152,7 @@ class on_success_policy {
 
     void dismiss() noexcept { ec_ = -1; }
 
-    bool should_execute() const noexcept { return ec_ != -1 && ec_ >= uncaught_exceptions(); }
+    [[nodiscard]] bool should_execute() const noexcept { return ec_ != -1 && ec_ >= uncaught_exceptions(); }
 };
 
 template <typename T, typename = void>
@@ -190,10 +186,10 @@ class scope_guard {
     P policy_;
     A action_;
 
+   public:
     void* operator new(std::size_t) = delete;
     void operator delete(void*) = delete;
 
-   public:
     scope_guard() = delete;
     scope_guard(const scope_guard&) = delete;
     scope_guard& operator=(const scope_guard&) = delete;

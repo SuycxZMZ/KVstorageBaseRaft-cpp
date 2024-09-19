@@ -10,7 +10,6 @@
 #include <queue>
 #include <stdexcept>
 #include <type_traits>
-// #include <utility>
 
 #include "blocking_iterator.hpp"
 
@@ -40,7 +39,7 @@ class closed_channel : public std::runtime_error {
 template <typename T>
 class channel {
    public:
-    using value_type = T;
+    using value_type [[maybe_unused]] = T;
     using iterator = blocking_iterator<channel<T>>;
     using size_type = std::size_t;
 
@@ -85,7 +84,7 @@ class channel {
     /**
      * Closes the channel.
      */
-    inline void close() noexcept;
+    [[maybe_unused]] inline void close() noexcept;
 
     /**
      * Returns true if the channel is closed.
@@ -192,7 +191,7 @@ constexpr bool channel<T>::empty() const noexcept {
 }
 
 template <typename T>
-void channel<T>::close() noexcept {
+[[maybe_unused]] void channel<T>::close() noexcept {
     {
         std::unique_lock<std::mutex> lock{mtx_};
         is_closed_.store(true);
