@@ -35,7 +35,6 @@ void KVrpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
     const std::string &method_name = method->name();
 
     // 序列化 request 请求参数
-    uint32_t args_size = 0;
     std::string args_str;
     if (!request->SerializeToString(&args_str))
     {
@@ -43,7 +42,7 @@ void KVrpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
         // std::cout << "Serialize request args_str error !!!" << std::endl;
         return;
     }
-    args_size = args_str.size();
+    uint32_t args_size = args_str.size();
 
     // set rpcheader
     sylar_rpc::RpcHeader rpcheader;
@@ -89,11 +88,14 @@ void KVrpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
                  /// 同一个socket上连着两次发送使用一把锁隔开还是比较合理的
                  /// 一般不会出现非常严重的锁争用
 
-    // 发送rpc请求
-    // 失败会重试连接再发送，重试连接失败会直接return
-    // TODO 这里要处理信号，如果对端被kill 9，杀掉，或者正常关闭
-    // 则这里再发送会收到SIGPIPE，需要忽略处理，send返回-1时关闭。返回值未-1，错误码为 ECONNRESET
-    //  在非调试版本可以给send 的最后一个参数加上 MSG_NOSIGNAL 忽略信号
+                 /// TODO: 目前这种写法不能防止串话，可以再rpc请求和发送上加一个序列号标记，
+                 /// 对上的才处理，对不上再收几个包
+
+    /// 发送rpc请求
+    /// 失败会重试连接再发送，重试连接失败会直接return
+    /// TODO 这里要处理信号，如果对端被kill 9，杀掉，或者正常关闭
+    /// 则这里再发送会收到SIGPIPE，需要忽略处理，send返回-1时关闭。返回值未-1，错误码为 ECONNRESET
+    ///  在非调试版本可以给send 的最后一个参数加上 MSG_NOSIGNAL 忽略信号
     while (send(m_clientFd, rpc_send_str.c_str(), rpc_send_str.size(), 0) < 0) {
         char errtxt[512] = {0};
         sprintf(errtxt, "recv error! errno:%d", errno);
@@ -117,10 +119,9 @@ void KVrpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
 
     // 接收rpc请求的响应值
     char recv_buf[1024] = {0};
-    ssize_t recv_size = 0;
+    ssize_t recv_size;
 
-    // TODO 这里要处理信号，如果对端被kill9杀掉 错误码是 ECONNRESET
-    // 如果对端close或者shutdown,那么返回0
+    /// 如果对端close或者shutdown,那么返回0
     if (-1 == (recv_size = recv(m_clientFd, recv_buf, 1024, 0))) {
         if (!(errno == EAGAIN || errno == EWOULDBLOCK)) {
             close(m_clientFd);
@@ -162,7 +163,14 @@ bool KVrpcChannel::newConnect(const char* ip, uint16_t port, string* errMsg) {
         close(clientfd);
         return false;
     }
-    // 接收超时，没放在一起方便后期拓展，这两个超时可以设为不一样的值
+
+
+    /// TODO 这里其实有一个bug，如果前一个recv超时，则后面的recv可能会收到前一个的旧包
+    /// 串行化调用不能很好解决串话问题，可以在每个rpc包里面加一个汇话id，连接初始化时初始化，之后递增
+    /// 则在一个recv中接收到一个小的id之后就知道是串话了，需要丢弃。
+    /// 但是具体怎么写目前还没想好，涉及到一个简单的收发协议，并且还要有时效性。
+
+    /// 接收超时，没放在一起方便后期拓展，这两个超时可以设为不一样的值
     timeout.tv_usec = m_recvTimeout * 1000;
     if (setsockopt(clientfd, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout)) < 0) {
         std::cerr << "Failed to set socket send timeout\n";
