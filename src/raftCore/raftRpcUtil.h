@@ -1,7 +1,3 @@
-//
-// Created by swx on 23-12-28.
-//
-
 #ifndef RAFTRPC_H
 #define RAFTRPC_H
 
@@ -11,8 +7,7 @@
 ///        对于一个raft节点来说，要和任意其他的节点维护一个rpc连接，即MprpcChannel
 class RaftRpcUtil {
 private:
-    raftRpcProctoc::raftRpc_Stub *stub_;
-
+    std::shared_ptr<raftRpcProctoc::raftRpc_Stub> stub_;
 public:
     // 暴露给rpc调用方内部调用 stub->AppendEntries
     bool AppendEntries(raftRpcProctoc::AppendEntriesArgs *args, raftRpcProctoc::AppendEntriesReply *response);
@@ -28,8 +23,8 @@ public:
     RaftRpcUtil(const std::string& ip, short port);
     ~RaftRpcUtil();
 
-    RaftRpcUtil(const RaftRpcUtil& other) = delete; // 禁止浅拷贝
-    RaftRpcUtil& operator= (const RaftRpcUtil& other) = delete; // 禁止浅拷贝
+    RaftRpcUtil(const RaftRpcUtil& other) = delete;
+    RaftRpcUtil& operator= (const RaftRpcUtil& other) = delete;
 };
 
 #endif  // RAFTRPC_H
