@@ -87,8 +87,12 @@ class KvServer : raftKVRpcProctoc::kvServerRpc {
      */
     void GetCommandFromRaft(ApplyMsg message);
 
-    // 检查请求是否被持久化，如果客户id不存在，或者对应的请求id太大，就返flase
-    // 客户id存在且请求id小于等于当前最大值，返回true
+    /**
+     * @brief 判断传入的请求是否已经操作过
+     * @param ClientId
+     * @param RequestId
+     * @return true代表已经操作过，false代表未操作
+     */
     bool ifRequestDuplicate(const std::string& ClientId, int RequestId);
 
     /**

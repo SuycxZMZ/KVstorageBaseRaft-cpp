@@ -127,10 +127,7 @@ void KvServer::GetCommandFromRaft(ApplyMsg message) {
         return;
     }
 
-    // State Machine (KVServer solute the duplicate problem)
-    // duplicate command will not be exed
-    if (!ifRequestDuplicate(op.ClientId, op.RequestId)) {
-        // execute command
+    if (!ifRequestDuplicate(op.ClientId, op.RequestId)) { // 没操作过再操作KVDB
         if (op.Operation == "Put") {
             ExecutePutOpOnKVDB(op);
         }
@@ -232,7 +229,6 @@ void KvServer::PutAppend(const raftKVRpcProctoc::PutAppendArgs *args, raftKVRpcP
     while (true) {
         ApplyMsg message;
         *m_applyChan >> message;
-        // auto message = m_applyChan->Pop();  // 阻塞弹出
         // 应用到 KVDB
         if (message.CommandValid) {
             GetCommandFromRaft(message);
