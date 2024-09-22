@@ -10,7 +10,7 @@
 
 Raft::Raft(sylar::IOManager::ptr _iom)
     : m_iom(std::move(_iom)),
-      m_pool(calculate_pool_size()),
+      m_rpcWorker(std::make_shared<sylar::IOManager>(calculate_pool_size() * 2, false)),
       m_lastSnapshotIncludeIndex(),
       m_me(),
       m_commitIndex(),
@@ -271,14 +271,22 @@ void Raft::doElection() {
             auto requestVoteReply = std::make_shared<raftRpcProctoc::RequestVoteReply>();
 
             // 在for循环中 --> 候选者可能会起 (n - 1) 个线程发送投票RPC
-            m_pool.commit_with_timeout(
-                [this, i, requestVoteArgs, requestVoteReply, votedNum]() {
-                    sendRequestVote(i, requestVoteArgs, requestVoteReply, votedNum);  // 直接调用任务
-                },
-                maxRandomizedElectionTime
-            );
+            commitWithTimeout([this, i, requestVoteArgs, requestVoteReply, votedNum]() {
+                           sendRequestVote(i, requestVoteArgs, requestVoteReply, votedNum);  // 直接调用任务
+                       },maxRandomizedElectionTime);
         }
     }
+}
+
+
+void Raft::commitWithTimeout(const std::function<void()>& task, [[maybe_unused]] int timeout) {
+    auto startTime = std::chrono::steady_clock::now();
+    m_rpcWorker->schedule([task, startTime, timeout] () {
+        if (std::chrono::duration_cast<std::chrono::milliseconds>(
+                std::chrono::steady_clock::now() - startTime).count() < timeout) {
+            task();
+        }
+    });
 }
 
 /**
@@ -301,7 +309,7 @@ void Raft::doHeartBeat() {
 
             // ----------------------------- 发快照心跳 ----------------------------- //
             if (m_nextIndex[i] <= m_lastSnapshotIncludeIndex) {
-                m_pool.commit_with_timeout([this, i] { leaderSendSnapShot(i); }, HeartBeatTimeout);
+                commitWithTimeout([this, i] { leaderSendSnapShot(i); }, HeartBeatTimeout);
                 continue;
             }
 
@@ -345,12 +353,9 @@ void Raft::doHeartBeat() {
             appendEntriesReply->set_appstate(Disconnected);
 
             // 提交发送任务到线程池
-            m_pool.commit_with_timeout(
-                [this, i, appendEntriesArgs, appendEntriesReply, appendNums]() {
-                    sendAppendEntries(i, appendEntriesArgs, appendEntriesReply, appendNums);  // 直接调用任务
-                },
-                HeartBeatTimeout
-            );
+            commitWithTimeout([this, i, appendEntriesArgs, appendEntriesReply, appendNums]() {
+                sendAppendEntries(i, appendEntriesArgs, appendEntriesReply, appendNums);  // 直接调用任务
+            },HeartBeatTimeout);
         }
 
         // leader发送心跳，重置心跳时间，与选举不同
@@ -816,7 +821,7 @@ bool Raft::sendRequestVote(int server, const std::shared_ptr<raftRpcProctoc::Req
             m_matchIndex[i] = 0;  // 每换一个领导都是从0开始 ？
         }
         // 马上向其他节点宣告自己就是leader
-        m_pool.commit_with_timeout([this] { doHeartBeat(); }, maxRandomizedElectionTime);
+        commitWithTimeout([this] { doHeartBeat(); }, maxRandomizedElectionTime);
         persist();
     }
     return true;

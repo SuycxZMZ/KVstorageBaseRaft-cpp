@@ -16,7 +16,6 @@
 #include "common/util.h"
 #include "raftRpcUtil.h"
 #include "sylar/iomanager.h"
-#include "thirdParty/threadPool/threadpool.h"
 #include "thirdParty/msd/channel.hpp"
 
 /// 网络状态表示  todo：可以在rpc中删除该字段，实际生产中是用不到的.
@@ -72,8 +71,8 @@ class Raft : public raftRpcProctoc::raftRpc {
     int m_lastSnapshotIncludeIndex;  // 最新的一个快照中包含的日志条目最大索引
     int m_lastSnapshotIncludeTerm;   // 最新的一个快照中日志条目的任期号
 
-    sylar::IOManager::ptr m_iom;     // 协程调度器
-    sylar::threadpool m_pool;        // 工作线程池，主要用来执行发送AE和投票请求任务
+    sylar::IOManager::ptr m_iom;       // 网络层协程调度器，它也用来做选举超时和心跳发送任务
+    sylar::IOManager::ptr m_rpcWorker; // 工作线程池，主要用来执行发送AE和投票请求任务
 
    public:
     Raft() = delete;
@@ -292,6 +291,12 @@ class Raft : public raftRpcProctoc::raftRpc {
     void init(std::vector<std::shared_ptr<RaftRpcUtil>> peers, int me, std::shared_ptr<Persister> persister,
               std::shared_ptr<applyCh> applych);
 
+    /**
+     * @brief 超时任务提交
+     * @param task rpc任务
+     * @param timeout 超时时间
+     */
+    void commitWithTimeout(const std::function<void()>& task, [[maybe_unused]] int timeout);
    private:
     /**
      * @brief 对Raft节点的状态进行序列化和反序列化
