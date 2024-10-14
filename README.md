@@ -1,4 +1,4 @@
-# sylarbased分支
+# grpcbased分支
 
 [集成rpc服务的sylar框架仓库及说明](https://github.com/SuycxZMZ/sylar-from-suycx)
 
@@ -6,53 +6,41 @@
 
 ## [main分支](https://github.com/SuycxZMZ/KVstorageBaseRaft-cpp/tree/main)
 
-## 改进
+## [sylarbased分支](https://github.com/SuycxZMZ/KVstorageBaseRaft-cpp/tree/sylarbased)
+
+## 使用gRPC重构版的代码改进
 
 - raft核心代码注释补全，[主干详细代码执行流说明](docs/项目解析.md)
-- 使用集成rpc服务的sylar网络框架重构
 - [main分支](https://github.com/SuycxZMZ/KVstorageBaseRaft-cpp/tree/main)重写muduo网络库，主要组件均已实现，支持更简单好用的异步日志系统。[日志系统可以单独剥离](https://github.com/SuycxZMZ/symlog)。
+- [sylarbased分支](https://github.com/SuycxZMZ/KVstorageBaseRaft-cpp/tree/sylarbased)基于sylar网络库的实现，比main分支更优雅，细节可以跳转过去看
 - [rpc详细解析](https://github.com/SuycxZMZ/MpRPC-Cpp)，这个我画的是muduo作为底层的结构，其实sylar也差不多，最主要的是重写handleClient，在muduo中是onMessage
-- AE和投票信息的的发送使用线程池处理，避免频繁创建销毁大量线程。
-- 移除fiber文件夹，直接使用sylar协程调度器调度(使用时要仔细考虑好调度器的线程数，既要处理网络收发，又要处理两个定时任务)
-- 对raft层的rpc调用方进行加锁保护，使每次调用的发送和接收为一个原子过程，避免出现答非所问和多线程写同一个socket
-- 对raft层的每个rpc调用设置超时时间，避免长时间阻塞造成后续调用不能及时执行，确保每个调用的时效性
+- AE和投票信息的的发送使用`boost`线程池处理，避免频繁创建销毁大量线程。
 - 优化代码组织结构，移除多余的include文件夹，更清爽的cmake代码结构，减少重复编译和路径污染
 - 引入开源库[cpp-channel](https://github.com/andreiavrammsd/cpp-channel)代替原本的手搓阻塞队列，golang风格，更优雅(只在原版代码中添加了超时弹出的接口)
 - 引入开源库[Defer-C++](https://github.com/Neargye/scope_guard)代替原本手搓的DEFER，该库主要使用RAII手法封了一套宏，使用简单，写的也比较规范
+- gRPC使用Http2.0作为网络传输协议，支持流式处理，多个流可以复用同一条连接
+- 天然支持高并发，stub是线程安全的，对于raft层来说，多个线程可以安全调用同一个stub
+- 支持超时和重试
+- 代码更加高效和简洁
+- 支持负载均衡和服务发现，配置起来更加优雅
+- gitbub这个东西也是个纯**，手机验证不支持中国大陆，最新的代码在[gitee](https://gitee.com/suycx/KVstorageBaseRaft-cpp)
 
 ## 使用
 
 1.库准备
 
-- 安装带rpc服务的sylar网络库，[sylar-from-suycx](https://github.com/SuycxZMZ/sylar-from-suycx)
-- `boost`、`protoc`
+- 安装[grpc](https://www.llfc.club/category?catid=225RaiVNI8pFDD5L4m807g7ZwmF#!aid/2TIG572uTKxQxned7LCk8KoulfL)，从官网安装时，子模块非常难下载，这个版本是grpc1.34版，配套的是protobuf3.13
+- `boost`：`sudo apt-get install libboost-dev libboost-test-dev libboost-all-dev`
 - 注意：我在[sylar-from-suycx](https://github.com/SuycxZMZ/sylar-from-suycx)项目的tools-packages文件夹下放了zookeeper3.4.1的安装包，如果是arm架构的cpu要装这个，官方原版的包有个函数里面直接用了x86的汇编，没加条件编译，会直接报错
 
-2.安装说明
-
-- protoc，本地版本为3.12.4，ubuntu22使用`sudo apt-get install protobuf-compiler libprotobuf-dev`默认安装的版本在这个附近，大概率能用，项目的tools-package中也放了3.12.4的源码，编译安装就行，如果报错直接百度，很好解决。ubuntu24.04默认安装的是3.21.1，编译会报错，目前没有解决。
-- boost，`sudo apt-get install libboost-dev libboost-test-dev libboost-all-dev`
-
-3.编译
+2.编译
 
 ```shell
-# 安装 sylar
-https://github.com/SuycxZMZ/sylar-from-suycx
+## Debug版
+bash build.sh DEBUG
 
-# 注意，在编译KVRaft项目之前，最好执行一下根目录下的`configureproto.sh`脚本，这个脚本会自动生成proto文件对应的.pb.h和.pb.cc文件，覆盖原本的文件
-sudo bash configureproto.sh
-
-# 带调试打印信息的编译
-mkdir cmake-build-debug
-cd cmake-build-debug
-cmake -DCMAKE_BUILD_TYPE=Debug ..
-make -j4
-
-# 不想要调试信息的话
-mkdir cmake-build-release
-cd cmake-build-release
-cmake -DCMAKE_BUILD_TYPE=Release ..
-make -j4
+## Release版
+bash build.sh RELEASE
 ```
 
 之后在目录bin就有对应的可执行文件生成：
@@ -99,40 +87,8 @@ kill -18 <pid>
 
 **待改善**：
 
-- [x] 搓一个能正常跑测试的版本，基本已经调试通过
-- [x] 粘包问题
-  - 正常情况下的长连接，如果调用方单线程调用，不会粘包，因为每次发送完都要`recv`阻塞等待结果，也就是**串行调用**，不存在粘包的情况
-  - 本项目的rpc调用是多线程的，如果一个节点对 另外一个节点的两个rpc调用没有及时处理，那么这两个rpc包就黏在一起了
-  - 解决这个问题比较简单，在网络接收数据时，一个包一个包的收就行了
-  - 另外，在这个项目的结构中出现对一个节点的两个rpc同时在进行是不合理的，这意味着两个线程操作同一个socket描述符，而且一个rpc调用是先`send`再`recv`，分开的，如果`send`没出现数据竞争，那`recv`也有可能后一个包先到，造成答非所问，也是错的。所以在最新的版本中，我在`rpcChannel`类中加了一个 `mutex` 互斥锁，发送时上锁，接收之后才解锁，保证每一个rpc调用是原子的，其实单独这个操作可以直接把粘包问题解决，这也解决了 第5点中的部分问题
-
-- [x] 添加线程池
-  - 线程池要支持动态伸缩。
-  - `leader` 节点上高负荷跑的有 `(n - 1)` 个AE发送线程，外部客户端访问是交给网络框架来做的
-  - `candidate` 节点上 `(n - 1)` 个投票线程，在失败之后重新回归 `follower`身份，线程销毁; 成功上位之后，这几个线程应该被 AE 线程复用
-  - 另外对于 `follower` 可能会临时起 `InstallSnapshot` 线程，发送快照应属于不常见现象，健康的状态是发送增量日志，可以单独起线程
-  - 每个节点上跑 `applierTicker`， 定期向状态机写入日志，将已提交但未应用的日志应用，加入到 `m_applyChan` 与KVserver层交互，时间到基本就要立马执行，适合单独起线程
-  - 所以正常网络情况下，每个节点上线程池最大限制为 `2n` 是足够充裕的
-- [x] 排队任务超时销毁
-  - 所以，对于加入线程池的任务，AE 投票 应该有一个超时时间限制，如果在一定的时间内得不到执行，那么这个任务已经没什么时效性了，可以销毁
-  - 对于AE任务，这个时间应该与心跳间隔相当
-  - 对于投票任务，这个时间可以在 心跳间隔与选举超时时间之间
-
-- [x] 已经开始执行的任务超时销毁
-  - 在网络很差的情况下，如果对端长时间不可写，每个发送rpc都是拿锁的，只要一直不返回，相对端的后续rpc调用任务就一直阻塞，还是会造成任务积压，积压过多就会导致一直选不出来leader，停止对外服务
-  - 所以一个rpc任务执行时间超过了正常值，也应该停掉。现在在`rpcChannel`的发送和接收上加了两个超时时间，理论上来说，对于raft层的rpc调用，这两个超时时间之和应该小于一个心跳超时时间(不能下一个心跳都来了，上一个还没发送完)，客户端的可以给大一点，暂时给的500毫秒，不在raft算法的讨论范围之内。
+- [ ] 心跳和超时定时任务使用boost协程实现
   
-## 未来计划
-
-使用gRPC重构代码，完全移除自己手搓的网络和rpc模块
-
-- gRPC使用Http2.0作为网络传输协议，支持流式处理，多个流可以复用同一条连接
-- 天然支持高并发，stub是线程安全的，对于raft层来说，多个线程可以安全调用同一个stub
-- 支持超时和重试
-- 支持异步，代码更加高效和简洁
-- 支持负载均衡和服务发现，配置起来更加优雅
-- gitbub这个东西也是个纯**，手机验证不支持中国大陆，最新的代码在[gitee](https://gitee.com/suycx/KVstorageBaseRaft-cpp)
-
 ## 参考&&致谢
 
 https://github.com/chenshuo/muduo
