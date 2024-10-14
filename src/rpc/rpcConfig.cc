@@ -4,6 +4,11 @@
 #include <iostream>
 #include <string>
 
+rpcConfig& rpcConfig::GetInstance() {
+    static rpcConfig instance;
+    return instance;
+}
+
 void rpcConfig::LoadConfigFile(const char* config_file) {
     FILE* pf = fopen(config_file, "r");
     if (nullptr == pf) {
@@ -64,4 +69,3 @@ void removeSpaces(std::string& str) {
     // 将处理后的字符串的末尾设置为'\0'，以表示字符串的结束
     str.resize(writePos);
 }
-

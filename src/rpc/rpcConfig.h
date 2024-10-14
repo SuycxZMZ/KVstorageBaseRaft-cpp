@@ -13,10 +13,10 @@ class rpcConfig {
 
     // 取ip和端口号
     std::string Load(const std::string& key);
-
+    static rpcConfig& GetInstance();
    private:
+    rpcConfig() = default;
     std::unordered_map<std::string, std::string> m_configMap;
 };
-
 
 #endif
