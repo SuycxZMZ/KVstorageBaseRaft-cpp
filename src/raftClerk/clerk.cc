@@ -76,23 +76,17 @@ void Clerk::Append(const std::string& key, const std::string& value) { PutAppend
 
 // 初始化客户端
 void Clerk::Init(const std::string& configFileName) {
-    // 获取所有raft节点ip、port ，并进行连接
-    rpcConfig config; 
-    config.LoadConfigFile(configFileName.c_str());
-    std::vector<std::pair<std::string, std::string>> ipPortVt;
+    // 获取所有raft节点ip、port ，并初始化grpc客户端
+    // rpcConfig::GetInstance() config;
+    rpcConfig::GetInstance().LoadConfigFile(configFileName.c_str());
+
     for (int i = 0; i < INT_MAX - 1; ++i) {
         std::string node = "node" + std::to_string(i);
-        std::string nodeIp = config.Load(node + "ip");
-        std::string nodePort = config.Load(node + "port");
-        if (nodeIp.empty()) {
-            break;
-        }
-        ipPortVt.emplace_back(nodeIp, nodePort);
-    }
-    // 进行连接
-    for (const auto& item : ipPortVt) {
-        std::string ip = item.first + ':';
-        m_servers.emplace_back(std::make_shared<raftServerRpcUtil>(ip + item.second));
+        std::string nodeIpPort = rpcConfig::GetInstance().Load(node + "ip");
+        if (nodeIpPort == "") break;
+        nodeIpPort += ':';
+        nodeIpPort += rpcConfig::GetInstance().Load(node + "port");
+        m_servers.emplace_back(std::make_shared<raftServerRpcUtil>(nodeIpPort));
     }
 }
 

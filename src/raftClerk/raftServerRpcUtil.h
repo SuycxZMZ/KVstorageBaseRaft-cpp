@@ -28,7 +28,7 @@ public:
   bool Get(raftKVRpcProctoc::GetArgs* args, raftKVRpcProctoc::GetReply* reply);
   bool PutAppend(raftKVRpcProctoc::PutAppendArgs* args, raftKVRpcProctoc::PutAppendReply* reply);
 
-  raftServerRpcUtil(const std::string& ipPort);
+  explicit raftServerRpcUtil(const std::string& ipPort);
   ~raftServerRpcUtil();
 };
 

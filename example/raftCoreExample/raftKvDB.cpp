@@ -1,5 +1,4 @@
 #include "raftCore/kvServer.h"
-#include <chrono>
 #include <cstring>
 #include <iostream>
 #include <unistd.h>
@@ -7,7 +6,6 @@
 #include <memory>
 #include <random>
 #include <string>
-#include <thread>
 #include <vector>
 #include <sys/wait.h>
 
@@ -43,7 +41,7 @@ int main(int argc, char **argv) {
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> dis(10000, 29999);
-    unsigned short startPort = dis(gen);
+    auto startPort = static_cast<short>(dis(gen));
     while ((c = getopt(argc, argv, "n:f:")) != -1) {
         switch (c) {
             case 'n':
@@ -69,22 +67,21 @@ int main(int argc, char **argv) {
     std::ofstream outfile;
     outfile.open("test.conf", std::ios::app);  // 打开文件并追加写入
     std::string basicTestIP = "127.0.0.1";
-    std::vector<short> portVec(nodeNum);
+    std::vector<int> portVec(nodeNum);
     for (int i = 0; i < nodeNum; ++i) {
-        portVec[i] = startPort + static_cast<short>(i);
+        portVec[i] = i + startPort;
         outfile << "node" << std::to_string(i) << "ip=" << basicTestIP << std::endl;
         outfile << "node" << std::to_string(i) << "port=" << std::to_string(portVec[i]) << std::endl;
     }
 
     // ---------------------- 进程创建，测试 ----------------------
     for (int i = 0; i < nodeNum; i++) {
-        short port = portVec[i];
+        auto port = static_cast<short>(portVec[i]);
         std::cout << "start to create raftkv node:" << i << " port:" << port << " pid:" << getpid() << std::endl;
         pid_t pid = fork();  // 创建新进程
         if (pid == 0) {
             // 如果是子进程
             signal(SIGPIPE, SIG_IGN);
-            std::this_thread::sleep_for(std::chrono::milliseconds(500));
             // 子进程的代码
             auto kvServer = std::make_unique<KvServer>(i, 500, configFileName, port);
             pause();  // 子进程进入等待状态

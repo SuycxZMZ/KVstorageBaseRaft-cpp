@@ -308,18 +308,19 @@ std::string KvServer::MakeSnapShot() {
     return grpc::Status::OK;
 }
 
-void KvServer::ConfigFileInit(short port) const {
-    std::string ip = "127.0.0.1";
-    std::string node = "node" + std::to_string(m_me);
-    std::ofstream outfile;
-    outfile.open("test.conf", std::ios::app);  // 打开文件并追加写入
-    if (!outfile.is_open()) {
-        std::cout << "打开配置文件 test.conf 失败！" << std::endl;
-        exit(EXIT_FAILURE);
-    }
-    outfile << node + "ip=" + ip << std::endl;
-    outfile << node + "port=" + std::to_string(port) << std::endl;
-    outfile.close();
+void KvServer::GrpcBuilderInit(const std::string &nodeInforFileName) {
+    // grpcServer初始化
+    // 获取 ip和端口号
+    // rpcConfig config;
+    rpcConfig::GetInstance().LoadConfigFile(nodeInforFileName.c_str());
+    std::string self_node = "node" + std::to_string(m_me);
+    std::string nodeIpPort = rpcConfig::GetInstance().Load(self_node + "ip") + ':';
+    nodeIpPort += rpcConfig::GetInstance().Load(self_node + "port");
+
+    m_grpcBuilder.AddListeningPort(nodeIpPort, ::grpc::InsecureServerCredentials());
+    // 注册 kvServer和raft层的rpc方法
+    m_grpcBuilder.RegisterService(this);
+    m_grpcBuilder.RegisterService(m_raftNode.get());
 }
 
 /**
@@ -338,20 +339,10 @@ KvServer::KvServer(int me, int maxraftstate, const std::string &nodeInforFileNam
       m_raftNode(std::make_shared<Raft>()),
       m_grpcBuilder() {
     sleep(1);
-    // ConfigFileInit(port);
-    // rpc层起来
-    rpcConfig config;
-    config.LoadConfigFile(nodeInforFileName.c_str());
-    std::string self_node = "node" + std::to_string(me);
-    // std::string self_node_ip = config.Load(self_node + "ip");
-    // std::cout << "------- debug: " << m_me << " : " << self_node_ip << std::endl;
-    m_grpcBuilder.AddListeningPort("127.0.0.1:" + std::to_string(port), ::grpc::InsecureServerCredentials());
 
-    std::cout << "------- debug: " << m_me << " : before register" << std::endl;
-    m_grpcBuilder.RegisterService(this);
-    m_grpcBuilder.RegisterService(m_raftNode.get());
-    std::cout << "------- debug: " << m_me << " : register success" << std::endl;
+    GrpcBuilderInit(nodeInforFileName);
     m_grpcServer = m_grpcBuilder.BuildAndStart();
+    // 手动异步开启grpcServer
     std::thread grpc_server_thread([this]() { m_grpcServer->Wait(); });
     grpc_server_thread.detach();
 
@@ -359,33 +350,24 @@ KvServer::KvServer(int me, int maxraftstate, const std::string &nodeInforFileNam
     sleep(2);
     std::cout << "raftServer node:" << m_me << " wake up!!!! start to connect other raftnode" << std::endl;
 
-    // 获取所有raft节点ip、port,并进行连接,要排除自己
-    std::vector<std::pair<std::string, short>> ipPortVt;
-    for (int i = 0; i < INT_MAX - 1; ++i) {
-        std::string node = "node" + std::to_string(i);
-        std::string nodeIp = config.Load(node + "ip");
-        std::string nodePortStr = config.Load(node + "port");
-        if (nodeIp.empty()) {
-            break;
-        }
-        ipPortVt.emplace_back(nodeIp, std::stoi(nodePortStr));
-    }
-
+    // 获取所有raft节点ip、port,并进grpc客户端的初始化,并排除自己
     std::vector<std::shared_ptr<RaftRpcUtil>> otherServers;
-    // 到其他节点的rpc客户端创建
-    for (int i = 0; i < ipPortVt.size(); ++i) {
+    for (int i = 0; i < INT_MAX - 1; ++i) {
         if (i == m_me) {
             otherServers.emplace_back(nullptr);
             continue;
         }
-        std::string otherNodeIp = ipPortVt[i].first + ':';
-        short otherNodePort = ipPortVt[i].second;
-        std::string ipPort = otherNodeIp + std::to_string(otherNodePort);
-        std::cout << "debug:" << ipPort << std::endl;
-        otherServers.emplace_back(std::make_shared<RaftRpcUtil>(ipPort));
-        std::cout << "node" << m_me << " --> 连接node" << i << " success!" << std::endl;
+        std::string node = "node" + std::to_string(i);
+        std::string nodeIpPort = rpcConfig::GetInstance().Load(node + "ip");
+        if (nodeIpPort.empty()) {
+            break;
+        }
+        nodeIpPort += ':';
+        nodeIpPort += rpcConfig::GetInstance().Load(node + "port");
+        otherServers.emplace_back(std::make_shared<RaftRpcUtil>(nodeIpPort));
     }
-    sleep(ipPortVt.size() - me);
+
+    sleep(otherServers.size() - me);
 
     // 传递给 raft::init 用的 persister
     auto persister = std::make_shared<Persister>(me);
@@ -405,6 +387,5 @@ KvServer::KvServer(int me, int maxraftstate, const std::string &nodeInforFileNam
     // 这个任务要单开一个独立线程，保证实时性，它是raft层消息的消费者，拿出raft层传过来的commit日志信息
     // 然后真正把命令保存到KVDB，保存成功put操作才会返回(失败的话是超时返回)，get也差不多
     std::thread apply_thread(&KvServer::ReadRaftApplyCommandLoop, this);
-
     apply_thread.join();  // 由于ReadRaftApplyCommandLoop是死循环，进程一直卡到这里
 }

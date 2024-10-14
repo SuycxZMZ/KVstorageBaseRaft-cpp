@@ -73,7 +73,7 @@ class KvServer final : raftKVRpcProctoc::kvServerRpc::Service {
      */
     KvServer(int me, int maxraftstate, const std::string &nodeInforFileName, short port);
 
-    void ConfigFileInit(short port) const;
+    void GrpcBuilderInit(const std::string &nodeInforFileName);
 
     // void StartKVServer();
 
