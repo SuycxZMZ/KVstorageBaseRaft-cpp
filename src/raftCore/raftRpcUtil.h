@@ -1,26 +1,39 @@
 #ifndef RAFTRPC_H
 #define RAFTRPC_H
 
+#include <grpcpp/impl/codegen/client_callback.h>
+#include <grpcpp/impl/codegen/client_context.h>
+#include <grpcpp/impl/codegen/status.h>
+#include <memory>
 #include "raftRpcPro/raftRPC.pb.h"
+#include "raftRpcPro/raftRPC.grpc.pb.h"
 
-/// @brief 维护当前节点对其他某一个结点的所有rpc发送通信的功能
-///        对于一个raft节点来说，要和任意其他的节点维护一个rpc连接，即MprpcChannel
+using grpc::Channel;
+using grpc::ClientContext;
+using grpc::Status;
+using raftRpcProctoc::AppendEntriesArgs;
+using raftRpcProctoc::AppendEntriesReply;
+using raftRpcProctoc::InstallSnapshotRequest;
+using raftRpcProctoc::InstallSnapshotResponse;
+using raftRpcProctoc::LogEntry;
+using raftRpcProctoc::raftRpc;
+using raftRpcProctoc::RequestVoteArgs;
+using raftRpcProctoc::RequestVoteReply;
+
+
 class RaftRpcUtil {
 private:
-    std::shared_ptr<raftRpcProctoc::raftRpc_Stub> stub_;
+    std::shared_ptr<raftRpc::Stub> m_stub;
 public:
-    // 暴露给rpc调用方内部调用 stub->AppendEntries
+
     bool AppendEntries(raftRpcProctoc::AppendEntriesArgs *args, raftRpcProctoc::AppendEntriesReply *response);
-    // 暴露给rpc调用方内部调用 stub->InstallSnapshot
+
     bool InstallSnapshot(raftRpcProctoc::InstallSnapshotRequest *args,
                          raftRpcProctoc::InstallSnapshotResponse *response);
-    // 暴露给rpc调用方内部调用 stub->RequestVote
+
     bool RequestVote(raftRpcProctoc::RequestVoteArgs *args, raftRpcProctoc::RequestVoteReply *response);
 
-    /// @brief RaftRpcUtil 构造函数
-    /// @param ip 对端ip
-    /// @param port 对端端口号
-    RaftRpcUtil(const std::string& ip, short port);
+    explicit RaftRpcUtil(const std::string& ipPort);
     ~RaftRpcUtil();
 
     RaftRpcUtil(const RaftRpcUtil& other) = delete;

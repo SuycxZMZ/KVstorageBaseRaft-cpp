@@ -146,7 +146,7 @@ static void InitDefaultsscc_info_RequestVoteReply_raftRPC_2eproto() {
 
 static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_raftRPC_2eproto[7];
 static constexpr ::PROTOBUF_NAMESPACE_ID::EnumDescriptor const** file_level_enum_descriptors_raftRPC_2eproto = nullptr;
-static const ::PROTOBUF_NAMESPACE_ID::ServiceDescriptor* file_level_service_descriptors_raftRPC_2eproto[1];
+static constexpr ::PROTOBUF_NAMESPACE_ID::ServiceDescriptor const** file_level_service_descriptors_raftRPC_2eproto = nullptr;
 
 const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_raftRPC_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   ~0u,  // no _has_bits_
@@ -256,7 +256,7 @@ const char descriptor_table_protodef_raftRPC_2eproto[] PROTOBUF_SECTION_VARIABLE
   "c.InstallSnapshotRequest\032\'.raftRpcProcto"
   "c.InstallSnapshotResponse\022P\n\013RequestVote"
   "\022\037.raftRpcProctoc.RequestVoteArgs\032 .raft"
-  "RpcProctoc.RequestVoteReplyB\003\200\001\001b\006proto3"
+  "RpcProctoc.RequestVoteReplyb\006proto3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_raftRPC_2eproto_deps[1] = {
 };
@@ -271,7 +271,7 @@ static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_raf
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_raftRPC_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_raftRPC_2eproto = {
-  false, false, descriptor_table_protodef_raftRPC_2eproto, "raftRPC.proto", 1000,
+  false, false, descriptor_table_protodef_raftRPC_2eproto, "raftRPC.proto", 995,
   &descriptor_table_raftRPC_2eproto_once, descriptor_table_raftRPC_2eproto_sccs, descriptor_table_raftRPC_2eproto_deps, 7, 0,
   schemas, file_default_instances, TableStruct_raftRPC_2eproto::offsets,
   file_level_metadata_raftRPC_2eproto, 7, file_level_enum_descriptors_raftRPC_2eproto, file_level_service_descriptors_raftRPC_2eproto,
@@ -2190,147 +2190,6 @@ void InstallSnapshotResponse::InternalSwap(InstallSnapshotResponse* other) {
   return GetMetadataStatic();
 }
 
-
-// ===================================================================
-
-raftRpc::~raftRpc() {}
-
-const ::PROTOBUF_NAMESPACE_ID::ServiceDescriptor* raftRpc::descriptor() {
-  ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&descriptor_table_raftRPC_2eproto);
-  return file_level_service_descriptors_raftRPC_2eproto[0];
-}
-
-const ::PROTOBUF_NAMESPACE_ID::ServiceDescriptor* raftRpc::GetDescriptor() {
-  return descriptor();
-}
-
-void raftRpc::AppendEntries(::PROTOBUF_NAMESPACE_ID::RpcController* controller,
-                         const ::raftRpcProctoc::AppendEntriesArgs*,
-                         ::raftRpcProctoc::AppendEntriesReply*,
-                         ::google::protobuf::Closure* done) {
-  controller->SetFailed("Method AppendEntries() not implemented.");
-  done->Run();
-}
-
-void raftRpc::InstallSnapshot(::PROTOBUF_NAMESPACE_ID::RpcController* controller,
-                         const ::raftRpcProctoc::InstallSnapshotRequest*,
-                         ::raftRpcProctoc::InstallSnapshotResponse*,
-                         ::google::protobuf::Closure* done) {
-  controller->SetFailed("Method InstallSnapshot() not implemented.");
-  done->Run();
-}
-
-void raftRpc::RequestVote(::PROTOBUF_NAMESPACE_ID::RpcController* controller,
-                         const ::raftRpcProctoc::RequestVoteArgs*,
-                         ::raftRpcProctoc::RequestVoteReply*,
-                         ::google::protobuf::Closure* done) {
-  controller->SetFailed("Method RequestVote() not implemented.");
-  done->Run();
-}
-
-void raftRpc::CallMethod(const ::PROTOBUF_NAMESPACE_ID::MethodDescriptor* method,
-                             ::PROTOBUF_NAMESPACE_ID::RpcController* controller,
-                             const ::PROTOBUF_NAMESPACE_ID::Message* request,
-                             ::PROTOBUF_NAMESPACE_ID::Message* response,
-                             ::google::protobuf::Closure* done) {
-  GOOGLE_DCHECK_EQ(method->service(), file_level_service_descriptors_raftRPC_2eproto[0]);
-  switch(method->index()) {
-    case 0:
-      AppendEntries(controller,
-             ::PROTOBUF_NAMESPACE_ID::internal::DownCast<const ::raftRpcProctoc::AppendEntriesArgs*>(
-                 request),
-             ::PROTOBUF_NAMESPACE_ID::internal::DownCast<::raftRpcProctoc::AppendEntriesReply*>(
-                 response),
-             done);
-      break;
-    case 1:
-      InstallSnapshot(controller,
-             ::PROTOBUF_NAMESPACE_ID::internal::DownCast<const ::raftRpcProctoc::InstallSnapshotRequest*>(
-                 request),
-             ::PROTOBUF_NAMESPACE_ID::internal::DownCast<::raftRpcProctoc::InstallSnapshotResponse*>(
-                 response),
-             done);
-      break;
-    case 2:
-      RequestVote(controller,
-             ::PROTOBUF_NAMESPACE_ID::internal::DownCast<const ::raftRpcProctoc::RequestVoteArgs*>(
-                 request),
-             ::PROTOBUF_NAMESPACE_ID::internal::DownCast<::raftRpcProctoc::RequestVoteReply*>(
-                 response),
-             done);
-      break;
-    default:
-      GOOGLE_LOG(FATAL) << "Bad method index; this should never happen.";
-      break;
-  }
-}
-
-const ::PROTOBUF_NAMESPACE_ID::Message& raftRpc::GetRequestPrototype(
-    const ::PROTOBUF_NAMESPACE_ID::MethodDescriptor* method) const {
-  GOOGLE_DCHECK_EQ(method->service(), descriptor());
-  switch(method->index()) {
-    case 0:
-      return ::raftRpcProctoc::AppendEntriesArgs::default_instance();
-    case 1:
-      return ::raftRpcProctoc::InstallSnapshotRequest::default_instance();
-    case 2:
-      return ::raftRpcProctoc::RequestVoteArgs::default_instance();
-    default:
-      GOOGLE_LOG(FATAL) << "Bad method index; this should never happen.";
-      return *::PROTOBUF_NAMESPACE_ID::MessageFactory::generated_factory()
-          ->GetPrototype(method->input_type());
-  }
-}
-
-const ::PROTOBUF_NAMESPACE_ID::Message& raftRpc::GetResponsePrototype(
-    const ::PROTOBUF_NAMESPACE_ID::MethodDescriptor* method) const {
-  GOOGLE_DCHECK_EQ(method->service(), descriptor());
-  switch(method->index()) {
-    case 0:
-      return ::raftRpcProctoc::AppendEntriesReply::default_instance();
-    case 1:
-      return ::raftRpcProctoc::InstallSnapshotResponse::default_instance();
-    case 2:
-      return ::raftRpcProctoc::RequestVoteReply::default_instance();
-    default:
-      GOOGLE_LOG(FATAL) << "Bad method index; this should never happen.";
-      return *::PROTOBUF_NAMESPACE_ID::MessageFactory::generated_factory()
-          ->GetPrototype(method->output_type());
-  }
-}
-
-raftRpc_Stub::raftRpc_Stub(::PROTOBUF_NAMESPACE_ID::RpcChannel* channel)
-  : channel_(channel), owns_channel_(false) {}
-raftRpc_Stub::raftRpc_Stub(
-    ::PROTOBUF_NAMESPACE_ID::RpcChannel* channel,
-    ::PROTOBUF_NAMESPACE_ID::Service::ChannelOwnership ownership)
-  : channel_(channel),
-    owns_channel_(ownership == ::PROTOBUF_NAMESPACE_ID::Service::STUB_OWNS_CHANNEL) {}
-raftRpc_Stub::~raftRpc_Stub() {
-  if (owns_channel_) delete channel_;
-}
-
-void raftRpc_Stub::AppendEntries(::PROTOBUF_NAMESPACE_ID::RpcController* controller,
-                              const ::raftRpcProctoc::AppendEntriesArgs* request,
-                              ::raftRpcProctoc::AppendEntriesReply* response,
-                              ::google::protobuf::Closure* done) {
-  channel_->CallMethod(descriptor()->method(0),
-                       controller, request, response, done);
-}
-void raftRpc_Stub::InstallSnapshot(::PROTOBUF_NAMESPACE_ID::RpcController* controller,
-                              const ::raftRpcProctoc::InstallSnapshotRequest* request,
-                              ::raftRpcProctoc::InstallSnapshotResponse* response,
-                              ::google::protobuf::Closure* done) {
-  channel_->CallMethod(descriptor()->method(1),
-                       controller, request, response, done);
-}
-void raftRpc_Stub::RequestVote(::PROTOBUF_NAMESPACE_ID::RpcController* controller,
-                              const ::raftRpcProctoc::RequestVoteArgs* request,
-                              ::raftRpcProctoc::RequestVoteReply* response,
-                              ::google::protobuf::Closure* done) {
-  channel_->CallMethod(descriptor()->method(2),
-                       controller, request, response, done);
-}
 
 // @@protoc_insertion_point(namespace_scope)
 }  // namespace raftRpcProctoc

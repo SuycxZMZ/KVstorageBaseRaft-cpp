@@ -1,13 +1,12 @@
 syntax = "proto3";
 
-
 package raftRpcProctoc; //所在的命名空间
 
-option cc_generic_services = true;  //开启stub服务
+// option cc_generic_services = true;  //开启stub服务
 
 // 日志实体
 message LogEntry{
-    bytes Command  =1;
+  bytes Command  =1;
 	int32 LogTerm   =2;
 	int32 LogIndex  = 3;
 }

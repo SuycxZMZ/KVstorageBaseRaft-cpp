@@ -14,7 +14,6 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_definitions(-DDprintf_Debug)
 endif()
 
-# only build examples if this is the main project
 if(CMAKE_PROJECT_NAME STREQUAL "KVRaftCpp")
     option(KVRaftCpp_BUILD_EXAMPLES "Build KVRaftCpp examples" ON)
 endif()
@@ -28,19 +27,23 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O2 -DNDEBUG")
 
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
+
+find_package(Boost REQUIRED COMPONENTS system)
+find_package(Protobuf REQUIRED)
+find_package(gRPC CONFIG REQUIRED)
+
 include_directories(${PROJECT_SOURCE_DIR}/src)
 
 # 设置项目库文件搜索路径 -L
 link_directories(
     ${PROJECT_SOURCE_DIR}/lib 
-    /usr/local/lib            
+    # /usr/local/lib            
 )
 
 add_subdirectory(src)
 if (KVRaftCpp_BUILD_EXAMPLES)
     add_subdirectory(example)
 endif()
-
 
 # 添加格式化目标 start
 # from : https://blog.csdn.net/guotianqing/article/details/121661067

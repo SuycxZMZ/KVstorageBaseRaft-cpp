@@ -90,7 +90,7 @@ static void InitDefaultsscc_info_PutAppendReply_kvServerRPC_2eproto() {
 
 static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_kvServerRPC_2eproto[4];
 static constexpr ::PROTOBUF_NAMESPACE_ID::EnumDescriptor const** file_level_enum_descriptors_kvServerRPC_2eproto = nullptr;
-static const ::PROTOBUF_NAMESPACE_ID::ServiceDescriptor* file_level_service_descriptors_kvServerRPC_2eproto[1];
+static constexpr ::PROTOBUF_NAMESPACE_ID::ServiceDescriptor const** file_level_service_descriptors_kvServerRPC_2eproto = nullptr;
 
 const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_kvServerRPC_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   ~0u,  // no _has_bits_
@@ -150,7 +150,7 @@ const char descriptor_table_protodef_kvServerRPC_2eproto[] PROTOBUF_SECTION_VARI
   "N\n\tPutAppend\022\037.raftKVRpcProctoc.PutAppen"
   "dArgs\032 .raftKVRpcProctoc.PutAppendReply\022"
   "<\n\003Get\022\031.raftKVRpcProctoc.GetArgs\032\032.raft"
-  "KVRpcProctoc.GetReplyB\003\200\001\001b\006proto3"
+  "KVRpcProctoc.GetReplyb\006proto3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_kvServerRPC_2eproto_deps[1] = {
 };
@@ -162,7 +162,7 @@ static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_kvS
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_kvServerRPC_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_kvServerRPC_2eproto = {
-  false, false, descriptor_table_protodef_kvServerRPC_2eproto, "kvServerRPC.proto", 434,
+  false, false, descriptor_table_protodef_kvServerRPC_2eproto, "kvServerRPC.proto", 429,
   &descriptor_table_kvServerRPC_2eproto_once, descriptor_table_kvServerRPC_2eproto_sccs, descriptor_table_kvServerRPC_2eproto_deps, 4, 0,
   schemas, file_default_instances, TableStruct_kvServerRPC_2eproto::offsets,
   file_level_metadata_kvServerRPC_2eproto, 4, file_level_enum_descriptors_kvServerRPC_2eproto, file_level_service_descriptors_kvServerRPC_2eproto,
@@ -1206,120 +1206,6 @@ void PutAppendReply::InternalSwap(PutAppendReply* other) {
   return GetMetadataStatic();
 }
 
-
-// ===================================================================
-
-kvServerRpc::~kvServerRpc() {}
-
-const ::PROTOBUF_NAMESPACE_ID::ServiceDescriptor* kvServerRpc::descriptor() {
-  ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&descriptor_table_kvServerRPC_2eproto);
-  return file_level_service_descriptors_kvServerRPC_2eproto[0];
-}
-
-const ::PROTOBUF_NAMESPACE_ID::ServiceDescriptor* kvServerRpc::GetDescriptor() {
-  return descriptor();
-}
-
-void kvServerRpc::PutAppend(::PROTOBUF_NAMESPACE_ID::RpcController* controller,
-                         const ::raftKVRpcProctoc::PutAppendArgs*,
-                         ::raftKVRpcProctoc::PutAppendReply*,
-                         ::google::protobuf::Closure* done) {
-  controller->SetFailed("Method PutAppend() not implemented.");
-  done->Run();
-}
-
-void kvServerRpc::Get(::PROTOBUF_NAMESPACE_ID::RpcController* controller,
-                         const ::raftKVRpcProctoc::GetArgs*,
-                         ::raftKVRpcProctoc::GetReply*,
-                         ::google::protobuf::Closure* done) {
-  controller->SetFailed("Method Get() not implemented.");
-  done->Run();
-}
-
-void kvServerRpc::CallMethod(const ::PROTOBUF_NAMESPACE_ID::MethodDescriptor* method,
-                             ::PROTOBUF_NAMESPACE_ID::RpcController* controller,
-                             const ::PROTOBUF_NAMESPACE_ID::Message* request,
-                             ::PROTOBUF_NAMESPACE_ID::Message* response,
-                             ::google::protobuf::Closure* done) {
-  GOOGLE_DCHECK_EQ(method->service(), file_level_service_descriptors_kvServerRPC_2eproto[0]);
-  switch(method->index()) {
-    case 0:
-      PutAppend(controller,
-             ::PROTOBUF_NAMESPACE_ID::internal::DownCast<const ::raftKVRpcProctoc::PutAppendArgs*>(
-                 request),
-             ::PROTOBUF_NAMESPACE_ID::internal::DownCast<::raftKVRpcProctoc::PutAppendReply*>(
-                 response),
-             done);
-      break;
-    case 1:
-      Get(controller,
-             ::PROTOBUF_NAMESPACE_ID::internal::DownCast<const ::raftKVRpcProctoc::GetArgs*>(
-                 request),
-             ::PROTOBUF_NAMESPACE_ID::internal::DownCast<::raftKVRpcProctoc::GetReply*>(
-                 response),
-             done);
-      break;
-    default:
-      GOOGLE_LOG(FATAL) << "Bad method index; this should never happen.";
-      break;
-  }
-}
-
-const ::PROTOBUF_NAMESPACE_ID::Message& kvServerRpc::GetRequestPrototype(
-    const ::PROTOBUF_NAMESPACE_ID::MethodDescriptor* method) const {
-  GOOGLE_DCHECK_EQ(method->service(), descriptor());
-  switch(method->index()) {
-    case 0:
-      return ::raftKVRpcProctoc::PutAppendArgs::default_instance();
-    case 1:
-      return ::raftKVRpcProctoc::GetArgs::default_instance();
-    default:
-      GOOGLE_LOG(FATAL) << "Bad method index; this should never happen.";
-      return *::PROTOBUF_NAMESPACE_ID::MessageFactory::generated_factory()
-          ->GetPrototype(method->input_type());
-  }
-}
-
-const ::PROTOBUF_NAMESPACE_ID::Message& kvServerRpc::GetResponsePrototype(
-    const ::PROTOBUF_NAMESPACE_ID::MethodDescriptor* method) const {
-  GOOGLE_DCHECK_EQ(method->service(), descriptor());
-  switch(method->index()) {
-    case 0:
-      return ::raftKVRpcProctoc::PutAppendReply::default_instance();
-    case 1:
-      return ::raftKVRpcProctoc::GetReply::default_instance();
-    default:
-      GOOGLE_LOG(FATAL) << "Bad method index; this should never happen.";
-      return *::PROTOBUF_NAMESPACE_ID::MessageFactory::generated_factory()
-          ->GetPrototype(method->output_type());
-  }
-}
-
-kvServerRpc_Stub::kvServerRpc_Stub(::PROTOBUF_NAMESPACE_ID::RpcChannel* channel)
-  : channel_(channel), owns_channel_(false) {}
-kvServerRpc_Stub::kvServerRpc_Stub(
-    ::PROTOBUF_NAMESPACE_ID::RpcChannel* channel,
-    ::PROTOBUF_NAMESPACE_ID::Service::ChannelOwnership ownership)
-  : channel_(channel),
-    owns_channel_(ownership == ::PROTOBUF_NAMESPACE_ID::Service::STUB_OWNS_CHANNEL) {}
-kvServerRpc_Stub::~kvServerRpc_Stub() {
-  if (owns_channel_) delete channel_;
-}
-
-void kvServerRpc_Stub::PutAppend(::PROTOBUF_NAMESPACE_ID::RpcController* controller,
-                              const ::raftKVRpcProctoc::PutAppendArgs* request,
-                              ::raftKVRpcProctoc::PutAppendReply* response,
-                              ::google::protobuf::Closure* done) {
-  channel_->CallMethod(descriptor()->method(0),
-                       controller, request, response, done);
-}
-void kvServerRpc_Stub::Get(::PROTOBUF_NAMESPACE_ID::RpcController* controller,
-                              const ::raftKVRpcProctoc::GetArgs* request,
-                              ::raftKVRpcProctoc::GetReply* response,
-                              ::google::protobuf::Closure* done) {
-  channel_->CallMethod(descriptor()->method(1),
-                       controller, request, response, done);
-}
 
 // @@protoc_insertion_point(namespace_scope)
 }  // namespace raftKVRpcProctoc

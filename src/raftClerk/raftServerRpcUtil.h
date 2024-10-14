@@ -1,18 +1,35 @@
 #ifndef RAFTSERVERRPC_H
 #define RAFTSERVERRPC_H
 
+#include <grpcpp/channel.h>
+#include <grpcpp/create_channel.h>
+#include <grpcpp/grpcpp.h>
+#include <grpcpp/impl/codegen/client_context.h>
+#include <grpcpp/impl/codegen/status.h>
+#include <grpcpp/security/credentials.h>
+#include <memory>
+#include <string>
+#include "raftRpcPro/kvServerRPC.grpc.pb.h"
 #include "raftRpcPro/kvServerRPC.pb.h"
 
-/// @brief 维护当前节点对其他某一个结点的所有rpc通信，包括接收其他节点的rpc和发送
+using grpc::ClientContext;
+using grpc::Status;
+using raftKVRpcProctoc::GetArgs;
+using raftKVRpcProctoc::GetReply;
+using raftKVRpcProctoc::kvServerRpc;
+using raftKVRpcProctoc::PutAppendArgs;
+using raftKVRpcProctoc::PutAppendReply;
+
 class raftServerRpcUtil {
 private:
-    std::shared_ptr<raftKVRpcProctoc::kvServerRpc_Stub> stub;
-public:
-    bool Get(raftKVRpcProctoc::GetArgs* GetArgs, raftKVRpcProctoc::GetReply* reply);
-    bool PutAppend(raftKVRpcProctoc::PutAppendArgs* args, raftKVRpcProctoc::PutAppendReply* reply);
+  std::shared_ptr<kvServerRpc::Stub> m_stub;
 
-    raftServerRpcUtil(const std::string& ip, short port);
-    ~raftServerRpcUtil();
+public:
+  bool Get(raftKVRpcProctoc::GetArgs* args, raftKVRpcProctoc::GetReply* reply);
+  bool PutAppend(raftKVRpcProctoc::PutAppendArgs* args, raftKVRpcProctoc::PutAppendReply* reply);
+
+  raftServerRpcUtil(const std::string& ipPort);
+  ~raftServerRpcUtil();
 };
 
 #endif  // RAFTSERVERRPC_H

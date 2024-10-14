@@ -1,31 +1,43 @@
 #include "raftRpcUtil.h"
-#include "rpc/KVrpcchannel.h"
-#include "sylar/rpc/rpccontroller.h"
+#include <grpcpp/create_channel.h>
+#include <grpcpp/impl/codegen/client_context.h>
+#include <grpcpp/impl/codegen/status.h>
+#include <grpcpp/security/credentials.h>
+#include "raftRpcPro/raftRPC.pb.h"
 
 bool RaftRpcUtil::AppendEntries(raftRpcProctoc::AppendEntriesArgs *args, raftRpcProctoc::AppendEntriesReply *response) {
-    sylar::rpc::MprpcController controller;
-    stub_->AppendEntries(&controller, args, response, nullptr);
-    return !controller.Failed();
+    grpc::ClientContext context;
+    Status status = m_stub->AppendEntries(&context, *args, response);
+    if (!status.ok()) {
+        std::cerr << "failure " + status.error_message() << std::endl;
+        return false;
+    }
+    return true;
 }
 
 bool RaftRpcUtil::InstallSnapshot(raftRpcProctoc::InstallSnapshotRequest *args,
                                   raftRpcProctoc::InstallSnapshotResponse *response) {
-    sylar::rpc::MprpcController controller;
-    stub_->InstallSnapshot(&controller, args, response, nullptr);
-    return !controller.Failed();
+    grpc::ClientContext context;
+    Status status = m_stub->InstallSnapshot(&context, *args, response);
+    if (!status.ok()) {
+        std::cerr << "failure " + status.error_message() << std::endl;
+        return false;
+    }
+    return true;
 }
 
 bool RaftRpcUtil::RequestVote(raftRpcProctoc::RequestVoteArgs *args, raftRpcProctoc::RequestVoteReply *response) {
-    sylar::rpc::MprpcController controller;
-    stub_->RequestVote(&controller, args, response, nullptr);
-    return !controller.Failed();
+    grpc::ClientContext context;
+    Status status = m_stub->RequestVote(&context, *args, response);
+    if (!status.ok()) {
+        std::cerr << "failure " + status.error_message() << std::endl;
+        return false;
+    }
+    return true;
 }
 
-// 先开启服务器，再尝试连接其他的节点，中间给一个间隔时间，等待其他的rpc服务器节点启动
-
-RaftRpcUtil::RaftRpcUtil(const std::string& ip, short port) :
-    stub_(std::make_shared<raftRpcProctoc::raftRpc_Stub>(
-          new KVrpcChannel(ip, port, true, HeartBeatTimeout / 2, HeartBeatTimeout / 2)))
+RaftRpcUtil::RaftRpcUtil(const std::string& ipPort) :
+  m_stub(raftRpc::NewStub(grpc::CreateChannel(ipPort, grpc::InsecureChannelCredentials())))
 {
 }
 

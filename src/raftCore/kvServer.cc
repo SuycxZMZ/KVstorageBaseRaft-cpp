@@ -1,8 +1,11 @@
 #include "kvServer.h"
+#include <grpcpp/security/server_credentials.h>
+#include <grpcpp/server.h>
 #include <memory>
+#include <string>
+#include <thread>
 #include "common/config.h"
-#include "rpc/KVrpcprovider.h"
-#include "sylar/rpc/rpcconfig.h"
+#include "rpc/rpcConfig.h"
 
 void KvServer::DprintfKVDB() {
 #ifdef Dprintf_Debug
@@ -11,7 +14,7 @@ void KvServer::DprintfKVDB() {
 #endif
 }
 
-void KvServer::ExecuteGetOpOnKVDB(const Op& op, std::string *value, bool *exist) {
+void KvServer::ExecuteGetOpOnKVDB(const Op &op, std::string *value, bool *exist) {
     {
         std::lock_guard<std::mutex> lock(m_mtx);
         *value = "";
@@ -127,7 +130,7 @@ void KvServer::GetCommandFromRaft(ApplyMsg message) {
         return;
     }
 
-    if (!ifRequestDuplicate(op.ClientId, op.RequestId)) { // 没操作过再操作KVDB
+    if (!ifRequestDuplicate(op.ClientId, op.RequestId)) {  // 没操作过再操作KVDB
         if (op.Operation == "Put") {
             ExecutePutOpOnKVDB(op);
         }
@@ -144,7 +147,7 @@ void KvServer::GetCommandFromRaft(ApplyMsg message) {
     SendMessageToWaitChan(op, message.CommandIndex);
 }
 
-bool KvServer::ifRequestDuplicate(const std::string& ClientId, int RequestId) {
+bool KvServer::ifRequestDuplicate(const std::string &ClientId, int RequestId) {
     std::lock_guard<std::mutex> lock(m_mtx);
     if (m_lastRequestClientAndId.find(ClientId) == m_lastRequestClientAndId.end()) {
         return false;
@@ -241,7 +244,7 @@ void KvServer::PutAppend(const raftKVRpcProctoc::PutAppendArgs *args, raftKVRpcP
     }
 }
 
-void KvServer::ReadSnapShotToInstall(const std::string& snapshot) {
+void KvServer::ReadSnapShotToInstall(const std::string &snapshot) {
     if (snapshot.empty()) {
         return;
     }
@@ -276,7 +279,7 @@ void KvServer::IfNeedToSendSnapShotCommand(int newLogIndex, [[maybe_unused]] int
     }
 }
 
-void KvServer::GetSnapShotFromRaft(const ApplyMsg& message) {
+void KvServer::GetSnapShotFromRaft(const ApplyMsg &message) {
     std::lock_guard<std::mutex> lock(m_mtx);
 
     if (Raft::CondInstallSnapshot(message.Snapshot)) {
@@ -291,16 +294,32 @@ std::string KvServer::MakeSnapShot() {
     return snapshotData;
 }
 
-void KvServer::PutAppend(google::protobuf::RpcController *controller, const ::raftKVRpcProctoc::PutAppendArgs *request,
-                         ::raftKVRpcProctoc::PutAppendReply *response, ::google::protobuf::Closure *done) {
+::grpc::Status KvServer::PutAppend(::grpc::ServerContext *context, const ::raftKVRpcProctoc::PutAppendArgs *request,
+                                   ::raftKVRpcProctoc::PutAppendReply *response) {
     KvServer::PutAppend(request, response);
-    done->Run();
+    // TODO 先暂时返回OK
+    return grpc::Status::OK;
 }
 
-void KvServer::Get(google::protobuf::RpcController *controller, const ::raftKVRpcProctoc::GetArgs *request,
-                   ::raftKVRpcProctoc::GetReply *response, ::google::protobuf::Closure *done) {
+::grpc::Status KvServer::Get(::grpc::ServerContext *context, const ::raftKVRpcProctoc::GetArgs *request,
+                             ::raftKVRpcProctoc::GetReply *response) {
     KvServer::Get(request, response);
-    done->Run();
+    // TODO 先暂时返回OK
+    return grpc::Status::OK;
+}
+
+void KvServer::ConfigFileInit(short port) const {
+    std::string ip = "127.0.0.1";
+    std::string node = "node" + std::to_string(m_me);
+    std::ofstream outfile;
+    outfile.open("test.conf", std::ios::app);  // 打开文件并追加写入
+    if (!outfile.is_open()) {
+        std::cout << "打开配置文件 test.conf 失败！" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+    outfile << node + "ip=" + ip << std::endl;
+    outfile << node + "port=" + std::to_string(port) << std::endl;
+    outfile.close();
 }
 
 /**
@@ -316,30 +335,32 @@ KvServer::KvServer(int me, int maxraftstate, const std::string &nodeInforFileNam
       m_maxRaftState(maxraftstate),
       m_skipList(6),
       m_lastSnapShotRaftLogIndex(0),
-      m_iom(std::make_shared<sylar::IOManager>(FIBER_THREAD_NUM, false)),
-      m_raftNode(std::make_shared<Raft>(m_iom)),
-      m_KvRpcProvider(std::make_shared<KVRpcProvider>(m_iom)) {
+      m_raftNode(std::make_shared<Raft>()),
+      m_grpcBuilder() {
     sleep(1);
+    // ConfigFileInit(port);
+    // rpc层起来
+    rpcConfig config;
+    config.LoadConfigFile(nodeInforFileName.c_str());
+    std::string self_node = "node" + std::to_string(me);
+    // std::string self_node_ip = config.Load(self_node + "ip");
+    // std::cout << "------- debug: " << m_me << " : " << self_node_ip << std::endl;
+    m_grpcBuilder.AddListeningPort("127.0.0.1:" + std::to_string(port), ::grpc::InsecureServerCredentials());
 
-    // rpc层起来，初始化阶段，调度器也没事情干，可以放调度器执行
-    m_iom->schedule([this, port]() -> void {
-        // 发布raft层方法，以及对客户端的方法
-        this->m_KvRpcProvider->NotifyService(this);
-        this->m_KvRpcProvider->NotifyService(this->m_raftNode.get());
-        // 启动一个rpc服务发布节点
-        this->m_KvRpcProvider->KVRpcProviderRunInit(m_me, port);
-        this->m_KvRpcProvider->InnerStart();
-    });
+    std::cout << "------- debug: " << m_me << " : before register" << std::endl;
+    m_grpcBuilder.RegisterService(this);
+    m_grpcBuilder.RegisterService(m_raftNode.get());
+    std::cout << "------- debug: " << m_me << " : register success" << std::endl;
+    m_grpcServer = m_grpcBuilder.BuildAndStart();
+    std::thread grpc_server_thread([this]() { m_grpcServer->Wait(); });
+    grpc_server_thread.detach();
 
-    // 等其他节点初始化完成
     std::cout << "raftServer node:" << m_me << " start to sleep to wait all ohter raftnode start!!!" << std::endl;
-    sleep(5);
+    sleep(2);
     std::cout << "raftServer node:" << m_me << " wake up!!!! start to connect other raftnode" << std::endl;
 
     // 获取所有raft节点ip、port,并进行连接,要排除自己
-    sylar::rpc::MprpcConfig config;
-    config.LoadConfigFile(nodeInforFileName.c_str());
-    std::vector<std::pair<std::string, short> > ipPortVt;
+    std::vector<std::pair<std::string, short>> ipPortVt;
     for (int i = 0; i < INT_MAX - 1; ++i) {
         std::string node = "node" + std::to_string(i);
         std::string nodeIp = config.Load(node + "ip");
@@ -350,20 +371,20 @@ KvServer::KvServer(int me, int maxraftstate, const std::string &nodeInforFileNam
         ipPortVt.emplace_back(nodeIp, std::stoi(nodePortStr));
     }
 
-    std::vector<std::shared_ptr<RaftRpcUtil> > otherServers;
-    // 进行连接
+    std::vector<std::shared_ptr<RaftRpcUtil>> otherServers;
+    // 到其他节点的rpc客户端创建
     for (int i = 0; i < ipPortVt.size(); ++i) {
         if (i == m_me) {
             otherServers.emplace_back(nullptr);
             continue;
         }
-        std::string otherNodeIp = ipPortVt[i].first;
+        std::string otherNodeIp = ipPortVt[i].first + ':';
         short otherNodePort = ipPortVt[i].second;
-        otherServers.emplace_back(
-            std::make_shared<RaftRpcUtil>(otherNodeIp, otherNodePort));  // 与其他节点通信的rpc通道
+        std::string ipPort = otherNodeIp + std::to_string(otherNodePort);
+        std::cout << "debug:" << ipPort << std::endl;
+        otherServers.emplace_back(std::make_shared<RaftRpcUtil>(ipPort));
         std::cout << "node" << m_me << " --> 连接node" << i << " success!" << std::endl;
     }
-    // 等待其他节点相互连接
     sleep(ipPortVt.size() - me);
 
     // 传递给 raft::init 用的 persister
@@ -380,9 +401,10 @@ KvServer::KvServer(int me, int maxraftstate, const std::string &nodeInforFileNam
     if (!snapshot.empty()) {
         ReadSnapShotToInstall(snapshot);
     }
-
+    std::cout << "before apply_thread and grpc_server_thread" << std::endl;
     // 这个任务要单开一个独立线程，保证实时性，它是raft层消息的消费者，拿出raft层传过来的commit日志信息
     // 然后真正把命令保存到KVDB，保存成功put操作才会返回(失败的话是超时返回)，get也差不多
-    std::thread t2(&KvServer::ReadRaftApplyCommandLoop, this);
-    t2.join();  // 由于ReadRaftApplyCommandLoop是死循环，进程一直卡到这里
+    std::thread apply_thread(&KvServer::ReadRaftApplyCommandLoop, this);
+
+    apply_thread.join();  // 由于ReadRaftApplyCommandLoop是死循环，进程一直卡到这里
 }

@@ -1,9 +1,14 @@
 #include "raftCore/kvServer.h"
+#include <chrono>
 #include <cstring>
 #include <iostream>
 #include <unistd.h>
 #include <fstream>
+#include <memory>
 #include <random>
+#include <string>
+#include <thread>
+#include <vector>
 #include <sys/wait.h>
 
 // SIGCHLD signal handler
@@ -52,9 +57,7 @@ int main(int argc, char **argv) {
                 exit(EXIT_FAILURE);
         }
     }
-    std::ofstream file(configFileName, std::ios::out | std::ios::app);
-    file.close();
-    file = std::ofstream(configFileName, std::ios::out | std::ios::trunc);
+    std::ofstream file = std::ofstream(configFileName, std::ios::trunc);
     if (file.is_open()) {
         file.close();
         std::cout << configFileName << " 已清空" << std::endl;
@@ -63,16 +66,27 @@ int main(int argc, char **argv) {
         exit(EXIT_FAILURE);
     }
 
+    std::ofstream outfile;
+    outfile.open("test.conf", std::ios::app);  // 打开文件并追加写入
+    std::string basicTestIP = "127.0.0.1";
+    std::vector<short> portVec(nodeNum);
+    for (int i = 0; i < nodeNum; ++i) {
+        portVec[i] = startPort + static_cast<short>(i);
+        outfile << "node" << std::to_string(i) << "ip=" << basicTestIP << std::endl;
+        outfile << "node" << std::to_string(i) << "port=" << std::to_string(portVec[i]) << std::endl;
+    }
+
     // ---------------------- 进程创建，测试 ----------------------
     for (int i = 0; i < nodeNum; i++) {
-        short port = startPort + static_cast<short>(i);
+        short port = portVec[i];
         std::cout << "start to create raftkv node:" << i << " port:" << port << " pid:" << getpid() << std::endl;
         pid_t pid = fork();  // 创建新进程
         if (pid == 0) {
             // 如果是子进程
             signal(SIGPIPE, SIG_IGN);
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
             // 子进程的代码
-            auto kvServer = new KvServer(i, 500, configFileName, port);
+            auto kvServer = std::make_unique<KvServer>(i, 500, configFileName, port);
             pause();  // 子进程进入等待状态
         } else if (pid > 0) {
             // 如果是父进程

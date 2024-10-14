@@ -1,27 +1,36 @@
 #include "raftServerRpcUtil.h"
-#include "sylar/rpc/rpccontroller.h"
-#include "rpc/KVrpcchannel.h"
+#include <grpcpp/create_channel.h>
+#include <grpcpp/impl/codegen/client_context.h>
+#include <grpcpp/impl/codegen/status.h>
+#include <grpcpp/security/credentials.h>
+#include <iostream>
+#include <string>
+#include "raftRpcPro/kvServerRPC.pb.h"
 
-raftServerRpcUtil::raftServerRpcUtil(const std::string& ip, short port) {
-    stub = std::make_shared<raftKVRpcProctoc::kvServerRpc_Stub>(
-        new KVrpcChannel(ip, port, false, CLERK_REQUEST_TIMEOUT / 2, CLERK_REQUEST_TIMEOUT / 2));
+raftServerRpcUtil::raftServerRpcUtil(const std::string &ipPort)
+    : m_stub(kvServerRpc::NewStub(grpc::CreateChannel(ipPort, grpc::InsecureChannelCredentials()))) {
 }
 
-raftServerRpcUtil::~raftServerRpcUtil() { 
-    std::cout << "--------------- [raftServerRpcUtil::~raftServerRpcUtil] a clerk released -------------\n"; 
+raftServerRpcUtil::~raftServerRpcUtil() {
+    std::cout << "--------------- [raftServerRpcUtil::~raftServerRpcUtil] a clerk released -------------\n";
 }
 
-bool raftServerRpcUtil::Get(raftKVRpcProctoc::GetArgs *GetArgs, raftKVRpcProctoc::GetReply *reply) {
-    sylar::rpc::MprpcController controller;
-    stub->Get(&controller, GetArgs, reply, nullptr);
-    return !controller.Failed();
+bool raftServerRpcUtil::Get(raftKVRpcProctoc::GetArgs *args, raftKVRpcProctoc::GetReply *reply) {
+    grpc::ClientContext context;
+    Status status = m_stub->Get(&context, *args, reply);
+    if (!status.ok()) {
+        std::cerr << "failure " + status.error_message() << std::endl;
+        return false;
+    }
+    return true;
 }
 
 bool raftServerRpcUtil::PutAppend(raftKVRpcProctoc::PutAppendArgs *args, raftKVRpcProctoc::PutAppendReply *reply) {
-    sylar::rpc::MprpcController controller;
-    stub->PutAppend(&controller, args, reply, nullptr);
-    if (controller.Failed()) {
-        std::cout << controller.ErrorText() << std::endl;
+    grpc::ClientContext context;
+    Status status = m_stub->PutAppend(&context, *args, reply);
+    if (!status.ok()) {
+        std::cerr << "failure " + status.error_message() << std::endl;
+        return false;
     }
-    return !controller.Failed();
+    return true;
 }

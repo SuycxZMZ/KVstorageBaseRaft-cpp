@@ -1,8 +1,7 @@
 #include "clerk.h"
 #include "raftServerRpcUtil.h"
 #include "common/util.h"
-#include "sylar/rpc/rpcconfig.h"
-
+#include "rpc/rpcConfig.h"
 #include <string>
 #include <vector>
 std::string Clerk::Get(const std::string& key) {
@@ -78,23 +77,22 @@ void Clerk::Append(const std::string& key, const std::string& value) { PutAppend
 // 初始化客户端
 void Clerk::Init(const std::string& configFileName) {
     // 获取所有raft节点ip、port ，并进行连接
-    sylar::rpc::MprpcConfig config; 
+    rpcConfig config; 
     config.LoadConfigFile(configFileName.c_str());
-    std::vector<std::pair<std::string, short>> ipPortVt;
+    std::vector<std::pair<std::string, std::string>> ipPortVt;
     for (int i = 0; i < INT_MAX - 1; ++i) {
         std::string node = "node" + std::to_string(i);
         std::string nodeIp = config.Load(node + "ip");
-        std::string nodePortStr = config.Load(node + "port");
+        std::string nodePort = config.Load(node + "port");
         if (nodeIp.empty()) {
             break;
         }
-        ipPortVt.emplace_back(nodeIp, std::stoi(nodePortStr)); 
+        ipPortVt.emplace_back(nodeIp, nodePort);
     }
     // 进行连接
     for (const auto& item : ipPortVt) {
-        std::string ip = item.first;
-        short port = item.second;
-        m_servers.emplace_back(std::make_shared<raftServerRpcUtil>(ip, port));
+        std::string ip = item.first + ':';
+        m_servers.emplace_back(std::make_shared<raftServerRpcUtil>(ip + item.second));
     }
 }
 

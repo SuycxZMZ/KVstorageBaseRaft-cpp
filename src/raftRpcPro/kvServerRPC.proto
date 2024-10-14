@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package raftKVRpcProctoc; //所在的命名空间
 
-option cc_generic_services = true;  //开启stub服务
+// option cc_generic_services = true;  //开启stub服务
 
 // 日志实体
 message GetArgs{
@@ -18,7 +18,6 @@ message GetReply  {
   bytes Value = 2;
 
 }
-
 
 // Put or Append
 message PutAppendArgs  {

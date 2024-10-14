@@ -1,7 +1,15 @@
 #ifndef RAFT_H
 #define RAFT_H
 
+#include <grpcpp/impl/codegen/server_context.h>
+#include <grpcpp/impl/codegen/status.h>
+#include <grpcpp/server.h>
+#include <grpcpp/server_builder.h>
 #include <atomic>
+#include <boost/asio.hpp>
+#include <boost/asio/io_context.hpp>
+#include <boost/asio/spawn.hpp>
+#include <boost/asio/thread_pool.hpp>
 #include <boost/serialization/string.hpp>
 #include <boost/serialization/vector.hpp>
 #include <chrono>
@@ -14,8 +22,8 @@
 #include "Persister.h"
 #include "common/config.h"
 #include "common/util.h"
+#include "raftRpcPro/raftRPC.grpc.pb.h"
 #include "raftRpcUtil.h"
-#include "sylar/iomanager.h"
 #include "thirdParty/msd/channel.hpp"
 
 /// 网络状态表示  todo：可以在rpc中删除该字段，实际生产中是用不到的.
@@ -35,26 +43,27 @@ constexpr int Normal = 3;
  *
  * @return constexpr int
  */
-constexpr int calculate_pool_size() { return static_cast<int>(MAX_NODE_NUM * 1.5); }
+constexpr int calculate_pool_size() { return static_cast<int>(MAX_NODE_NUM * 2); }
 
 /**
  * @brief Raft 核心类
  */
-class Raft : public raftRpcProctoc::raftRpc {
+class Raft final : public raftRpc::Service {
    public:
     using applyCh = msd::channel<ApplyMsg>;
+
    private:
     std::mutex m_mtx;                                   // 互斥锁
     std::vector<std::shared_ptr<RaftRpcUtil>> m_peers;  // 保存与其他raft结点通信的stub
-    std::shared_ptr<Persister> m_persister;             // 持久化层，负责raft节点本身数据的持久化，并不是kvDB持久化
+    std::shared_ptr<Persister> m_persister;  // 持久化层，负责raft节点本身数据的持久化，并不是kvDB持久化
 
     int m_me;           // raft是以集群启动，这个用来标识自己的的编号
     int m_currentTerm;  // 记录任期
     int m_votedFor;     // 记录当前term给谁投票过
 
     std::vector<raftRpcProctoc::LogEntry> m_logs;  // raft节点保存的全部的日志信息。
-    int m_commitIndex;                             // 已经commit的日志，主节点得到大多数回应之后可以commit
-    int m_lastApplied;                             // 上次汇报给KVserver层的日志index
+    int m_commitIndex;  // 已经commit的日志，主节点得到大多数回应之后可以commit
+    int m_lastApplied;  // 上次汇报给KVserver层的日志index
 
     std::vector<int> m_nextIndex;   // m_nextIndex 保存leader下一次应该从哪一个日志开始发送给follower
     std::vector<int> m_matchIndex;  // m_matchIndex表示follower在哪一个日志是已经匹配了的
@@ -70,18 +79,15 @@ class Raft : public raftRpcProctoc::raftRpc {
     // Snapshot是kvDB的快照，也可以看成是日志，因此:全部的日志 = m_logs + snapshot
     int m_lastSnapshotIncludeIndex;  // 最新的一个快照中包含的日志条目最大索引
     int m_lastSnapshotIncludeTerm;   // 最新的一个快照中日志条目的任期号
-
-    sylar::IOManager::ptr m_iom;       // 网络层协程调度器，它也用来做选举超时和心跳发送任务
-    sylar::IOManager::ptr m_rpcWorker; // 工作线程池，主要用来执行发送AE和投票请求任务
+    boost::asio::thread_pool m_rpcTasksWorker;
+    boost::asio::io_context m_ioContext;
 
    public:
-    Raft() = delete;
-
     /**
      * @brief raft节点构造函数
      * @param iom 指向全局调度器的智能指针
      */
-    explicit Raft(sylar::IOManager::ptr iom);
+    Raft();
 
     ~Raft() override;
 
@@ -122,6 +128,9 @@ class Raft : public raftRpcProctoc::raftRpc {
      */
     [[noreturn]] void electionTimeOutTicker();
 
+    // 后台启动心跳和超时定时任务
+    void startBackgroundTasks();
+
     /**
      * @brief 返回待apply的日志信息
      */
@@ -129,10 +138,10 @@ class Raft : public raftRpcProctoc::raftRpc {
     int getNewCommandIndex();
     void getPrevLogInfo(int server, int *preIndex, int *preTerm);
 
-//    /**
-//     * @brief 看当前节点是否是leader
-//     */
-//    void GetState(int *term, int *isLeader);
+    //    /**
+    //     * @brief 看当前节点是否是leader
+    //     */
+    //    void GetState(int *term, int *isLeader);
     bool GetState(int *term);
 
     /**
@@ -207,8 +216,9 @@ class Raft : public raftRpcProctoc::raftRpc {
      * @param votedNum 记录投票的结点数量
      * @param return 返回是否成功
      */
-    bool sendRequestVote(int server, const std::shared_ptr<raftRpcProctoc::RequestVoteArgs>& args,
-                        const std::shared_ptr<raftRpcProctoc::RequestVoteReply>& reply, const std::shared_ptr<int>& votedNum);
+    bool sendRequestVote(int server, const std::shared_ptr<raftRpcProctoc::RequestVoteArgs> &args,
+                         const std::shared_ptr<raftRpcProctoc::RequestVoteReply> &reply,
+                         const std::shared_ptr<int> &votedNum);
 
     /**
      * @brief Leader真正发送心跳的函数，执行RPC
@@ -218,15 +228,15 @@ class Raft : public raftRpcProctoc::raftRpc {
      * @param appendNums 记录回复的结点数量
      * @param return 返回是否成功
      */
-    bool sendAppendEntries(int server, const std::shared_ptr<raftRpcProctoc::AppendEntriesArgs>& args,
-                           const std::shared_ptr<raftRpcProctoc::AppendEntriesReply>& reply,
-                           const std::shared_ptr<std::atomic_int32_t>& appendNums);
+    bool sendAppendEntries(int server, const std::shared_ptr<raftRpcProctoc::AppendEntriesArgs> &args,
+                           const std::shared_ptr<raftRpcProctoc::AppendEntriesReply> &reply,
+                           const std::shared_ptr<std::atomic_int32_t> &appendNums);
 
-//    /**
-//     * @brief 给上层的kvserver层发送消息
-//     */
-//    void pushMsgToKvServer(ApplyMsg msg);
-    void readPersist(const std::string& data);
+    //    /**
+    //     * @brief 给上层的kvserver层发送消息
+    //     */
+    //    void pushMsgToKvServer(ApplyMsg msg);
+    void readPersist(const std::string &data);
 
     /**
      * @brief 将当前raft节点的状态序列化为字符串
@@ -252,33 +262,18 @@ class Raft : public raftRpcProctoc::raftRpc {
      * @param newLogIndex kvServer层传过来的新的日志索引
      * @param snapshot kvServer层传过来的KVDB数据快照
      */
-    void Snapshot(int newLogIndex, const std::string& snapshot);
+    void Snapshot(int newLogIndex, const std::string &snapshot);
 
    public:
-    /**
-     * @brief 重写基类方法, 远程 follower 节点远程被调用。动态多态，框架会自己调用
-     */
-    void AppendEntries(google::protobuf::RpcController *controller,
-                               const ::raftRpcProctoc::AppendEntriesArgs *request,
-                               ::raftRpcProctoc::AppendEntriesReply *response,
-                               ::google::protobuf::Closure *done) override;
+    ::grpc::Status AppendEntries(::grpc::ServerContext *context, const ::raftRpcProctoc::AppendEntriesArgs *request,
+                                 ::raftRpcProctoc::AppendEntriesReply *response) override;
 
-    /**
-     * @brief 重写基类方法,因为rpc远程调用真正调用的是这个方法
-     *        序列化，反序列化等操作rpc框架都已经做完了，因此这里只需要获取值然后真正调用本地方法即可。
-     */
-    void InstallSnapshot(google::protobuf::RpcController *controller,
-                                 const ::raftRpcProctoc::InstallSnapshotRequest *request,
-                                 ::raftRpcProctoc::InstallSnapshotResponse *response,
-                                 ::google::protobuf::Closure *done) override;
+    ::grpc::Status InstallSnapshot(::grpc::ServerContext *context,
+                                   const ::raftRpcProctoc::InstallSnapshotRequest *request,
+                                   ::raftRpcProctoc::InstallSnapshotResponse *response) override;
 
-    /**
-     * @brief 重写基类方法,因为rpc远程调用真正调用的是这个方法
-     *        序列化，反序列化等操作rpc框架都已经做完了，因此这里只需要获取值然后真正调用本地方法即可。
-     */
-    void RequestVote(google::protobuf::RpcController *controller,
-                             const ::raftRpcProctoc::RequestVoteArgs *request,
-                             ::raftRpcProctoc::RequestVoteReply *response, ::google::protobuf::Closure *done) override;
+    ::grpc::Status RequestVote(::grpc::ServerContext *context, const ::raftRpcProctoc::RequestVoteArgs *request,
+                               ::raftRpcProctoc::RequestVoteReply *response) override;
 
    public:
     /**
@@ -296,7 +291,8 @@ class Raft : public raftRpcProctoc::raftRpc {
      * @param task rpc任务
      * @param timeout 超时时间
      */
-    void commitWithTimeout(const std::function<void()>& task, [[maybe_unused]] int timeout);
+    void commitWithTimeout(const std::function<void()> &task, [[maybe_unused]] int timeout);
+
    private:
     /**
      * @brief 对Raft节点的状态进行序列化和反序列化
@@ -326,7 +322,5 @@ class Raft : public raftRpcProctoc::raftRpc {
         std::unordered_map<std::string, int> umap;
     };
 };
-
-// typedef sylar::SingletonPtr<sylar::threadpool> t_pool;
 
 #endif  // RAFT_H

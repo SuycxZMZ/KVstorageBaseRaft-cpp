@@ -1,17 +1,27 @@
 #include "raft.h"
+#include <grpcpp/grpcpp.h>
+#include <grpcpp/impl/codegen/server_context.h>
+#include <grpcpp/impl/codegen/status.h>
+#include <grpcpp/impl/codegen/status_code_enum.h>
+#include <grpcpp/security/server_credentials.h>
+#include <grpcpp/server.h>
+#include <grpcpp/server_builder.h>
 #include <atomic>
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/archive/text_oarchive.hpp>
+#include <boost/asio/impl/spawn.hpp>
+#include <boost/asio/post.hpp>
+#include <boost/asio/spawn.hpp>
+#include <boost/asio/steady_timer.hpp>
 #include <chrono>
 #include <memory>
+#include <thread>
 #include "common/config.h"
 #include "common/util.h"
 #include "thirdParty/scopeGuard/scope_guard.hpp"
 
-Raft::Raft(sylar::IOManager::ptr _iom)
-    : m_iom(std::move(_iom)),
-      m_rpcWorker(std::make_shared<sylar::IOManager>(calculate_pool_size() * 2, false)),
-      m_lastSnapshotIncludeIndex(),
+Raft::Raft()
+    : m_lastSnapshotIncludeIndex(),
       m_me(),
       m_commitIndex(),
       m_lastApplied(),
@@ -19,9 +29,8 @@ Raft::Raft(sylar::IOManager::ptr _iom)
       m_currentTerm(),
       m_votedFor(),
       m_status(),
-      m_applyChan(nullptr)
-{
-}
+      m_applyChan(nullptr),
+      m_rpcTasksWorker(MAX_NODE_NUM) {}
 Raft::~Raft() { std::cout << "----------[Raft::~Raft()]---------- \n"; }
 
 /**
@@ -42,12 +51,12 @@ void Raft::AppendEntries(const raftRpcProctoc::AppendEntriesArgs* args, raftRpcP
                 args->leaderid(), args->term(), m_me, m_currentTerm);
         return;  // 注意从过期的领导人收到消息不要重设定时器
     }
-    DEFER{ persist(); };
+    DEFER { persist(); };
 
     if (args->term() > m_currentTerm) {  // 当前落后 可以往下走 ---------------------------------------
         m_status = Follower;
         m_currentTerm = args->term();
-        m_votedFor = -1;  
+        m_votedFor = -1;
     }
     myAssert(args->term() == m_currentTerm, format("assert {args.Term == rf.currentTerm} fail"));
     m_status = Follower;
@@ -75,13 +84,12 @@ void Raft::AppendEntries(const raftRpcProctoc::AppendEntriesArgs* args, raftRpcP
                 if (m_logs[getSlicesIndexFromLogIndex(log.logindex())].logterm() == log.logterm() &&
                     m_logs[getSlicesIndexFromLogIndex(log.logindex())].command() != log.command()) {
                     // 相同位置的log，其logTerm相等，但是命令却不相同，不符合raft的前向匹配，异常了！
-                    myAssert(
-                        false,
-                        format("[func-AppendEntries-rf{%d}] 两节点logIndex{%d}和term{%d}相同，但是其command{%d:%d}"
-                               " {%d:%d}却不同！！\n",
-                               m_me, log.logindex(), log.logterm(), m_me,
-                               m_logs[getSlicesIndexFromLogIndex(log.logindex())].command(), args->leaderid(),
-                               log.command()));
+                    myAssert(false,
+                             format("[func-AppendEntries-rf{%d}] 两节点logIndex{%d}和term{%d}相同，但是其command{%d:%d}"
+                                    " {%d:%d}却不同！！\n",
+                                    m_me, log.logindex(), log.logterm(), m_me,
+                                    m_logs[getSlicesIndexFromLogIndex(log.logindex())].command(), args->leaderid(),
+                                    log.command()));
                 }
                 if (m_logs[getSlicesIndexFromLogIndex(log.logindex())].logterm() != log.logterm()) {  // 覆盖
                     m_logs[getSlicesIndexFromLogIndex(log.logindex())] = log;
@@ -143,12 +151,13 @@ bool Raft::sendAppendEntries(int server, const std::shared_ptr<raftRpcProctoc::A
 
     std::lock_guard<std::mutex> lock(m_mtx);
     // 对reply进行处理
-    if (reply->term() > m_currentTerm) {  // 自己已经过时了 或者集群要进入下一个term周期，这里可以思考一下节点网络分区的情况
+    if (reply->term() >
+        m_currentTerm) {  // 自己已经过时了 或者集群要进入下一个term周期，这里可以思考一下节点网络分区的情况
         m_status = Follower;
         m_currentTerm = reply->term();
         m_votedFor = -1;
         return ok;
-    } else if (reply->term() < m_currentTerm) {  // 对端任期比较老，接到心跳包之后会--> 
+    } else if (reply->term() < m_currentTerm) {  // 对端任期比较老，接到心跳包之后会-->
                                                  // 先同步term，再同步日志，其实这种情况在本项目中不好模拟，但是要考虑到
         DPrintf("[func -sendAppendEntries rf{%d}] node:{%d} term{%d}<rf{%d}term{%d}\n", m_me, server, reply->term(),
                 m_me, m_currentTerm);
@@ -227,9 +236,7 @@ bool Raft::sendAppendEntries(int server, const std::shared_ptr<raftRpcProctoc::A
     }
 }
 
-bool Raft::CondInstallSnapshot([[maybe_unused]] const std::string& snapshot) {
-    return true;
-}
+bool Raft::CondInstallSnapshot([[maybe_unused]] const std::string& snapshot) { return true; }
 
 /**
  * @brief 实际发起选举，构造需要发送的rpc,调用sendRequestVote处理rpc及其相应。
@@ -271,19 +278,20 @@ void Raft::doElection() {
             auto requestVoteReply = std::make_shared<raftRpcProctoc::RequestVoteReply>();
 
             // 在for循环中 --> 候选者可能会起 (n - 1) 个线程发送投票RPC
-            commitWithTimeout([this, i, requestVoteArgs, requestVoteReply, votedNum]() {
-                           sendRequestVote(i, requestVoteArgs, requestVoteReply, votedNum);  // 直接调用任务
-                       },maxRandomizedElectionTime);
+            commitWithTimeout(
+                [this, i, requestVoteArgs, requestVoteReply, votedNum]() {
+                    sendRequestVote(i, requestVoteArgs, requestVoteReply, votedNum);  // 直接调用任务
+                },
+                maxRandomizedElectionTime);
         }
     }
 }
 
-
 void Raft::commitWithTimeout(const std::function<void()>& task, [[maybe_unused]] int timeout) {
     auto startTime = std::chrono::steady_clock::now();
-    m_rpcWorker->schedule([task, startTime, timeout] () {
-        if (std::chrono::duration_cast<std::chrono::milliseconds>(
-                std::chrono::steady_clock::now() - startTime).count() < timeout) {
+    boost::asio::post(this->m_rpcTasksWorker, [task, startTime, timeout]() {
+        if (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - startTime)
+                .count() < timeout) {
             task();
         }
     });
@@ -353,9 +361,11 @@ void Raft::doHeartBeat() {
             appendEntriesReply->set_appstate(Disconnected);
 
             // 提交发送任务到线程池
-            commitWithTimeout([this, i, appendEntriesArgs, appendEntriesReply, appendNums]() {
-                sendAppendEntries(i, appendEntriesArgs, appendEntriesReply, appendNums);  // 直接调用任务
-            },HeartBeatTimeout);
+            commitWithTimeout(
+                [this, i, appendEntriesArgs, appendEntriesReply, appendNums]() {
+                    sendAppendEntries(i, appendEntriesArgs, appendEntriesReply, appendNums);  // 直接调用任务
+                },
+                HeartBeatTimeout);
         }
 
         // leader发送心跳，重置心跳时间，与选举不同
@@ -658,7 +668,7 @@ void Raft::RequestVote(const raftRpcProctoc::RequestVoteArgs* args, raftRpcProct
              format("[func--rf{%d}] 前面校验过args.Term==rf.currentTerm，这里却不等", m_me));
 
     // 现在节点任期都是相同的(任期小的也已经更新到新的args的term了)，还需要检查log的term和index是不是匹配的
-//    int lastLogTerm = getLastLogTerm();
+    //    int lastLogTerm = getLastLogTerm();
 
     // 只有 没投过票，且candidate的日志的新的程度 ≥ 接受者的日志新的程度 才会给请求方投票
     //  这里，新的程度判断为，如果当前节点的最新的一条日志所在的任期号大于远端节点，就不给他投
@@ -774,7 +784,8 @@ int Raft::getSlicesIndexFromLogIndex(int logIndex) {
  * @param return 返回是否成功
  */
 bool Raft::sendRequestVote(int server, const std::shared_ptr<raftRpcProctoc::RequestVoteArgs>& args,
-                          const  std::shared_ptr<raftRpcProctoc::RequestVoteReply>& reply, const std::shared_ptr<int>& votedNum) {
+                           const std::shared_ptr<raftRpcProctoc::RequestVoteReply>& reply,
+                           const std::shared_ptr<int>& votedNum) {
     auto start = now();
     DPrintf("[func-sendRequestVote rf{%d}] --> server{%d} send RequestVote start", m_me, server, getLastLogIndex());
     bool ok = m_peers[server]->RequestVote(args.get(), reply.get());  // 发送请求投票，远程调用raft节点的投票
@@ -830,24 +841,26 @@ bool Raft::sendRequestVote(int server, const std::shared_ptr<raftRpcProctoc::Req
 /**
  * @brief 重写基类方法, 远程 follower 节点远程被调用
  */
-void Raft::AppendEntries(google::protobuf::RpcController* controller,
-                         const ::raftRpcProctoc::AppendEntriesArgs* request,
-                         ::raftRpcProctoc::AppendEntriesReply* response, ::google::protobuf::Closure* done) {
+::grpc::Status Raft::AppendEntries(::grpc::ServerContext* context, const ::raftRpcProctoc::AppendEntriesArgs* request,
+                                   ::raftRpcProctoc::AppendEntriesReply* response) {
     AppendEntries(request, response);
-    done->Run();
+    // TODO 先暂时返回OK
+    return grpc::Status::OK;
 }
 
-void Raft::InstallSnapshot(google::protobuf::RpcController* controller,
-                           const ::raftRpcProctoc::InstallSnapshotRequest* request,
-                           ::raftRpcProctoc::InstallSnapshotResponse* response, ::google::protobuf::Closure* done) {
+::grpc::Status Raft::InstallSnapshot(::grpc::ServerContext* context,
+                                     const ::raftRpcProctoc::InstallSnapshotRequest* request,
+                                     ::raftRpcProctoc::InstallSnapshotResponse* response) {
     InstallSnapshot(request, response);
-    done->Run();
+    // TODO 先暂时返回OK
+    return grpc::Status::OK;
 }
 
-void Raft::RequestVote(google::protobuf::RpcController* controller, const ::raftRpcProctoc::RequestVoteArgs* request,
-                       ::raftRpcProctoc::RequestVoteReply* response, ::google::protobuf::Closure* done) {
+::grpc::Status Raft::RequestVote(::grpc::ServerContext* context, const ::raftRpcProctoc::RequestVoteArgs* request,
+                                 ::raftRpcProctoc::RequestVoteReply* response) {
     RequestVote(request, response);
-    done->Run();
+    // TODO 先暂时返回OK
+    return grpc::Status::OK;
 }
 
 bool Raft::Start(Op command, int* newLogIndex, int* newLogTerm) {
@@ -876,6 +889,14 @@ bool Raft::Start(Op command, int* newLogIndex, int* newLogTerm) {
     return true;
 }
 
+// void Raft::startBackgroundTasks() {
+//     boost::asio::spawn(m_ioContext, [this](boost::asio::yield_context& yield) { leaderHearBeatTicker(yield); });
+//     boost::asio::spawn(m_ioContext, [this](boost::asio::yield_context& yield) { electionTimeOutTicker(yield); });
+//     std::thread([this]() {
+//         m_ioContext.run();
+//     }).detach();
+// }
+
 /**
  * @brief 初始化
  * @param peers 与其他raft节点通信的channel
@@ -887,7 +908,7 @@ void Raft::init(std::vector<std::shared_ptr<RaftRpcUtil>> peers, int me, std::sh
                 std::shared_ptr<applyCh> applych) {
     m_peers = std::move(peers);          // 需要与其他raft节点通信类
     m_persister = std::move(persister);  // 持久化类
-    m_me = me;                // 标记自己，不能给自己发送rpc
+    m_me = me;                           // 标记自己，不能给自己发送rpc
     {
         std::lock_guard<std::mutex> lock(m_mtx);
         this->m_applyChan = std::move(applych);  // 与kv-server沟通
@@ -917,10 +938,13 @@ void Raft::init(std::vector<std::shared_ptr<RaftRpcUtil>> peers, int me, std::sh
         DPrintf("[Init&ReInit] Sever %d, term %d, lastSnapshotIncludeIndex {%d} , lastSnapshotIncludeTerm {%d}", m_me,
                 m_currentTerm, m_lastSnapshotIncludeIndex, m_lastSnapshotIncludeTerm);
     }
-    m_iom->schedule([this] { leaderHearBeatTicker(); });  // leader 心跳定时器
-    m_iom->schedule([this] { electionTimeOutTicker(); });  // 选举超时定时器，触发就开始发起选举
 
+    // startBackgroundTasks();
+    std::thread t1([this] { electionTimeOutTicker(); });
+    std::thread t2([this] { leaderHearBeatTicker(); });
     std::thread t3([this] { applierTicker(); });  // apply 定时器，单起一个线程
+    t1.detach();
+    t2.detach();
     t3.detach();
 }
 
