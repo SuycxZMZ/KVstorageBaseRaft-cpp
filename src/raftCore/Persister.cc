@@ -1,5 +1,4 @@
 #include "Persister.h"
-#include "common/util.h"
 #include "scope_guard.hpp"
 #include "spdlog/spdlog.h"
 
