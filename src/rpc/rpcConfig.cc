@@ -1,8 +1,8 @@
 #include "rpcConfig.h"
 
 #include <cstddef>
-#include <iostream>
 #include <string>
+#include "spdlog/spdlog.h"
 
 rpcConfig& rpcConfig::GetInstance() {
     static rpcConfig instance;
@@ -12,7 +12,7 @@ rpcConfig& rpcConfig::GetInstance() {
 void rpcConfig::LoadConfigFile(const char* config_file) {
     FILE* pf = fopen(config_file, "r");
     if (nullptr == pf) {
-        std::cout << config_file << " is not exist !!!" << std::endl;
+        spdlog::critical("{} is not exist !!!", config_file);
         exit(EXIT_FAILURE);
     }
 
@@ -39,10 +39,8 @@ void rpcConfig::LoadConfigFile(const char* config_file) {
 
         m_configMap.emplace(key, value);
     }
-
-    std::cout << "------------------- configure -------------------" << std::endl;
     for (auto& info : m_configMap) {
-        std::cout << info.first << ":" << info.second << std::endl;
+        spdlog::info("{}:{}", info.first, info.second);
     }
 }
 

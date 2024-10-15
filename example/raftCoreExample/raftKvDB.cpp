@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 #include <sys/wait.h>
+#include "spdlog/spdlog.h"
 
 // SIGCHLD signal handler
 void handle_sigchld(int sig) {
@@ -16,7 +17,7 @@ void handle_sigchld(int sig) {
 }
 
 void ShowArgsHelp() {
-    std::cout << "format: command -n <nodeNum> -f <configFileName>" << std::endl;
+    spdlog::warn("format: command -n <nodeNum> -f <configFileName>");
 }
 
 int main(int argc, char **argv) {
@@ -58,10 +59,9 @@ int main(int argc, char **argv) {
     std::ofstream file = std::ofstream(configFileName, std::ios::trunc);
     if (file.is_open()) {
         file.close();
-        std::cout << configFileName << " 已清空" << std::endl;
+        spdlog::info("{} 已清空", configFileName);
     } else {
-        std::cout << "无法打开 " << configFileName << std::endl;
-        exit(EXIT_FAILURE);
+        spdlog::critical("无法打开 {}", configFileName);
     }
 
     std::ofstream outfile;
@@ -77,7 +77,7 @@ int main(int argc, char **argv) {
     // ---------------------- 进程创建，测试 ----------------------
     for (int i = 0; i < nodeNum; i++) {
         auto port = static_cast<short>(portVec[i]);
-        std::cout << "start to create raftkv node:" << i << " port:" << port << " pid:" << getpid() << std::endl;
+        spdlog::info("------ raftkv start-->node: {} port: {} pid: {} ------", i, port, getpid());
         pid_t pid = fork();  // 创建新进程
         if (pid == 0) {
             // 如果是子进程

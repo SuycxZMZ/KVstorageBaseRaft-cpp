@@ -4,6 +4,7 @@
 #include <grpcpp/impl/codegen/status.h>
 #include <grpcpp/security/credentials.h>
 #include "raftRpcPro/raftRPC.pb.h"
+#include "spdlog/spdlog.h"
 
 bool RaftRpcUtil::AppendEntries(raftRpcProctoc::AppendEntriesArgs *args, raftRpcProctoc::AppendEntriesReply *response) {
     grpc::ClientContext context;
@@ -41,6 +42,6 @@ RaftRpcUtil::RaftRpcUtil(const std::string& ipPort) :
 {
 }
 
-RaftRpcUtil::~RaftRpcUtil() { 
-    std::cout << "--------------- [RaftRpcUtil::~RaftRpcUtil()] ------------------- \n";
+RaftRpcUtil::~RaftRpcUtil() {
+    spdlog::info("--------------- [RaftRpcUtil::~RaftRpcUtil()] ------------------- ");
 }

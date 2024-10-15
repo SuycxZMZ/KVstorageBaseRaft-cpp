@@ -6,13 +6,14 @@
 #include <iostream>
 #include <string>
 #include "raftRpcPro/kvServerRPC.pb.h"
+#include "spdlog/spdlog.h"
 
 raftServerRpcUtil::raftServerRpcUtil(const std::string &ipPort)
     : m_stub(kvServerRpc::NewStub(grpc::CreateChannel(ipPort, grpc::InsecureChannelCredentials()))) {
 }
 
 raftServerRpcUtil::~raftServerRpcUtil() {
-    std::cout << "--------------- [raftServerRpcUtil::~raftServerRpcUtil] a clerk released -------------\n";
+    spdlog::info("--------------- [raftServerRpcUtil::~raftServerRpcUtil] a clerk created -------------");
 }
 
 bool raftServerRpcUtil::Get(raftKVRpcProctoc::GetArgs *args, raftKVRpcProctoc::GetReply *reply) {

@@ -26,7 +26,7 @@
 #include "common/util.h"
 #include "raftRpcPro/raftRPC.grpc.pb.h"
 #include "raftRpcUtil.h"
-#include "thirdParty/msd/channel.hpp"
+#include "channel.hpp"
 
 /// 网络状态表示  todo：可以在rpc中删除该字段，实际生产中是用不到的.
 /// 方便网络分区的时候debug，网络异常的时候为disconnected，
@@ -82,7 +82,7 @@ class Raft final : public raftRpc::Service {
     int m_lastSnapshotIncludeIndex;  // 最新的一个快照中包含的日志条目最大索引
     int m_lastSnapshotIncludeTerm;   // 最新的一个快照中日志条目的任期号
     boost::asio::thread_pool m_rpcTasksWorker;
-    
+
     // election 和 heartBeat 的协程执行器成员
     boost::asio::io_context m_ioContext;
     boost::asio::steady_timer m_electionTimer;
@@ -260,7 +260,7 @@ class Raft final : public raftRpc::Service {
      * @return true 发起成功
      * @return false 发起失败，不是leader
      */
-    bool Start(Op command, int *newLogIndex, int *newLogTerm);
+    bool Start(const Op& command, int *newLogIndex, int *newLogTerm);
 
     /**
      * @brief 根据kvServer层传过来的 newLogIndex 和 KVDB快照进行压缩日志

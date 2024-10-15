@@ -1,6 +1,7 @@
 #include "Persister.h"
 #include "common/util.h"
-#include "thirdParty/scopeGuard/scope_guard.hpp"
+#include "scope_guard.hpp"
+#include "spdlog/spdlog.h"
 
 void Persister::Save(const std::string& raftstate, const std::string& snapshot) {
     std::lock_guard<std::mutex> lg(m_mtx);
@@ -76,7 +77,7 @@ Persister::Persister(const int me)
         fileOpenFlag = false;
     }
     if (!fileOpenFlag) {
-        DPrintf("[func-Persister::Persister] file open error");
+        SPDLOG_ERROR("[func-Persister::Persister] file open error");
     }
     /**
      * 绑定流
@@ -86,7 +87,7 @@ Persister::Persister(const int me)
 }
 
 Persister::~Persister() {
-    std::cout << "------------- [Persister::~Persister()] \n";
+    SPDLOG_INFO(" ------------- [Persister::~Persister()] ------------- ");
     if (m_raftStateOutStream.is_open()) {
         m_raftStateOutStream.close();
     }

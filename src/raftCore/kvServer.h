@@ -20,8 +20,8 @@
 #include "raftCore/ApplyMsg.h"
 #include "raftRpcPro/kvServerRPC.grpc.pb.h"
 #include "raftRpcPro/kvServerRPC.pb.h"
-#include "thirdParty/msd/channel.hpp"
-#include "thirdParty/skipList/skipList.h"
+#include "channel.hpp"
+#include "skipList.h"
 
 /**
  * @brief kvServer负责与外部客户端和其他raft节点通信

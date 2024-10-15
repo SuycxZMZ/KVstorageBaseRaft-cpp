@@ -4,6 +4,7 @@
 #include "rpc/rpcConfig.h"
 #include <string>
 #include <vector>
+#include "spdlog/spdlog.h"
 std::string Clerk::Get(const std::string& key) {
     m_requestId++;
     int requestId = m_requestId;
@@ -53,13 +54,12 @@ void Clerk::PutAppend(const std::string& key, const std::string& value, const st
         // RPC调用
         bool ok = m_servers[server]->PutAppend(&args, &reply);
         if (!ok || reply.err() == ErrWrongLeader) {
-            DPrintf("[Clerk::PutAppend]原以为的leader：{%d}请求失败，向新leader{%d}重试  ，操作：{%s}", server,
-                    server + 1, op.c_str());
+            SPDLOG_ERROR("Clerk::PutAppend 原以为的leader：{} 请求失败，向新leader重试，操作：{}", server + 1, op.c_str());
             if (!ok) {
-                DPrintf("重试原因，rpc失败，");
+                SPDLOG_ERROR("重试原因，rpc失败");
             }
             if (reply.err() == ErrWrongLeader) {
-                DPrintf("重试原因：非leader");
+                SPDLOG_ERROR("重试原因：非leader");
             }
             server = (server + 1) % (int)m_servers.size();  // try the next server
             continue;
