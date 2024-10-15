@@ -32,7 +32,13 @@ find_package(Boost REQUIRED COMPONENTS system)
 find_package(Protobuf REQUIRED)
 find_package(gRPC CONFIG REQUIRED)
 
-include_directories(${PROJECT_SOURCE_DIR}/src)
+include_directories(
+    ${PROJECT_SOURCE_DIR}/src
+    ${PROJECT_SOURCE_DIR}/thirdParty/msd
+    ${PROJECT_SOURCE_DIR}/thirdParty/scopeGuard
+    ${PROJECT_SOURCE_DIR}/thirdParty/skipList
+    ${PROJECT_SOURCE_DIR}/thirdParty/spdlog/include
+)
 
 # 设置项目库文件搜索路径 -L
 link_directories(
