@@ -7,8 +7,10 @@
 #include <grpcpp/server_builder.h>
 #include <atomic>
 #include <boost/asio.hpp>
+#include <boost/asio/awaitable.hpp>
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/spawn.hpp>
+#include <boost/asio/steady_timer.hpp>
 #include <boost/asio/thread_pool.hpp>
 #include <boost/serialization/string.hpp>
 #include <boost/serialization/vector.hpp>
@@ -80,7 +82,11 @@ class Raft final : public raftRpc::Service {
     int m_lastSnapshotIncludeIndex;  // 最新的一个快照中包含的日志条目最大索引
     int m_lastSnapshotIncludeTerm;   // 最新的一个快照中日志条目的任期号
     boost::asio::thread_pool m_rpcTasksWorker;
+    
+    // election 和 heartBeat 的协程执行器成员
     boost::asio::io_context m_ioContext;
+    boost::asio::steady_timer m_electionTimer;
+    boost::asio::steady_timer m_heartBeatTimer;
 
    public:
     /**
@@ -126,7 +132,7 @@ class Raft final : public raftRpc::Service {
      *        3.sendRequestVote：负责发送选举中的RPC，在发送完rpc后还需要负责接收并处理对端发送回来的响应。
      *        4.RequestVote：远端执行，接收别人发来的选举请求，主要检验是否要给对方投票。
      */
-    [[noreturn]] void electionTimeOutTicker();
+    boost::asio::awaitable<void> electionTimeOutTicker(boost::asio::steady_timer &timer);
 
     // 后台启动心跳和超时定时任务
     void startBackgroundTasks();
@@ -156,7 +162,7 @@ class Raft final : public raftRpc::Service {
     /**
      * @brief 检查是否需要发起心跳（leader）如果该发起就执行doHeartBeat。
      */
-    [[noreturn]] void leaderHearBeatTicker();
+    boost::asio::awaitable<void> leaderHearBeatTicker(boost::asio::steady_timer &timer);
     void leaderSendSnapShot(int server);
 
     /**

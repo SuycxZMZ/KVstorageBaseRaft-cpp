@@ -9,10 +9,14 @@
 #include <atomic>
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/archive/text_oarchive.hpp>
+#include <boost/asio/co_spawn.hpp>
+#include <boost/asio/detached.hpp>
+#include <boost/asio/detail/chrono.hpp>
 #include <boost/asio/impl/spawn.hpp>
 #include <boost/asio/post.hpp>
 #include <boost/asio/spawn.hpp>
 #include <boost/asio/steady_timer.hpp>
+#include <boost/asio/use_awaitable.hpp>
 #include <chrono>
 #include <memory>
 #include <thread>
@@ -30,7 +34,9 @@ Raft::Raft()
       m_votedFor(),
       m_status(),
       m_applyChan(nullptr),
-      m_rpcTasksWorker(MAX_NODE_NUM) {}
+      m_rpcTasksWorker(MAX_NODE_NUM),
+      m_electionTimer(m_ioContext),
+      m_heartBeatTimer(m_ioContext){}
 Raft::~Raft() { std::cout << "----------[Raft::~Raft()]---------- \n"; }
 
 /**
@@ -377,10 +383,11 @@ void Raft::doHeartBeat() {
  * @brief 负责查看是否该发起选举，如果该发起选举就执行doElection发起选举。
  *        注意，只有follower状态的节点才会执行这个函数。而leader只负责sleep什么也不做
  */
-[[noreturn]] void Raft::electionTimeOutTicker() {
+boost::asio::awaitable<void> Raft::electionTimeOutTicker(boost::asio::steady_timer& timer) {
     while (true) {
         while (m_status == Leader) {
-            usleep(HeartBeatTimeout * 1000);
+            timer.expires_after(std::chrono::milliseconds(HeartBeatTimeout));
+            co_await timer.async_wait(boost::asio::use_awaitable);
         }
 
         // 计算距离上次重置选举计时器的时间 + 随机的选举超时时间，然后根据这个时间决定是否睡眠
@@ -395,7 +402,9 @@ void Raft::doHeartBeat() {
         // 若超时时间未到，进入睡眠状态 .count()返回毫秒数
         if (std::chrono::duration<double, std::milli>(suitableSleepTime).count() > 1) {
             auto start = std::chrono::steady_clock::now();
-            usleep(std::chrono::duration_cast<std::chrono::microseconds>(suitableSleepTime).count());
+            timer.expires_after(suitableSleepTime);
+            // usleep(std::chrono::duration_cast<std::chrono::microseconds>(suitableSleepTime).count());
+            co_await timer.async_wait(boost::asio::use_awaitable);
             auto end = std::chrono::steady_clock::now();
             std::chrono::duration<double, std::milli> duration = end - start;
             // 使用ANSI控制序列将输出颜色修改为紫色
@@ -521,14 +530,15 @@ void Raft::InstallSnapshot(const raftRpcProctoc::InstallSnapshotRequest* args,
  * @brief 检查是否需要发起心跳（leader）如果该发起就执行doHeartBeat。
  *        注意:只有leader才可以发起心跳。follower在这个函数中什么也不做。
  */
-[[noreturn]] void Raft::leaderHearBeatTicker() {
+boost::asio::awaitable<void> Raft::leaderHearBeatTicker(boost::asio::steady_timer& timer) {
     while (true) {
         // follower和candidate在这里循环睡觉
         while (m_status != Leader) {
-            usleep(1000 * HeartBeatTimeout);
+            timer.expires_after(std::chrono::milliseconds(HeartBeatTimeout));
+            co_await timer.async_wait(boost::asio::use_awaitable);
+            // usleep(1000 * HeartBeatTimeout);
         }
         static std::atomic<int32_t> atomicCount = 0;
-
         std::chrono::duration<signed long int, std::ratio<1, 1000000000>> suitableSleepTime{};
         std::chrono::system_clock::time_point wakeTime{};
         {
@@ -545,7 +555,9 @@ void Raft::InstallSnapshot(const raftRpcProctoc::InstallSnapshotRequest* args,
             auto start = std::chrono::steady_clock::now();
 
             // 真正的心跳包发送间隔
-            usleep(std::chrono::duration_cast<std::chrono::microseconds>(suitableSleepTime).count());
+            timer.expires_after(suitableSleepTime);
+            co_await timer.async_wait(boost::asio::use_awaitable);
+            // usleep(std::chrono::duration_cast<std::chrono::microseconds>(suitableSleepTime).count());
             auto end = std::chrono::steady_clock::now();
             std::chrono::duration<double, std::milli> duration = end - start;
             // 使用ANSI控制序列将输出颜色修改为紫色
@@ -939,12 +951,12 @@ void Raft::init(std::vector<std::shared_ptr<RaftRpcUtil>> peers, int me, std::sh
                 m_currentTerm, m_lastSnapshotIncludeIndex, m_lastSnapshotIncludeTerm);
     }
 
-    // startBackgroundTasks();
-    std::thread t1([this] { electionTimeOutTicker(); });
-    std::thread t2([this] { leaderHearBeatTicker(); });
+    boost::asio::co_spawn(m_ioContext, electionTimeOutTicker(m_electionTimer), boost::asio::detached);
+    boost::asio::co_spawn(m_ioContext, leaderHearBeatTicker(m_heartBeatTimer), boost::asio::detached);
+    std::thread tickerThread([this] { m_ioContext.run(); });
     std::thread t3([this] { applierTicker(); });  // apply 定时器，单起一个线程
-    t1.detach();
-    t2.detach();
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    tickerThread.detach();
     t3.detach();
 }
 
