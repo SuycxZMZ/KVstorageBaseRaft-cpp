@@ -19,6 +19,7 @@
 - AE和投票信息的的发送使用`boost`线程池处理，避免频繁创建销毁大量线程。
 - `electionTimeOutTicker`和`leaderHearBeatTicker`两个定时任务使用`boost::asio`协程执行，节省线程切换的开销
 - 优化代码组织结构，移除多余的include文件夹，更清爽的cmake代码结构，减少重复编译和路径污染
+- 引入开源库[spdlog](https://github.com/gabime/spdlog)代替原本的简陋打印函数，支持异步日志，更优雅
 - 引入开源库[cpp-channel](https://github.com/andreiavrammsd/cpp-channel)代替原本的手搓阻塞队列，golang风格，更优雅(只在原版代码中添加了超时弹出的接口)
 - 引入开源库[Defer-C++](https://github.com/Neargye/scope_guard)代替原本手搓的DEFER，该库主要使用RAII手法封了一套宏，使用简单，写的也比较规范
 - gRPC使用Http2.0作为网络传输协议，支持流式处理，多个流可以复用同一条连接
@@ -89,6 +90,7 @@ kill -18 <pid>
 **待改善**：
 
 - [x] `electionTimeOutTicker`和`leaderHearBeatTicker`任务使用boost协程实现
+- [x] 使用`spdlog`格式化日志打印，增强扩展性和可读性，可以很方便的做异步输出和文件输出
 - [ ] docker运行环境以及对应的运行脚本
 - [ ] 切片集群的实现，类似于redis-cluster(可能会做)
   
