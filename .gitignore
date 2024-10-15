@@ -12,3 +12,5 @@ build
 *.out
 *.a
 /cmake-build-debug-wsl/
+
+src/raftRpcPro
