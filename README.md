@@ -29,6 +29,22 @@
 
 ## 使用
 
+0.环境说明
+
+- 我的开发环境是ubuntu24.04WSL，如果是20或者22，建议手动编译安装最新的boost库。g++或者clang++要支持C++20标准。
+
+列一下我的环境：
+
+```shell
+ubuntu24.04 WSL
+gcc version 13.2.0
+boost version 1.83.0
+GNU Make 4.3
+cmake version 3.28.3
+protobuf 3.13
+grpc 1.34
+```
+
 1.库准备
 
 - 安装[grpc](https://www.llfc.club/category?catid=225RaiVNI8pFDD5L4m807g7ZwmF#!aid/2TIG572uTKxQxned7LCk8KoulfL)，从官网安装时，子模块非常难下载，这个版本是grpc1.34版，配套的是protobuf3.13
@@ -77,12 +93,16 @@ kill -18 <pid>
 
 ```
 
+## 客户端一个请求的大致原理图
+
+![alt text](docs/all.drawio.png)
+
 ## Docs
 
 - [项目解析](docs/项目解析.md)
 - [tinymuduo](https://github.com/SuycxZMZ/tiny-muduo)
 - [基于tinymuduo的RPC框架](https://github.com/SuycxZMZ/MpRPC-Cpp)
-- [协程框架](https://github.com/SuycxZMZ/sylar-from-suycx)
+- [sylar协程框架](https://github.com/SuycxZMZ/sylar-from-suycx)
 - [恋恋风尘的boostAsio和grpc讲解](https://llfc.club/category?catid=225RaiVNI8pFDD5L4m807g7ZwmF#!aid/2LfzYBkRCfdEDrtE6hWz8VrCLoS)
 
 ## TODO
