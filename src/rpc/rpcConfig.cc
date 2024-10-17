@@ -12,18 +12,16 @@ rpcConfig& rpcConfig::GetInstance() {
 void rpcConfig::LoadConfigFile(const char* config_file) {
     FILE* pf = fopen(config_file, "r");
     if (nullptr == pf) {
-        spdlog::critical("{} is not exist !!!", config_file);
+        spdlog::critical("{} does not exist!!!", config_file);
         exit(EXIT_FAILURE);
     }
 
-    while (!feof(pf)) {
-        char buf[512];
-        fgets(buf, 512, pf);
-
+    char buf[512];
+    while (fgets(buf, sizeof(buf), pf) != nullptr) {
         // 去掉多余的空格
         std::string str_buf(buf);
         removeSpaces(str_buf);
-        if (str_buf[0] == '#' || str_buf.empty()) {
+        if (str_buf.empty() || str_buf[0] == '#') {
             continue;
         }
 
@@ -34,13 +32,18 @@ void rpcConfig::LoadConfigFile(const char* config_file) {
         }
 
         std::string key = str_buf.substr(0, idx);
-        std::string value = str_buf.substr(idx + 1, str_buf.length() - idx - 1);
-        if (value.back() == '\n') value.resize(value.length() - 1);
+        std::string value = str_buf.substr(idx + 1);
+        if (!value.empty() && value.back() == '\n') {
+            value.pop_back();  // 移除换行符
+        }
 
         m_configMap.emplace(key, value);
     }
-    for (auto& info : m_configMap) {
-        spdlog::info("{}:{}", info.first, info.second);
+
+    fclose(pf);  // 确保文件被关闭
+
+    for (const auto& info : m_configMap) {
+        spdlog::info("{}: {}", info.first, info.second);
     }
 }
 
