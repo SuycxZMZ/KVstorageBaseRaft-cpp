@@ -1,5 +1,6 @@
 #include <cstdio>
 #include "raftClerk/clerk.h"
+#include "spdlog/spdlog.h"
 
 const int test_count = 500;
 
@@ -10,10 +11,9 @@ int main() {
     
     int tmp = test_count;
     while (tmp--) {
-        // client.Put("x", std::to_string(tmp));
         client.Append("x", std::to_string(tmp));
         std::string get1 = client.Get("x");
-        printf("get return :{%s}\r\n", get1.c_str());
+        spdlog::info("get return : {}", get1);
     }
     return 0;
 }
