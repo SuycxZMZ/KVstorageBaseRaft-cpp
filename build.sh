@@ -4,11 +4,11 @@
 set -x
 
 # 解析命令行参数
-BUILD_TYPE="DEBUG"
+BUILD_TYPE="Debug"
 BUILD_DIR="cmake-build-debug"
 
-if [[ "$1" == "RELEASE" ]]; then
-    BUILD_TYPE="RELEASE"
+if [[ "$1" == "Release" ]]; then
+    BUILD_TYPE="Release"
     BUILD_DIR="cmake-build-release"
 fi
 
