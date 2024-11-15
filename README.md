@@ -10,6 +10,10 @@
 
 每个分支都有改进点，细节见分支主页readme
 
+技术栈: *Linux, C/C++(C++11), boost.asio, gRPC, Protobuf, coroutine, socketAPI, 多线程。sylar中还包括epoll和hook以及ucontext下协程的实现*
+
+[sylar和muduo的一些总结](https://zakuv5r1g02.feishu.cn/wiki/NTbawzte0iyYnrkYfyMc8PmwnlP?from=from_copylink)，批判性的看就行，这是我秋招刚开始时写的，后面没有再改
+
 ## 使用gRPC重构版的代码改进
 
 - raft核心代码注释补全，[主干详细代码执行流说明](docs/项目解析.md)
@@ -32,12 +36,13 @@
 0.环境说明
 
 - 我的开发环境是ubuntu24.04WSL，如果是20或者22，建议手动编译安装最新的boost库。g++或者clang++要支持C++20标准。
+- 新修改的版本支持MacOS，我的测试机芯片是m1，MacOS15.1，用了boost1.86.0(**仅grpc分支**，sylar和muduo分支不支持)
 
 列一下我的环境：
 
 ```shell
 ubuntu24.04 WSL
-gcc version 13.2.0
+gcc version 13.2.0(Mac下为 clang++16.0)
 boost version 1.83.0
 GNU Make 4.3
 cmake version 3.28.3
@@ -49,6 +54,7 @@ grpc 1.34
 
 - 安装[grpc](https://www.llfc.club/category?catid=225RaiVNI8pFDD5L4m807g7ZwmF#!aid/2TIG572uTKxQxned7LCk8KoulfL)，从官网安装时，子模块非常难下载，这个版本是grpc1.34版，配套的是protobuf3.13
 - `boost`：`sudo apt-get install libboost-dev libboost-test-dev libboost-all-dev`
+- boost也可以使用[源码包](https://www.boost.org/)编译安装，命令百度或者ChatGPT都行，linux和Mac下暂时没什么坑。
 
 2.编译
 
@@ -111,8 +117,7 @@ kill -18 <pid>
 
 - [x] `electionTimeOutTicker`和`leaderHearBeatTicker`任务使用boost协程实现
 - [x] 使用`spdlog`格式化日志打印，增强扩展性和可读性，可以很方便的做异步输出和文件输出
-- [ ] docker运行环境以及对应的运行脚本
-- [ ] 切片集群的实现，类似于redis-cluster(可能会做)
+- [x] 项目之后基本不再会更新，三个分支作为应届生秋招项目已经足够
   
 ## 参考&&致谢
 
