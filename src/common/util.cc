@@ -3,7 +3,7 @@
 #include <random>
 #include "config.h"
 
-std::chrono::_V2::system_clock::time_point now() { return std::chrono::high_resolution_clock::now(); }
+std::chrono::system_clock::time_point now() { return std::chrono::system_clock::now(); }
 
 std::chrono::milliseconds getRandomizedElectionTimeout() {
     std::random_device rd;

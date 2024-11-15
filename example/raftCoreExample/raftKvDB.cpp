@@ -83,7 +83,8 @@ int main(int argc, char **argv) {
             // 如果是子进程
             signal(SIGPIPE, SIG_IGN);
             // 子进程的代码
-            auto kvServer = std::make_unique<KvServer>(i, 500, configFileName, port);
+            std::shared_ptr<KvServer> kvServer =
+                std::move(std::make_shared<KvServer>(i, 500, configFileName, port));
             pause();  // 子进程进入等待状态
         } else if (pid > 0) {
             // 如果是父进程

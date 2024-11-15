@@ -37,7 +37,8 @@ Raft::Raft()
       m_applyChan(nullptr),
       m_rpcTasksWorker(MAX_NODE_NUM),
       m_electionTimer(m_ioContext),
-      m_heartBeatTimer(m_ioContext){}
+      m_heartBeatTimer(m_ioContext),
+      m_strand(boost::asio::make_strand(m_ioContext)){}
 Raft::~Raft() { SPDLOG_INFO("----------[Raft::~Raft()]----------"); }
 
 /**
@@ -349,15 +350,49 @@ void Raft::doHeartBeat() {
  * @brief 负责查看是否该发起选举，如果该发起选举就执行doElection发起选举。
  *        注意，只有follower状态的节点才会执行这个函数。而leader只负责sleep什么也不做
  */
-boost::asio::awaitable<void> Raft::electionTimeOutTicker(boost::asio::steady_timer& timer) {
+//boost::asio::awaitable<void> Raft::electionTimeOutTicker(boost::asio::steady_timer& timer) {
+//    while (true) {
+//        while (m_status == Leader) {
+//            timer.expires_after(std::chrono::milliseconds(HeartBeatTimeout));
+//            co_await timer.async_wait(boost::asio::use_awaitable);
+//        }
+//
+//        // 计算距离上次重置选举计时器的时间 + 随机的选举超时时间，然后根据这个时间决定是否睡眠
+//        std::chrono::duration<signed long int, std::ratio<1, 1000000000>> suitableSleepTime{};
+//        std::chrono::system_clock::time_point wakeTime{};
+//        {
+//            std::lock_guard<std::mutex> lock(m_mtx);
+//            wakeTime = now();
+//            suitableSleepTime = getRandomizedElectionTimeout() + m_lastResetElectionTime - wakeTime;
+//        }
+//
+//        // 若超时时间未到，进入睡眠状态 .count()返回毫秒数
+//        if (std::chrono::duration<double, std::milli>(suitableSleepTime).count() > 1) {
+//            auto start = std::chrono::steady_clock::now();
+//            timer.expires_after(suitableSleepTime);
+//            co_await timer.async_wait(boost::asio::use_awaitable);
+//            auto end = std::chrono::steady_clock::now();
+//            std::chrono::duration<double, std::milli> duration = end - start;
+//            SPDLOG_INFO("electionTimeOutTicker();函数设置睡眠时间为:{} 毫秒，实际睡眠时间为:{} 毫秒",
+//                        std::chrono::duration_cast<std::chrono::milliseconds>(suitableSleepTime).count(), duration.count());
+//        }
+//
+//        // 说明睡眠的这段时间有重置定时器，那么就没有超时，再次睡眠
+//        if (std::chrono::duration<double, std::milli>(m_lastResetElectionTime - wakeTime).count() > 0) {
+//            continue;
+//        }
+//        // 若超时时间已到，调用doElection() 函数启动领导者选举过程。
+//        doElection();
+//    }
+//}
+void Raft::electionTimeOutTicker(boost::asio::steady_timer& timer, boost::asio::yield_context yield) {
     while (true) {
         while (m_status == Leader) {
-            timer.expires_after(std::chrono::milliseconds(HeartBeatTimeout));
-            co_await timer.async_wait(boost::asio::use_awaitable);
+            timer.expires_after(std::chrono::milliseconds(150));
+            timer.async_wait(yield);
         }
 
-        // 计算距离上次重置选举计时器的时间 + 随机的选举超时时间，然后根据这个时间决定是否睡眠
-        std::chrono::duration<signed long int, std::ratio<1, 1000000000>> suitableSleepTime{};
+        std::chrono::nanoseconds suitableSleepTime{};
         std::chrono::system_clock::time_point wakeTime{};
         {
             std::lock_guard<std::mutex> lock(m_mtx);
@@ -365,22 +400,20 @@ boost::asio::awaitable<void> Raft::electionTimeOutTicker(boost::asio::steady_tim
             suitableSleepTime = getRandomizedElectionTimeout() + m_lastResetElectionTime - wakeTime;
         }
 
-        // 若超时时间未到，进入睡眠状态 .count()返回毫秒数
         if (std::chrono::duration<double, std::milli>(suitableSleepTime).count() > 1) {
             auto start = std::chrono::steady_clock::now();
             timer.expires_after(suitableSleepTime);
-            co_await timer.async_wait(boost::asio::use_awaitable);
+            timer.async_wait(yield);
             auto end = std::chrono::steady_clock::now();
             std::chrono::duration<double, std::milli> duration = end - start;
-            SPDLOG_INFO("electionTimeOutTicker();函数设置睡眠时间为:{} 毫秒，实际睡眠时间为:{} 毫秒",
+            SPDLOG_INFO("electionTimeOutTicker() 设置睡眠时间: {} ms, 实际睡眠时间: {} ms",
                         std::chrono::duration_cast<std::chrono::milliseconds>(suitableSleepTime).count(), duration.count());
         }
 
-        // 说明睡眠的这段时间有重置定时器，那么就没有超时，再次睡眠
         if (std::chrono::duration<double, std::milli>(m_lastResetElectionTime - wakeTime).count() > 0) {
             continue;
         }
-        // 若超时时间已到，调用doElection() 函数启动领导者选举过程。
+
         doElection();
     }
 }
@@ -484,16 +517,17 @@ void Raft::InstallSnapshot(const raftRpcProctoc::InstallSnapshotRequest* args,
  * @brief 检查是否需要发起心跳（leader）如果该发起就执行doHeartBeat。
  *        注意:只有leader才可以发起心跳。follower在这个函数中什么也不做。
  */
-boost::asio::awaitable<void> Raft::leaderHearBeatTicker(boost::asio::steady_timer& timer) {
+void Raft::leaderHeartBeatTicker(boost::asio::steady_timer& timer, boost::asio::yield_context yield) {
+    static std::atomic<int32_t> atomicCount {0};
+
     while (true) {
-        // follower和candidate在这里循环睡觉
+        // 如果状态不是 Leader，则等待
         while (m_status != Leader) {
             timer.expires_after(std::chrono::milliseconds(HeartBeatTimeout));
-            co_await timer.async_wait(boost::asio::use_awaitable);
-            // usleep(1000 * HeartBeatTimeout);
+            timer.async_wait(yield);
         }
-        static std::atomic<int32_t> atomicCount = 0;
-        std::chrono::duration<signed long int, std::ratio<1, 1000000000>> suitableSleepTime{};
+
+        std::chrono::nanoseconds suitableSleepTime{};
         std::chrono::system_clock::time_point wakeTime{};
         {
             std::lock_guard<std::mutex> lock(m_mtx);
@@ -501,24 +535,22 @@ boost::asio::awaitable<void> Raft::leaderHearBeatTicker(boost::asio::steady_time
             suitableSleepTime = std::chrono::milliseconds(HeartBeatTimeout) + m_lastResetHearBeatTime - wakeTime;
         }
 
-        // sleep
         if (std::chrono::duration<double, std::milli>(suitableSleepTime).count() > 1) {
-            SPDLOG_INFO("{} leaderHearBeatTicker();函数设置睡眠时间为:{} 毫秒", atomicCount.load(),
+            SPDLOG_INFO("{} leaderHearBeatTicker(); 函数设置睡眠时间为: {} 毫秒", atomicCount.load(),
                         std::chrono::duration_cast<std::chrono::milliseconds>(suitableSleepTime).count());
-            auto start = std::chrono::steady_clock::now();
 
-            // 真正的心跳包发送间隔
+            auto start = std::chrono::steady_clock::now();
             timer.expires_after(suitableSleepTime);
-            co_await timer.async_wait(boost::asio::use_awaitable);
-            // usleep(std::chrono::duration_cast<std::chrono::microseconds>(suitableSleepTime).count());
+            timer.async_wait(yield);
             auto end = std::chrono::steady_clock::now();
             std::chrono::duration<double, std::milli> duration = end - start;
-            SPDLOG_INFO("{} leaderHearBeatTicker();函数实际睡眠时间为: {} 毫秒", atomicCount.load(), duration.count());
+
+            SPDLOG_INFO("{} leaderHearBeatTicker(); 实际睡眠时间为: {} 毫秒", atomicCount.load(), duration.count());
             ++atomicCount;
         }
 
         if (std::chrono::duration<double, std::milli>(m_lastResetHearBeatTime - wakeTime).count() > 0) {
-            // 睡眠的这段时间有重置定时器，没有超时，再次睡眠
+            // 如果在睡眠期间重置了定时器，则重新循环等待
             continue;
         }
 
@@ -868,8 +900,13 @@ void Raft::init(std::vector<std::shared_ptr<RaftRpcUtil>> peers, int me, std::sh
             m_me, m_currentTerm, m_lastSnapshotIncludeIndex, m_lastSnapshotIncludeTerm);
     }
 
-    boost::asio::co_spawn(m_ioContext, electionTimeOutTicker(m_electionTimer), boost::asio::detached);
-    boost::asio::co_spawn(m_ioContext, leaderHearBeatTicker(m_heartBeatTimer), boost::asio::detached);
+//    boost::asio::co_spawn(m_ioContext, electionTimeOutTicker(m_electionTimer), boost::asio::detached);
+    boost::asio::spawn(m_strand, [this](boost::asio::yield_context yield) {
+        electionTimeOutTicker(m_electionTimer, yield);
+    });
+    boost::asio::spawn(m_strand, [this](boost::asio::yield_context yield) {
+        leaderHeartBeatTicker(m_heartBeatTimer, yield);
+    });
     std::thread tickerThread([this] { m_ioContext.run(); });
     std::thread t3([this] { applierTicker(); });  // apply 定时器，单起一个线程
     // std::this_thread::sleep_for(std::chrono::milliseconds(200));

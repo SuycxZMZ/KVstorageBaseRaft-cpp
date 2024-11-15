@@ -75,8 +75,8 @@ class Raft final : public raftRpc::Service {
 
     std::shared_ptr<applyCh> m_applyChan;  // applyTicker作为主要生产者，KVserver作为消费者
 
-    std::chrono::_V2::system_clock::time_point m_lastResetElectionTime;  // 选举超时时间
-    std::chrono::_V2::system_clock::time_point m_lastResetHearBeatTime;  // 心跳超时，用于leader
+    std::chrono::system_clock::time_point m_lastResetElectionTime;  // 选举超时时间
+    std::chrono::system_clock::time_point m_lastResetHearBeatTime;  // 心跳超时，用于leader
 
     // Snapshot是kvDB的快照，也可以看成是日志，因此:全部的日志 = m_logs + snapshot
     int m_lastSnapshotIncludeIndex;  // 最新的一个快照中包含的日志条目最大索引
@@ -85,6 +85,7 @@ class Raft final : public raftRpc::Service {
 
     // election 和 heartBeat 的协程执行器成员
     boost::asio::io_context m_ioContext;
+    boost::asio::strand<boost::asio::io_context::executor_type> m_strand;
     boost::asio::steady_timer m_electionTimer;
     boost::asio::steady_timer m_heartBeatTimer;
 
@@ -132,7 +133,8 @@ class Raft final : public raftRpc::Service {
      *        3.sendRequestVote：负责发送选举中的RPC，在发送完rpc后还需要负责接收并处理对端发送回来的响应。
      *        4.RequestVote：远端执行，接收别人发来的选举请求，主要检验是否要给对方投票。
      */
-    boost::asio::awaitable<void> electionTimeOutTicker(boost::asio::steady_timer &timer);
+//    boost::asio::awaitable<void> electionTimeOutTicker(boost::asio::steady_timer &timer);
+    void electionTimeOutTicker(boost::asio::steady_timer& timer, boost::asio::yield_context yield);
 
     // 后台启动心跳和超时定时任务
     void startBackgroundTasks();
@@ -162,7 +164,8 @@ class Raft final : public raftRpc::Service {
     /**
      * @brief 检查是否需要发起心跳（leader）如果该发起就执行doHeartBeat。
      */
-    boost::asio::awaitable<void> leaderHearBeatTicker(boost::asio::steady_timer &timer);
+//    boost::asio::awaitable<void> leaderHearBeatTicker(boost::asio::steady_timer &timer);
+    void leaderHeartBeatTicker(boost::asio::steady_timer& timer, boost::asio::yield_context yield);
     void leaderSendSnapShot(int server);
 
     /**
