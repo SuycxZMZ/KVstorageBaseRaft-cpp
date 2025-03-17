@@ -10,7 +10,7 @@
 
 每个分支都有改进点，细节见分支主页readme
 
-技术栈: *Linux, C/C++(C++11), boost.asio, gRPC, Protobuf, coroutine, socketAPI, 多线程。sylar中还包括epoll和hook以及ucontext下协程的实现*
+**技术栈**: <font color="99dd55">Linux, C/C++(C++11), boost.asio, gRPC, Protobuf, coroutine, socketAPI, 多线程, hook。</font>
 
 [sylar和muduo的一些总结](https://zakuv5r1g02.feishu.cn/wiki/NTbawzte0iyYnrkYfyMc8PmwnlP?from=from_copylink)，批判性的看就行，这是我秋招刚开始时写的，后面没有再改
 
@@ -119,7 +119,6 @@ kill -9 <pid>
 kill -19 <pid>
 # 恢复进程
 kill -18 <pid>
-
 ```
 
 ## 客户端一个请求的大致原理图
