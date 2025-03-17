@@ -33,7 +33,7 @@
 
 ## 使用
 
-0.环境说明
+### 0.环境说明
 
 - 我的开发环境是ubuntu24.04WSL，如果是20或者22，建议手动编译安装最新的boost库。g++或者clang++要支持C++20标准。
 - 新修改的版本支持MacOS，我的测试机芯片是m1，MacOS15.1，用了boost1.86.0(**仅grpc分支**，sylar和muduo分支不支持)
@@ -50,13 +50,15 @@ protobuf 3.13
 grpc 1.34
 ```
 
-1.库准备
+### 1.库准备
 
 - 安装[grpc](https://www.llfc.club/category?catid=225RaiVNI8pFDD5L4m807g7ZwmF#!aid/2TIG572uTKxQxned7LCk8KoulfL)，从官网安装时，子模块非常难下载，这个版本是grpc1.34版，配套的是protobuf3.13
 - `boost`：`sudo apt-get install libboost-dev libboost-test-dev libboost-all-dev`
 - boost也可以使用[源码包](https://www.boost.org/)编译安装，命令百度或者ChatGPT都行，linux和Mac下暂时没什么坑。
 
-2.编译
+### 2.编译
+
+#### 命令行编译
 
 ```shell
 ## Debug版
@@ -74,18 +76,37 @@ bash build.sh RELEASE
 注意先运行provider，再运行consumer
 运行时在bin目录下`./raftCoreRun -n 5 -f test.conf`，再开一个终端`./callerMain`，启动raft集群和测试客户端代码
 
+#### clion简单配置
+
+![docs/images/clion-config1.png](docs/images/clion-config1.png)
+
+![docs/images/clion-config2.png](docs/images/clion-config2.png)
+
+### provider 跑起来之后的样子
+
+![docs/images/provider.png](docs/images/provider.png)
+
+### caller 跑起来之后的样子
+
+![docs/images/caller.png](docs/images/caller.png)
+
 ## 节点故障情况模拟
 
 ```shell
 # raftCoreRun 跑起来之后可以查看几个节点的子进程
-ps -aux
+ps -aux ｜ grep raft
+# mac下参数可能要换一下
+ps -a | grep raft
 ```
-
+### linux 下大致长这样
 ![docs/images/raft-fail.png](docs/images/raft-fail.png)
+
+### mac下大致长这样
+![docs/images/mac-ps.png](docs/images/mac-ps.png)
 
 ```shell
 # 1. 
-# 输出如上图所示，一般第一个进程是父进程，在后面几个中随机抽一个，杀掉
+# ps打印出来有进程号，一般第一个进程是父进程，在后面几个中随机抽一个，杀掉
 kill -9 <pid>
 # 在运行 raftCoreRun 的终端还可以看到剩下的节点在继续运行，运行caller还可以正常工作，集群正常
 
@@ -122,12 +143,21 @@ kill -18 <pid>
 ## 参考&&致谢
 
 https://github.com/chenshuo/muduo
+
 https://programmercarl.com/other/kstar.html
+
 https://github.com/youngyangyang04/KVstorageBaseRaft-cpp
+
 https://blog.csdn.net/T_Solotov/article/details/124044175
+
 https://zhuanlan.zhihu.com/p/636581210
+
 https://github.com/Shangyizhou/A-Tiny-Network-Library
+
 https://www.cnblogs.com/tuilk/p/16793625.html
+
 https://github.com/andreiavrammsd/cpp-channel
+
 https://github.com/Neargye/scope_guard
+
 https://llfc.club/
