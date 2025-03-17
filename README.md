@@ -82,28 +82,30 @@ bash build.sh RELEASE
 
 ![docs/images/clion-config2.png](docs/images/clion-config2.png)
 
-### provider 跑起来之后的样子
+#### provider 跑起来之后的样子
 
 ![docs/images/provider.png](docs/images/provider.png)
 
-### caller 跑起来之后的样子
+#### caller 跑起来之后的样子
 
 ![docs/images/caller.png](docs/images/caller.png)
 
 ## 节点故障情况模拟
 
+### 查看进程号
 ```shell
 # raftCoreRun 跑起来之后可以查看几个节点的子进程
 ps -aux ｜ grep raft
 # mac下参数可能要换一下
 ps -a | grep raft
 ```
-### linux 下大致长这样
+#### linux 下大致长这样
 ![docs/images/raft-fail.png](docs/images/raft-fail.png)
 
-### mac下大致长这样
+#### mac下大致长这样
 ![docs/images/mac-ps.png](docs/images/mac-ps.png)
 
+### 杀死或刮起节点
 ```shell
 # 1. 
 # ps打印出来有进程号，一般第一个进程是父进程，在后面几个中随机抽一个，杀掉
