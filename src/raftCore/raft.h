@@ -15,7 +15,6 @@
 #include <boost/serialization/string.hpp>
 #include <boost/serialization/vector.hpp>
 #include <chrono>
-#include <cmath>
 #include <memory>
 #include <mutex>
 #include <string>

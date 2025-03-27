@@ -1,5 +1,4 @@
 #include "raftCore/kvServer.h"
-#include <cstring>
 #include <iostream>
 #include <unistd.h>
 #include <fstream>
