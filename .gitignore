@@ -14,3 +14,4 @@ build
 /cmake-build-debug-wsl/
 
 src/raftRpcPro
+.DS_Store
